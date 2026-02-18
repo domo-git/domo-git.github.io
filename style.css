@@ -1,28 +1,69 @@
+/* Base page */
 body {
-    background-color: #0d1117;
-    color: #c9d1d9;
-    font-family: Arial, sans-serif;
+    background-color: #0d1117; /* Dark background */
+    color: #c9d1d9;            /* Light gray text for readability */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 40px;
+    line-height: 1.6;
 }
 
+/* Main title */
 h1 {
-    color: #58a6ff;
+    color: #58a6ff; /* Keep bright blue for your name/title */
+    font-size: 2.5em;
+    margin-bottom: 10px;
 }
 
+/* Section headers */
 h2 {
-    color: #79c0ff;
+    color: #79c0ff; /* Slightly lighter blue for sections */
     margin-top: 30px;
+    margin-bottom: 10px;
 }
 
+/* Paragraphs */
+p {
+    color: #c9d1d9; /* Light gray for body text */
+    font-size: 1.05em;
+}
+
+/* Links */
 a {
-    color: #58a6ff;
+    color: #58a6ff; /* Blue links to stand out */
     text-decoration: none;
+    font-weight: bold;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
+/* Navigation bar */
+nav {
+    margin: 20px 0;
+}
+
+nav a {
+    margin-right: 15px;
+}
+
+/* Horizontal rules */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #30363d; /* Subtle divider */
+}
+
+/* Lists */
 ul {
     line-height: 1.8;
+}
+
+/* Optional: subtle block styling for project descriptions */
+.project-block {
+    background-color: #161b22; /* Slightly lighter than body */
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #58a6ff;
+    border-radius: 4px;
 }
