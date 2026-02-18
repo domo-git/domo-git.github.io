@@ -1,39 +1,41 @@
 /* Base page */
 body {
-    background-color: #0d0d0d;       /* Very dark background */
-    color: #00ff41;                   /* Classic Matrix green for text */
-    font-family: 'Courier New', Courier, monospace; /* Retro/futuristic feel */
+    background-color: #0d0d0d; /* Dark background */
+    color: #00ff41;             /* Matrix-style green for body text */
+    font-family: 'Courier New', Courier, monospace; /* Retro/Y2K feel */
     margin: 40px;
     line-height: 1.6;
+    position: relative;
     overflow-x: hidden;
 }
 
-/* Binary background animation */
-@keyframes binaryStream {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100%; }
-}
-
+/* Animated binary background */
 .binary-bg {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: -1;
     background: repeating-linear-gradient(
-        to bottom,
+        0deg,
         rgba(0, 255, 65, 0.05) 0px,
-        rgba(0, 255, 65, 0.05) 1px,
-        transparent 1px,
-        transparent 3px
+        rgba(0, 255, 65, 0.05) 2px,
+        transparent 2px,
+        transparent 6px
     );
-    animation: binaryStream 15s linear infinite;
+    background-size: 100% 20px;
+    animation: binaryScroll 10s linear infinite;
+}
+
+@keyframes binaryScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
 }
 
 /* Main title */
 h1 {
-    color: #39ff14;                  /* Glowy green */
+    color: #39ff14;
     font-size: 2.5em;
     margin-bottom: 10px;
     text-shadow: 0 0 5px #39ff14, 0 0 10px #00ff41;
@@ -41,10 +43,25 @@ h1 {
 
 /* Section headers */
 h2 {
-    color: #00ff41;                  /* Matrix green */
+    color: #00ff41;
     margin-top: 30px;
     margin-bottom: 10px;
     text-shadow: 0 0 3px #00ff41;
+    transition: text-shadow 0.2s;
+}
+
+/* Glitch effect on hover */
+.project-block:hover h2 {
+    animation: glitch 0.6s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
+    20% { text-shadow: -2px 2px #00ff41, 2px -2px #39ff14; }
+    40% { text-shadow: 2px -2px #00ff41, -2px 2px #39ff14; }
+    60% { text-shadow: -2px 0 #00ff41, 2px 0 #39ff14; }
+    80% { text-shadow: 2px 2px #00ff41, -2px -2px #39ff14; }
+    100% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
 }
 
 /* Paragraphs */
@@ -55,13 +72,15 @@ p {
 
 /* Links */
 a {
-    color: #58a6ff;                  /* Only links are bright blue */
+    color: #1e90ff;       /* Darker, more professional blue */
     text-decoration: none;
     font-weight: bold;
+    transition: color 0.3s, text-shadow 0.3s;
 }
 
 a:hover {
-    text-decoration: underline;
+    color: #58a6ff;       /* Brighter blue on hover */
+    text-shadow: 0 0 5px #58a6ff;
 }
 
 /* Navigation bar */
@@ -85,26 +104,12 @@ ul {
     line-height: 1.8;
 }
 
-/* Project block with glitch hover effect */
+/* Project block */
 .project-block {
-    background-color: #001100;       /* Dark greenish blocks */
+    background-color: #001100;   /* Dark greenish blocks */
     padding: 15px;
     margin-bottom: 20px;
     border-left: 4px solid #39ff14;
     border-radius: 4px;
-    transition: text-shadow 0.3s;
-}
-
-/* Glitch hover effect */
-.project-block:hover h2 {
-    animation: glitch 0.5s infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
-    20% { text-shadow: -2px 2px #00ff41, 2px -2px #39ff14; }
-    40% { text-shadow: 2px -2px #00ff41, -2px 2px #39ff14; }
-    60% { text-shadow: -2px 0 #00ff41, 2px 0 #39ff14; }
-    80% { text-shadow: 2px 2px #00ff41, -2px -2px #39ff14; }
-    100% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
+    transition: all 0.3s;
 }
