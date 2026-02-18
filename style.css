@@ -1,35 +1,61 @@
 /* Base page */
 body {
-    background-color: #0d1117; /* Dark background */
-    color: #c9d1d9;            /* Light gray text for readability */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d0d0d;       /* Very dark background */
+    color: #00ff41;                   /* Classic Matrix green for text */
+    font-family: 'Courier New', Courier, monospace; /* Retro/futuristic feel */
     margin: 40px;
     line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Binary background animation */
+@keyframes binaryStream {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
+.binary-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 65, 0.05) 0px,
+        rgba(0, 255, 65, 0.05) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    animation: binaryStream 15s linear infinite;
 }
 
 /* Main title */
 h1 {
-    color: #58a6ff; /* Keep bright blue for your name/title */
+    color: #39ff14;                  /* Glowy green */
     font-size: 2.5em;
     margin-bottom: 10px;
+    text-shadow: 0 0 5px #39ff14, 0 0 10px #00ff41;
 }
 
 /* Section headers */
 h2 {
-    color: #79c0ff; /* Slightly lighter blue for sections */
+    color: #00ff41;                  /* Matrix green */
     margin-top: 30px;
     margin-bottom: 10px;
+    text-shadow: 0 0 3px #00ff41;
 }
 
 /* Paragraphs */
 p {
-    color: #c9d1d9; /* Light gray for body text */
+    color: #00ff41;
     font-size: 1.05em;
 }
 
 /* Links */
 a {
-    color: #58a6ff; /* Blue links to stand out */
+    color: #58a6ff;                  /* Only links are bright blue */
     text-decoration: none;
     font-weight: bold;
 }
@@ -51,7 +77,7 @@ nav a {
 hr {
     border: 0;
     height: 1px;
-    background-color: #30363d; /* Subtle divider */
+    background-color: #003300;
 }
 
 /* Lists */
@@ -59,11 +85,26 @@ ul {
     line-height: 1.8;
 }
 
-/* Optional: subtle block styling for project descriptions */
+/* Project block with glitch hover effect */
 .project-block {
-    background-color: #161b22; /* Slightly lighter than body */
+    background-color: #001100;       /* Dark greenish blocks */
     padding: 15px;
     margin-bottom: 20px;
-    border-left: 4px solid #58a6ff;
+    border-left: 4px solid #39ff14;
     border-radius: 4px;
+    transition: text-shadow 0.3s;
+}
+
+/* Glitch hover effect */
+.project-block:hover h2 {
+    animation: glitch 0.5s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
+    20% { text-shadow: -2px 2px #00ff41, 2px -2px #39ff14; }
+    40% { text-shadow: 2px -2px #00ff41, -2px 2px #39ff14; }
+    60% { text-shadow: -2px 0 #00ff41, 2px 0 #39ff14; }
+    80% { text-shadow: 2px 2px #00ff41, -2px -2px #39ff14; }
+    100% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
 }
