@@ -1,152 +1,43 @@
 <hr>
 
-<h2>Adversary Emulation Lab – Enterprise Ransomware Simulation</h2>
+<h2>Interactive Investigation – Phase 1: Initial Access</h2>
 
-<div class="project-block">
+<div class="lab-box">
 
-    <h3>Lab Objective</h3>
+    <p><strong>Scenario:</strong></p>
     <p>
-        This lab environment was designed to replicate the behavior of
-        human-operated ransomware actors within a controlled Active Directory
-        infrastructure. The goal was to observe real telemetry artifacts,
-        validate detection logic, and understand enterprise attack propagation
-        mechanics from initial access through impact.
+        Your SOC detects multiple failed login attempts followed by a successful
+        RDP authentication from an external IP.
+        Review the log snippet below and identify the suspicious Event ID.
     </p>
 
-    <h3>Environment Architecture</h3>
-    <p>
-        The lab was built as a segmented virtualized network simulating a
-        mid-sized enterprise. Components included:
-    </p>
+    <pre class="log-block">
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14
+    </pre>
 
-    <ul>
-        <li>1 Windows Server Domain Controller (Active Directory + DNS)</li>
-        <li>2 Windows 10 Enterprise Workstations</li>
-        <li>1 File Server hosting network shares</li>
-        <li>Centralized logging via Windows Event Forwarding</li>
-        <li>Simulated external attacker machine</li>
-    </ul>
+    <p><strong>Question:</strong> Which Event ID indicates successful remote access?</p>
 
-    <p>
-        Network segmentation was implemented to replicate realistic
-        internal trust boundaries and lateral movement constraints.
-    </p>
+    <input type="text" id="answer1" placeholder="Enter Event ID">
+    <button onclick="checkAnswer1()">Submit</button>
 
-    <h3>Phase 1 – Initial Access Simulation</h3>
-    <p>
-        Remote Desktop Protocol (RDP) was intentionally exposed within the lab.
-        Weak password policies were configured to simulate poor credential hygiene.
-    </p>
-
-    <p>
-        Controlled brute-force attempts were executed to validate:
-    </p>
-
-    <ul>
-        <li>Account lockout policy behavior</li>
-        <li>Event ID 4625 (failed logon) frequency patterns</li>
-        <li>Event ID 4624 (successful logon – type 10)</li>
-    </ul>
-
-    <h3>Phase 2 – Credential Access</h3>
-    <p>
-        Following authenticated access, credential dumping techniques were
-        replicated to simulate LSASS memory extraction behavior.
-    </p>
-
-    <p>
-        Observed telemetry included:
-    </p>
-
-    <ul>
-        <li>Abnormal process creation (Event ID 4688)</li>
-        <li>Suspicious handle access to lsass.exe</li>
-        <li>Privilege escalation token assignments</li>
-    </ul>
-
-    <h3>Phase 3 – Privilege Escalation & Group Abuse</h3>
-    <p>
-        Misconfigured nested group memberships were intentionally created
-        within Active Directory to demonstrate privilege escalation without
-        direct credential theft of privileged accounts.
-    </p>
-
-    <p>
-        Enumeration activities were logged to identify detection opportunities
-        around:
-    </p>
-
-    <ul>
-        <li>Domain user enumeration</li>
-        <li>Group membership queries</li>
-        <li>Excessive directory read operations</li>
-    </ul>
-
-    <h3>Phase 4 – Lateral Movement</h3>
-    <p>
-        Lateral movement techniques were simulated using:
-    </p>
-
-    <ul>
-        <li>SMB-based remote service creation</li>
-        <li>Administrative share access (C$, ADMIN$)</li>
-        <li>Remote PowerShell sessions</li>
-    </ul>
-
-    <p>
-        Key artifacts analyzed:
-    </p>
-
-    <ul>
-        <li>Event ID 7045 – New service installed</li>
-        <li>Remote process execution logs</li>
-        <li>Abnormal authentication patterns across hosts</li>
-    </ul>
-
-    <h3>Phase 5 – Impact & Recovery Testing</h3>
-    <p>
-        Controlled encryption simulations were executed against test directories.
-        Prior to encryption, shadow copies were deleted using:
-    </p>
-
-    <code>vssadmin delete shadows /all /quiet</code>
-
-    <p>
-        Backup service interruption and file share enumeration were
-        analyzed to understand operational impact and recovery time objectives.
-    </p>
-
-    <h3>Detection Engineering Outcomes</h3>
-    <p>
-        The lab validated detection logic across multiple layers:
-    </p>
-
-    <ul>
-        <li>Authentication anomaly detection</li>
-        <li>Credential dumping behavior monitoring</li>
-        <li>Service creation alerts</li>
-        <li>Shadow copy deletion detection</li>
-        <li>Lateral authentication correlation</li>
-    </ul>
-
-    <p>
-        Lessons learned reinforced the importance of:
-    </p>
-
-    <ul>
-        <li>Strict MFA enforcement</li>
-        <li>Account lockout thresholds</li>
-        <li>Least-privilege group structuring</li>
-        <li>Centralized log aggregation and correlation</li>
-        <li>Segmentation to contain blast radius</li>
-    </ul>
-
-    <h3>Strategic Value</h3>
-    <p>
-        This adversary emulation lab bridged theoretical threat intelligence
-        with hands-on defensive validation, providing practical insight into
-        enterprise ransomware containment, detection engineering, and
-        incident response preparation.
-    </p>
+    <p id="result1"></p>
 
 </div>
+
+<script>
+function checkAnswer1() {
+    const answer = document.getElementById("answer1").value.trim();
+    const result = document.getElementById("result1");
+
+    if (answer === "4624") {
+        result.innerHTML = "✔ Correct. Event ID 4624 indicates successful authentication. Logon Type 10 confirms RDP access.";
+        result.style.color = "lime";
+    } else {
+        result.innerHTML = "✖ Incorrect. Review Windows authentication Event IDs.";
+        result.style.color = "red";
+    }
+}
+</script>
