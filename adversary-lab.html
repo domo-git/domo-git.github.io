@@ -153,44 +153,153 @@
 
 <hr>
 
-<h2>Interactive Investigation – Phase 1: Initial Access</h2>
+<h2>Adversary Emulation – Interactive Investigation Room</h2>
 
-<div class="lab-box">
+<div class="lab-terminal">
 
-    <p><strong>Scenario:</strong></p>
-    <p>
-        Your SOC detects multiple failed login attempts followed by a successful
-        RDP authentication from an external IP.
-        Review the log snippet below and identify the suspicious Event ID.
-    </p>
+<p>> Investigation initialized...</p>
+<p>> Analyst access granted.</p>
 
-    <pre class="log-block">
-Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+<h3>[ Task 1 ] – Initial Access Detection</h3>
+
+<pre class="log-block">
 Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
 Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
 Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14
-    </pre>
+</pre>
 
-    <p><strong>Question:</strong> Which Event ID indicates successful remote access?</p>
+<p>> Identify the Event ID confirming successful RDP authentication:</p>
 
-    <input type="text" id="answer1" placeholder="Enter Event ID">
-    <button onclick="checkAnswer1()">Submit</button>
+<input type="text" id="task1">
+<button onclick="checkTask1()">Execute</button>
 
-    <p id="result1"></p>
+<p id="output1"></p>
+
+<div id="task2-section" class="hidden">
+
+<h3>[ Task 2 ] – Credential Access Identification</h3>
+
+<pre class="log-block">
+Process Created: mimikatz.exe
+Event ID: 4688
+Target Process Accessed: lsass.exe
+</pre>
+
+<p>> Which Windows process is being targeted for credential extraction?</p>
+
+<input type="text" id="task2">
+<button onclick="checkTask2()">Execute</button>
+
+<p id="output2"></p>
+
+</div>
+
+<div id="task3-section" class="hidden">
+
+<h3>[ Task 3 ] – Lateral Movement Artifact</h3>
+
+<pre class="log-block">
+New Service Installed
+Event ID: 7045
+Binary Path: \\192.168.1.15\ADMIN$\payload.exe
+</pre>
+
+<p>> What Event ID indicates service-based lateral movement?</p>
+
+<input type="text" id="task3">
+<button onclick="checkTask3()">Execute</button>
+
+<p id="output3"></p>
+
+</div>
+
+<div id="task4-section" class="hidden">
+
+<h3>[ Task 4 ] – Impact Analysis</h3>
+
+<pre class="log-block">
+Command Executed:
+vssadmin delete shadows /all /quiet
+</pre>
+
+<p>> What Windows recovery feature is being targeted by this command?</p>
+
+<input type="text" id="task4">
+<button onclick="checkTask4()">Execute</button>
+
+<p id="output4"></p>
+
+</div>
+
+<div id="completion-section" class="hidden">
+
+<h3>Room Complete</h3>
+<p class="success">
+✔ All tasks completed successfully.  
+You identified authentication abuse, credential dumping,
+lateral movement, and ransomware impact techniques.
+</p>
+
+</div>
 
 </div>
 
 <script>
-function checkAnswer1() {
-    const answer = document.getElementById("answer1").value.trim();
-    const result = document.getElementById("result1");
+
+function checkTask1() {
+    const answer = document.getElementById("task1").value.trim();
+    const output = document.getElementById("output1");
 
     if (answer === "4624") {
-        result.innerHTML = "✔ Correct. Event ID 4624 indicates successful authentication. Logon Type 10 confirms RDP access.";
-        result.style.color = "lime";
+        output.innerHTML = "✔ Correct. Successful RDP authentication detected.";
+        output.className = "success";
+        document.getElementById("task2-section").classList.remove("hidden");
     } else {
-        result.innerHTML = "✖ Incorrect. Review Windows authentication Event IDs.";
-        result.style.color = "red";
+        output.innerHTML = "✖ Incorrect. Review authentication Event IDs.";
+        output.className = "error";
     }
 }
+
+function checkTask2() {
+    const answer = document.getElementById("task2").value.trim().toLowerCase();
+    const output = document.getElementById("output2");
+
+    if (answer === "lsass.exe" || answer === "lsass") {
+        output.innerHTML = "✔ Correct. LSASS memory access indicates credential dumping.";
+        output.className = "success";
+        document.getElementById("task3-section").classList.remove("hidden");
+    } else {
+        output.innerHTML = "✖ Incorrect. Identify the Windows authentication subsystem.";
+        output.className = "error";
+    }
+}
+
+function checkTask3() {
+    const answer = document.getElementById("task3").value.trim();
+    const output = document.getElementById("output3");
+
+    if (answer === "7045") {
+        output.innerHTML = "✔ Correct. Service installation used for lateral movement.";
+        output.className = "success";
+        document.getElementById("task4-section").classList.remove("hidden");
+    } else {
+        output.innerHTML = "✖ Incorrect. Check service creation Event IDs.";
+        output.className = "error";
+    }
+}
+
+function checkTask4() {
+    const answer = document.getElementById("task4").value.trim().toLowerCase();
+    const output = document.getElementById("output4");
+
+    if (answer.includes("shadow")) {
+        output.innerHTML = "✔ Correct. Shadow copies are deleted to prevent recovery.";
+        output.className = "success";
+        document.getElementById("completion-section").classList.remove("hidden");
+    } else {
+        output.innerHTML = "✖ Incorrect. Consider Windows backup recovery mechanisms.";
+        output.className = "error";
+    }
+}
+
 </script>
