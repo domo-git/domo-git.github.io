@@ -381,3 +381,39 @@ code {
     border-radius: 3px;
     color: #33ccff;
 }
+
+.phase {
+    background: #111;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-left: 4px solid #00ff88;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.phase:hover {
+    background: #222;
+}
+
+.phase-detail {
+    margin-top: 5px;
+    padding-left: 10px;
+    color: #33ccff;
+    font-size: 0.95em;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Infection chain container */
+.infection-chain {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Scroll-based binary intensity (optional enhancement) */
+body.scrolled .binary-stream span {
+    opacity: 0.15;
+    animation-duration: 10s;
+}
