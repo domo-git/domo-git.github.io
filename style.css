@@ -417,3 +417,51 @@ body.scrolled .binary-stream span {
     opacity: 0.15;
     animation-duration: 10s;
 }
+
+
+/* Exit Button Styling */
+.exit-btn {
+    background: #111;
+    color: #00ff88;
+    padding: 5px 10px;
+    border: 1px solid #00ff88;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.exit-btn:hover {
+    background: #00ff88;
+    color: #111;
+}
+
+/* Infection Chain Phase Header */
+.phase-header {
+    cursor: pointer;
+    padding: 5px;
+    border-left: 3px solid #00ff88;
+    transition: background 0.3s, color 0.3s;
+}
+
+.phase-header:hover {
+    background: #222;
+    color: #33ccff;
+}
+
+/* Link Button inside Phase Detail */
+.link-btn {
+    display: inline-block;
+    margin-top: 5px;
+    background: #111;
+    color: #3399ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    border: 1px solid #3399ff;
+    font-size: 0.9em;
+}
+
+.link-btn:hover {
+    background: #3399ff;
+    color: #111;
+}
