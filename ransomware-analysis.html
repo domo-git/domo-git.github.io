@@ -1,135 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ransomware Technique Analysis | Domenico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Page Header -->
+<h1 class="matrix-header">Ransomware Technique Analysis</h1>
 <hr>
 
-<h2>Case Study 01 – Simulated Human-Operated Ransomware Intrusion</h2>
+<!-- Navigation -->
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="projects.html">Projects</a> |
+    <a href="about.html">About</a>
+</nav>
+<hr>
 
+<!-- Project Content -->
 <div class="project-block">
 
-    <h3>Attack Lifecycle Overview</h3>
+    <h2 class="glitch-hover">Overview</h2>
     <p>
-        This simulated intrusion models a human-operated ransomware campaign
-        targeting a mid-sized Windows Active Directory enterprise environment.
-        The attack chain follows the MITRE ATT&CK lifecycle from Initial Access
-        through Impact, with emphasis on credential abuse, privilege escalation,
-        and operator-driven lateral movement.
+        This analysis examines real-world ransomware campaigns through the lens of MITRE ATT&CK.
+        The goal is to map initial access, lateral movement, privilege escalation, and encryption stages, 
+        while highlighting observable telemetry for defensive correlation.
     </p>
 
-    <h3>Initial Access – Exposed RDP & Credential Reuse</h3>
-    <p>
-        Initial access was achieved through brute-force and credential stuffing
-        attempts against an externally exposed RDP service (TCP/3389).
-        The targeted account reused a password previously exposed in public
-        breach datasets and did not have multi-factor authentication enforced.
-    </p>
-
-    <p>
-        Weak password hygiene in this context included:
-    </p>
-
+    <h2 class="glitch-hover">Infection Chain</h2>
     <ul>
-        <li>Password reuse across VPN, O365, and domain accounts</li>
-        <li>Passwords lacking length complexity (&lt;10 characters, no entropy)</li>
-        <li>No account lockout threshold configured in Active Directory</li>
-        <li>MFA not enforced for remote access services</li>
+        <li><strong>Initial Access:</strong> Phishing email with macro-enabled attachments or exposed RDP endpoints.</li>
+        <li><strong>Execution:</strong> Malicious binaries executed on endpoint; persistence via registry and scheduled tasks.</li>
+        <li><strong>Credential Access:</strong> LSASS memory dumps, stolen cached credentials, weak password exploitation.</li>
+        <li><strong>Lateral Movement:</strong> SMB and administrative shares; PowerShell and remote service creation.</li>
+        <li><strong>Impact:</strong> Controlled encryption of sensitive files; shadow copy deletion to prevent recovery.</li>
     </ul>
 
-    <p>
-        Successful authentication generated Windows Event ID 4624 (Logon Type 10),
-        indicating remote interactive logon via RDP.
-    </p>
-
-    <h3>Credential Access – LSASS Memory Extraction</h3>
-    <p>
-        After establishing a foothold, the operator escalated privileges by
-        dumping credentials from LSASS memory using administrative access.
-        Extracted material included plaintext credentials and NTLM hashes
-        for domain users currently logged into the compromised host.
-    </p>
-
-    <p>
-        This activity would typically generate:
-    </p>
-
+    <h2 class="glitch-hover">Weak Password Hygiene Examples</h2>
     <ul>
-        <li>Suspicious access to lsass.exe process memory</li>
-        <li>Event ID 4688 for abnormal process creation</li>
-        <li>Potential EDR alerts for credential dumping behavior</li>
+        <li>Passwords under 8 characters or default system passwords.</li>
+        <li>Reused passwords across multiple systems or services.</li>
+        <li>Plaintext storage of credentials in scripts or config files.</li>
+        <li>Lack of enforced complexity or MFA.</li>
     </ul>
 
-    <h3>Privilege Escalation – Token Manipulation & Misconfigured Groups</h3>
-    <p>
-        Privilege escalation was facilitated by misconfigured domain group
-        memberships, where a compromised user was indirectly nested within
-        a group granting local administrator rights across multiple hosts.
-    </p>
-
-    <p>
-        Token impersonation techniques were used to elevate privileges
-        without requiring direct password knowledge of privileged accounts.
-    </p>
-
-    <h3>Lateral Movement – SMB & Remote Service Execution</h3>
-    <p>
-        With elevated privileges, the operator enumerated domain systems
-        using native commands and moved laterally via:
-    </p>
-
+    <h2 class="glitch-hover">Observed Behavior & Detection</h2>
     <ul>
-        <li>SMB-based remote service creation</li>
-        <li>Administrative share access (C$, ADMIN$)</li>
-        <li>PowerShell remoting where enabled</li>
+        <li>Abnormal logon failures followed by successful RDP authentication (Event ID 4625 → 4624).</li>
+        <li>Suspicious LSASS memory access from unprivileged accounts.</li>
+        <li>Unexpected service creation (Event ID 7045) on multiple hosts.</li>
+        <li>Shadow copy deletion attempts (<code>vssadmin delete shadows /all /quiet</code>).</li>
+        <li>Network-wide lateral authentication anomalies.</li>
     </ul>
 
-    <p>
-        This generated service creation events (Event ID 7045) and
-        suspicious remote process execution patterns.
-    </p>
-
-    <h3>Command-and-Control & Persistence</h3>
-    <p>
-        Persistence was established via scheduled tasks and registry run keys.
-        Outbound HTTPS connections to attacker-controlled infrastructure
-        blended with legitimate encrypted traffic, reducing detection by
-        perimeter-only monitoring solutions.
-    </p>
-
-    <h3>Impact – Backup Targeting & Double Extortion</h3>
-    <p>
-        Prior to encryption, shadow copies were deleted using
-        <code>vssadmin delete shadows</code> and backup services were disabled.
-        File shares were enumerated to identify high-value data for exfiltration.
-    </p>
-
-    <p>
-        Data staging preceded encryption, aligning with double-extortion
-        tactics observed in modern ransomware operations.
-    </p>
-
-    <h3>Detection Engineering & Defensive Strategy</h3>
+    <h2 class="glitch-hover">Strategic Value</h2>
     <ul>
-        <li>Enforce MFA on all remote authentication endpoints</li>
-        <li>Implement account lockout thresholds to mitigate brute force attempts</li>
-        <li>Monitor LSASS memory access behavior</li>
-        <li>Alert on Event ID 7045 (new service creation)</li>
-        <li>Detect shadow copy deletion commands</li>
-        <li>Apply least-privilege and audit nested group memberships</li>
+        <li>Actionable detection rules for SIEM correlation.</li>
+        <li>Insight into enterprise weaknesses such as weak credential policies.</li>
+        <li>Foundation for purple team exercises bridging offense and defense.</li>
     </ul>
-
-    <h3>Lab Validation</h3>
-    <p>
-        Key components of this intrusion were replicated in a segmented lab
-        environment consisting of a Windows Server domain controller,
-        member workstations, and simulated enterprise services.
-    </p>
-
-    <p>
-        The lab allowed observation of authentication logs, process creation
-        telemetry, service installation artifacts, and encryption behaviors
-        under controlled conditions.
-    </p>
-
-    <p>
-        Full replication architecture and methodology are documented in the
-        <a href="adversary-lab.html">Adversary Emulation Lab</a> section.
-    </p>
 
 </div>
+
+<!-- Animated Binary Stream for Header -->
+<div class="binary-stream">
+    <span>01010101011010100101010101010101</span>
+    <span>10101001101010101001010101010101</span>
+    <span>01101010101011010100101010101010</span>
+</div>
+
+</body>
+</html>
