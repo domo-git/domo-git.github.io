@@ -267,6 +267,13 @@ let completedTasks = 0;
 function updateProgress() {
     document.getElementById("progress").innerText =
         "Progress: " + completedTasks + " / 4 Tasks Completed";
+
+    if (completedTasks === 4) {
+        setTimeout(() => {
+            document.getElementById("labCompleteOverlay")
+                .classList.remove("hidden");
+        }, 500);
+    }
 }
 
     
