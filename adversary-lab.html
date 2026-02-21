@@ -150,3 +150,47 @@
     </p>
 
 </div>
+
+<hr>
+
+<h2>Interactive Investigation – Phase 1: Initial Access</h2>
+
+<div class="lab-box">
+
+    <p><strong>Scenario:</strong></p>
+    <p>
+        Your SOC detects multiple failed login attempts followed by a successful
+        RDP authentication from an external IP.
+        Review the log snippet below and identify the suspicious Event ID.
+    </p>
+
+    <pre class="log-block">
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
+Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14
+    </pre>
+
+    <p><strong>Question:</strong> Which Event ID indicates successful remote access?</p>
+
+    <input type="text" id="answer1" placeholder="Enter Event ID">
+    <button onclick="checkAnswer1()">Submit</button>
+
+    <p id="result1"></p>
+
+</div>
+
+<script>
+function checkAnswer1() {
+    const answer = document.getElementById("answer1").value.trim();
+    const result = document.getElementById("result1");
+
+    if (answer === "4624") {
+        result.innerHTML = "✔ Correct. Event ID 4624 indicates successful authentication. Logon Type 10 confirms RDP access.";
+        result.style.color = "lime";
+    } else {
+        result.innerHTML = "✖ Incorrect. Review Windows authentication Event IDs.";
+        result.style.color = "red";
+    }
+}
+</script>
