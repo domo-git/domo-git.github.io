@@ -7,9 +7,15 @@
 </head>
 <body>
 
+<!-- Exit Button -->
+<div style="text-align: right; margin-bottom: 10px;">
+    <a href="projects.html" class="exit-btn">Exit to Projects</a>
+</div>
+
 <h1 class="matrix-header">Ransomware Technique Analysis</h1>
 <hr>
 
+<!-- Navigation -->
 <nav>
     <a href="index.html">Home</a> |
     <a href="projects.html">Projects</a> |
@@ -28,44 +34,57 @@ mapping each phase while highlighting observable telemetry for defensive correla
 <h2 class="glitch-hover">Infection Chain</h2>
 
 <div class="infection-chain">
-    <div class="phase" onclick="togglePhase('phase1')">
-        <strong>Initial Access</strong> (click to expand)
+
+    <div class="phase">
+        <div class="phase-header" onclick="togglePhase('phase1')">
+            <strong>Initial Access</strong> (click to expand)
+        </div>
         <div id="phase1" class="phase-detail hidden">
-            Phishing email with macro-enabled attachments or exposed RDP endpoints.
-            Telemetry: Event IDs 4625, 4624. Weak password hygiene exploited.
+            <p>Phishing emails with macro-enabled attachments or exposed RDP endpoints.</p>
+            <p>Telemetry: Event IDs 4625, 4624. Weak password hygiene exploited.</p>
+            <a href="adversary-lab.html" class="link-btn">Go to Emulation Lab →</a>
         </div>
     </div>
 
-    <div class="phase" onclick="togglePhase('phase2')">
-        <strong>Execution</strong>
+    <div class="phase">
+        <div class="phase-header" onclick="togglePhase('phase2')">
+            <strong>Execution</strong>
+        </div>
         <div id="phase2" class="phase-detail hidden">
             Malicious binaries executed; persistence via registry keys & scheduled tasks.
             Tools used: PowerShell scripts, remote services.
         </div>
     </div>
 
-    <div class="phase" onclick="togglePhase('phase3')">
-        <strong>Credential Access</strong>
+    <div class="phase">
+        <div class="phase-header" onclick="togglePhase('phase3')">
+            <strong>Credential Access</strong>
+        </div>
         <div id="phase3" class="phase-detail hidden">
             LSASS memory dumps, stolen cached credentials.
             Weak password policies highlighted.
         </div>
     </div>
 
-    <div class="phase" onclick="togglePhase('phase4')">
-        <strong>Lateral Movement</strong>
+    <div class="phase">
+        <div class="phase-header" onclick="togglePhase('phase4')">
+            <strong>Lateral Movement</strong>
+        </div>
         <div id="phase4" class="phase-detail hidden">
             SMB shares, administrative access, remote PowerShell.
         </div>
     </div>
 
-    <div class="phase" onclick="togglePhase('phase5')">
-        <strong>Impact</strong>
+    <div class="phase">
+        <div class="phase-header" onclick="togglePhase('phase5')">
+            <strong>Impact</strong>
+        </div>
         <div id="phase5" class="phase-detail hidden">
             File encryption simulations; shadow copy deletion 
             (<code>vssadmin delete shadows /all /quiet</code>).
         </div>
     </div>
+
 </div>
 
 <h2 class="glitch-hover">Weak Password Hygiene</h2>
