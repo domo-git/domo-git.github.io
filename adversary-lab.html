@@ -262,28 +262,57 @@ lateral movement, and ransomware impact techniques.
 
 <script>
 
+let completedTasks = 0;
+
+function updateProgress() {
+    document.getElementById("progress").innerText =
+        "Progress: " + completedTasks + " / 4 Tasks Completed";
+}
+
+    
+<script>
+
 function checkTask1() {
-    const answer = document.getElementById("task1").value.trim();
+    const input = document.getElementById("task1");
+    const answer = input.value.trim();
     const output = document.getElementById("output1");
 
     if (answer === "4624") {
         output.innerHTML = "✔ Correct. Successful RDP authentication detected.";
         output.className = "success";
+
+        if (!input.disabled) {
+            completedTasks++;
+            updateProgress();
+        }
+
+        input.disabled = true;
         document.getElementById("task2-section").classList.remove("hidden");
+
     } else {
         output.innerHTML = "✖ Incorrect. Review authentication Event IDs.";
         output.className = "error";
     }
 }
 
+    
 function checkTask2() {
-    const answer = document.getElementById("task2").value.trim().toLowerCase();
+    const input = document.getElementById("task2");
+    const answer = input.value.trim().toLowerCase();
     const output = document.getElementById("output2");
 
     if (answer === "lsass.exe" || answer === "lsass") {
         output.innerHTML = "✔ Correct. LSASS memory access indicates credential dumping.";
         output.className = "success";
+
+        if (!input.disabled) {
+            completedTasks++;
+            updateProgress();
+        }
+
+        input.disabled = true;
         document.getElementById("task3-section").classList.remove("hidden");
+
     } else {
         output.innerHTML = "✖ Incorrect. Identify the Windows authentication subsystem.";
         output.className = "error";
@@ -291,13 +320,22 @@ function checkTask2() {
 }
 
 function checkTask3() {
-    const answer = document.getElementById("task3").value.trim();
+    const input = document.getElementById("task3");
+    const answer = input.value.trim();
     const output = document.getElementById("output3");
 
     if (answer === "7045") {
         output.innerHTML = "✔ Correct. Service installation used for lateral movement.";
         output.className = "success";
+
+        if (!input.disabled) {
+            completedTasks++;
+            updateProgress();
+        }
+
+        input.disabled = true;
         document.getElementById("task4-section").classList.remove("hidden");
+
     } else {
         output.innerHTML = "✖ Incorrect. Check service creation Event IDs.";
         output.className = "error";
@@ -311,7 +349,18 @@ function checkTask4() {
     if (answer.includes("shadow")) {
         output.innerHTML = "✔ Correct. Shadow copies are deleted to prevent recovery.";
         output.className = "success";
+
+        // Prevent double counting
+        if (!document.getElementById("task4").disabled) {
+            completedTasks++;
+            updateProgress();
+        }
+
+        // Disable input after correct answer
+        document.getElementById("task4").disabled = true;
+
         document.getElementById("completion-section").classList.remove("hidden");
+
     } else {
         output.innerHTML = "✖ Incorrect. Consider Windows backup recovery mechanisms.";
         output.className = "error";
