@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Threat Actor Profiling | Domenico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="binary-bg"></div>
+
+<!-- Exit Button -->
+<div style="text-align: right; margin-bottom: 15px;">
+    <a href="projects.html" class="exit-btn">← Exit to Projects</a>
+</div>
+
+<hr>
+
+<h1 class="matrix-header">Threat Actor Profiling</h1>
+
+<!-- Navigation -->
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="projects.html">Projects</a> |
+    <a href="about.html">About</a>
+</nav>
+
+<hr>
+
+<div class="project-block">
+
+    <!-- Lab Objective -->
+    <h2 class="glitch-hover">Lab Objective</h2>
+    <p>
+        Structured profiling of known ransomware groups, focusing on TTP patterns, infrastructure behavior, and operational methodology.
+        This lab allows you to observe adversary behaviors and gain practical insights into enterprise ransomware threats.
+        Follow the instructions to simulate profiling, track indicators, and document patterns for defensive correlation.
+    </p>
+
+    <!-- Replication Instructions -->
+    <h2 class="glitch-hover">Hands-On Profiling Instructions</h2>
+    <ul>
+        <li>Set up a virtual lab (VMs) replicating a small Active Directory environment.</li>
+        <li>Deploy network monitoring tools like Sysmon and ELK/Graylog for telemetry capture.</li>
+        <li>Collect logs and events from simulated ransomware behavior in a controlled environment.</li>
+        <li>Analyze logs for TTPs: initial access, execution, credential access, lateral movement, and impact.</li>
+        <li>Document operational patterns and map them to MITRE ATT&CK techniques.</li>
+    </ul>
+
+    <!-- Threat Actor Examples with Infection Chain -->
+    <h2 class="glitch-hover">Example Ransomware Groups</h2>
+    <div class="infection-chain">
+
+        <div class="phase">
+            <div class="phase-header" onclick="togglePhase('ta1')">
+                <strong>REvil / Sodinokibi</strong> (click to expand)
+            </div>
+            <div id="ta1" class="phase-detail hidden">
+                Observed TTPs: phishing campaigns, RDP brute force, SMB exploitation.<br>
+                Infrastructure behavior: fast lateral movement, multi-server deployment.<br>
+                Operational methodology: double-extortion, exfiltration prior to encryption.
+            </div>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header" onclick="togglePhase('ta2')">
+                <strong>DarkSide</strong>
+            </div>
+            <div id="ta2" class="phase-detail hidden">
+                Observed TTPs: spear phishing, exploit kits, network enumeration.<br>
+                Infrastructure behavior: decentralized C2 servers, temporary staging.<br>
+                Operational methodology: ransomware-as-a-service, targeted enterprise attacks.
+            </div>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header" onclick="togglePhase('ta3')">
+                <strong>LockBit</strong>
+            </div>
+            <div id="ta3" class="phase-detail hidden">
+                Observed TTPs: automated propagation, privilege escalation, lateral spread.<br>
+                Infrastructure behavior: anonymous payment systems, fast file encryption.<br>
+                Operational methodology: aggressive RaaS campaigns, minimal exposure.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Live RSS Feed -->
+    <h2 class="glitch-hover">Current Threat Intelligence Feed</h2>
+    <div class="project-block">
+        <p>Stay updated with the latest ransomware activity and intelligence alerts:</p>
+        <ul id="rss-feed">
+            <li>Loading recent activity...</li>
+        </ul>
+    </div>
+
+    <!-- Transition to Mini Quiz -->
+    <h2 class="glitch-hover">Next Step</h2>
+    <p>
+        Now that you’ve profiled known ransomware actors and observed their operational patterns, apply your knowledge
+        in the interactive mini quiz below to test your understanding of TTPs, infrastructure behavior, and impact scenarios.
+    </p>
+
+</div>
+
+<script>
+// Toggle Infection Chain Phases
+function togglePhase(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('hidden');
+}
+
+// Load RSS Feed
+async function loadRSSFeed() {
+    const feedContainer = document.getElementById('rss-feed');
+    try {
+        const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.hiveintel.com/rss');
+        const data = await response.json();
+        feedContainer.innerHTML = '';
+        data.items.slice(0,5).forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
+            feedContainer.appendChild(li);
+        });
+    } catch(err) {
+        feedContainer.innerHTML = '<li>Unable to load feed at this time.</li>';
+        console.error(err);
+    }
+}
+
+loadRSSFeed();
+</script>
+
+</body>
+</html>
