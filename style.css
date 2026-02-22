@@ -1,98 +1,30 @@
-/* Base page */
+/* ============================= */
+/* GLOBAL BASE STYLES */
+/* ============================= */
+
 body {
-    background-color: #0d0d0d; /* Dark background */
-    color: #00ff41;             /* Matrix-style green for body text */
-    font-family: 'Courier New', Courier, monospace; /* Retro/Y2K feel */
+    background-color: #0d0d0d;
+    color: #00ff88;
+    font-family: "Courier New", Courier, monospace;
     margin: 40px;
     line-height: 1.6;
-    position: relative;
     overflow-x: hidden;
-}
-
-/* Animated binary background */
-.binary-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 255, 65, 0.05) 0px,
-        rgba(0, 255, 65, 0.05) 2px,
-        transparent 2px,
-        transparent 6px
-    );
-    background-size: 100% 20px;
-    animation: binaryScroll 10s linear infinite;
-}
-
-@keyframes binaryScroll {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100%; }
-}
-
-/* Main title */
-h1 {
-    color: #39ff14;
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    text-shadow: 0 0 5px #39ff14, 0 0 10px #00ff41;
-}
-
-/* Section headers */
-h2 {
-    color: #00ff41;
-    margin-top: 30px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 3px #00ff41;
-    transition: text-shadow 0.2s;
-}
-
-/* Glitch effect on hover */
-.project-block:hover h2 {
-    animation: glitch 0.6s infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
-    20% { text-shadow: -2px 2px #00ff41, 2px -2px #39ff14; }
-    40% { text-shadow: 2px -2px #00ff41, -2px 2px #39ff14; }
-    60% { text-shadow: -2px 0 #00ff41, 2px 0 #39ff14; }
-    80% { text-shadow: 2px 2px #00ff41, -2px -2px #39ff14; }
-    100% { text-shadow: 2px 0 #00ff41, -2px 0 #39ff14; }
-}
-
-/* Paragraphs */
-p {
-    color: #00ff41;
-    font-size: 1.05em;
 }
 
 /* Links */
 a {
-    color: #1e90ff;       /* Darker, more professional blue */
+    color: #3399ff;
     text-decoration: none;
     font-weight: bold;
-    transition: color 0.3s, text-shadow 0.3s;
+    transition: 0.3s ease;
 }
 
 a:hover {
-    color: #58a6ff;       /* Brighter blue on hover */
+    color: #58a6ff;
     text-shadow: 0 0 5px #58a6ff;
 }
 
-/* Navigation bar */
-nav {
-    margin: 20px 0;
-}
-
-nav a {
-    margin-right: 15px;
-}
-
-/* Horizontal rules */
+/* Horizontal rule */
 hr {
     border: 0;
     height: 1px;
@@ -104,34 +36,161 @@ ul {
     line-height: 1.8;
 }
 
-/* Project block */
-.project-block {
-    background-color: #001100;   /* Dark greenish blocks */
-    padding: 15px;
-    margin-bottom: 20px;
-    border-left: 4px solid #39ff14;
-    border-radius: 4px;
-    transition: all 0.3s;
+/* Hidden utility */
+.hidden {
+    display: none !important;
 }
 
+/* ============================= */
+/* MATRIX HEADER + BINARY */
+/* ============================= */
 
-/* Existing site styles above */
+.matrix-header {
+    font-size: 36px;
+    text-align: center;
+    text-shadow: 0 0 5px #39ff14, 0 0 10px #00ff41;
+}
 
+.binary-stream {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.05;
+}
+
+.binary-stream span {
+    display: block;
+    white-space: nowrap;
+    color: #00ff88;
+    animation: scrollBinary 15s linear infinite;
+    font-size: 14px;
+}
+
+@keyframes scrollBinary {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
 
 /* ============================= */
-/* Dark Terminal Interactive Lab */
+/* PROJECT BLOCK */
+/* ============================= */
+
+.project-block {
+    background: #111;
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid #00ff88;
+}
+
+/* ============================= */
+/* INFECTION CHAIN */
+/* ============================= */
+
+.infection-chain {
+    margin-bottom: 20px;
+}
+
+.phase {
+    background: #111;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid #00ff88;
+    transition: background 0.3s ease;
+}
+
+.phase:hover {
+    background: #1a1a1a;
+}
+
+.phase-header {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.phase-detail {
+    margin-top: 8px;
+    padding-left: 10px;
+    color: #33ccff;
+    font-size: 0.95em;
+}
+
+/* ============================= */
+/* EXIT BUTTON */
+/* ============================= */
+
+.exit-btn {
+    background: #111;
+    color: #00ff88;
+    padding: 5px 10px;
+    border: 1px solid #00ff88;
+    border-radius: 5px;
+}
+
+.exit-btn:hover {
+    background: #00ff88;
+    color: #111;
+}
+
+/* ============================= */
+/* LINK BUTTON */
+/* ============================= */
+
+.link-btn {
+    display: inline-block;
+    margin-top: 8px;
+    background: #111;
+    color: #3399ff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #3399ff;
+    font-size: 0.9em;
+}
+
+.link-btn:hover {
+    background: #3399ff;
+    color: #111;
+}
+
+/* ============================= */
+/* TERMINAL LAB */
 /* ============================= */
 
 .lab-terminal {
-    background: #111;
+    position: relative;
+    background: #0a0a0a;
     border: 1px solid #00ff88;
-    padding: 20px;
+    padding: 25px;
     margin-top: 30px;
-    box-shadow: 0 0 15px #00ff88;
-    color: #00ff88;
-    font-family: "Courier New", monospace;
+    box-shadow: 0 0 10px #00ff88;
+    overflow: hidden;
+    animation: glowPulse 3s infinite ease-in-out;
 }
 
+/* Scanlines */
+.lab-terminal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,136,0.03),
+        rgba(0,255,136,0.03) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* Glow animation */
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px #00ff88; }
+    50% { box-shadow: 0 0 20px #00ff88; }
+    100% { box-shadow: 0 0 10px #00ff88; }
+}
+
+/* Log block */
 .log-block {
     background: #000;
     padding: 15px;
@@ -139,6 +198,7 @@ ul {
     white-space: pre-wrap;
 }
 
+/* Input fields */
 .lab-terminal input {
     background: black;
     border: 1px solid #00ff88;
@@ -147,6 +207,7 @@ ul {
     margin-top: 10px;
 }
 
+/* Buttons */
 .lab-terminal button {
     background: #00ff88;
     color: black;
@@ -160,6 +221,7 @@ ul {
     background: #00cc66;
 }
 
+/* Success & Error */
 .success {
     color: #00ff88;
 }
@@ -168,83 +230,9 @@ ul {
     color: red;
 }
 
-.hidden {
-    display: none;
-}
-
-
 /* ============================= */
-/* Advanced Terminal Effects */
+/* COMPLETION OVERLAY */
 /* ============================= */
-
-.lab-terminal {
-    position: relative;
-    background: #0a0a0a;
-    border: 1px solid #00ff88;
-    padding: 25px;
-    margin-top: 30px;
-    box-shadow: 0 0 10px #00ff88, 0 0 25px rgba(0,255,136,0.4);
-    color: #00ff88;
-    font-family: "Courier New", monospace;
-    overflow: hidden;
-}
-
-/* Subtle scanline effect */
-.lab-terminal::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-        to bottom,
-        rgba(0,255,136,0.03),
-        rgba(0,255,136,0.03) 2px,
-        transparent 2px,
-        transparent 4px
-    );
-    pointer-events: none;
-}
-
-/* Glow pulse animation */
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 10px #00ff88; }
-    50% { box-shadow: 0 0 20px #00ff88; }
-    100% { box-shadow: 0 0 10px #00ff88; }
-}
-
-.lab-terminal {
-    animation: glowPulse 3s infinite ease-in-out;
-}
-
-/* Blinking cursor */
-.cursor::after {
-    content: "_";
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-/* Smooth task reveal animation */
-.hidden {
-    display: none;
-}
-
-.reveal {
-    animation: fadeIn 0.6s ease-in forwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
 
 .overlay {
     position: fixed;
@@ -263,108 +251,17 @@ ul {
     text-align: center;
     color: #00ff88;
     border-radius: 10px;
-    transform: scale(0.7);
-    opacity: 0;
     animation: popIn 0.6s ease-out forwards;
 }
 
-.completion-card h1 {
-    margin-bottom: 15px;
-    font-size: 32px;
-    letter-spacing: 2px;
-}
-
 @keyframes popIn {
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-.hidden {
-    display: none;
-}
-
-
-/* === General Page Styling === */
-body {
-    background-color: #0d0d0d;
-    color: #00ff88;
-    font-family: "Courier New", Courier, monospace;
-    line-height: 1.6;
-    padding: 20px;
-}
-
-a {
-    color: #3399ff; /* Blue links */
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* === Project Block Styling === */
-.project-block {
-    background: #111;
-    padding: 20px 25px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    border: 1px solid #00ff88;
-}
-
-/* === Matrix Header with Binary Stream === */
-.matrix-header {
-    font-size: 36px;
-    position: relative;
-    z-index: 10;
-    text-align: center;
-}
-
-/* Binary stream animation */
-.binary-stream {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 0;
-    opacity: 0.05;
-}
-
-.binary-stream span {
-    display: block;
-    white-space: nowrap;
-    font-family: "Courier New", monospace;
-    color: #00ff88;
-    animation: scrollBinary 15s linear infinite;
-    font-size: 14px;
-    line-height: 1.2;
-}
-
-@keyframes scrollBinary {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-}
-
-/* === Glitch Hover Effect === */
-.glitch-hover {
-    position: relative;
-    display: inline-block;
-    color: #00ff88;
-    cursor: default;
-}
-
-.glitch-hover::before,
-.glitch-hover::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-}
+/* ============================= */
+/* GLITCH HOVER */
+/* ============================= */
 
 .glitch-hover:hover {
     text-shadow:
@@ -374,94 +271,10 @@ a:hover {
         -2px -2px #00ffff;
 }
 
-/* === Optional: code tag styling === */
+/* Code styling */
 code {
     background: #222;
     padding: 2px 4px;
     border-radius: 3px;
     color: #33ccff;
-}
-
-.phase {
-    background: #111;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    border-left: 4px solid #00ff88;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.phase:hover {
-    background: #222;
-}
-
-.phase-detail {
-    margin-top: 5px;
-    padding-left: 10px;
-    color: #33ccff;
-    font-size: 0.95em;
-}
-
-.hidden {
-    display: none;
-}
-
-/* Infection chain container */
-.infection-chain {
-    margin-bottom: 20px;
-    position: relative;
-}
-
-/* Scroll-based binary intensity (optional enhancement) */
-body.scrolled .binary-stream span {
-    opacity: 0.15;
-    animation-duration: 10s;
-}
-
-
-/* Exit Button Styling */
-.exit-btn {
-    background: #111;
-    color: #00ff88;
-    padding: 5px 10px;
-    border: 1px solid #00ff88;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.exit-btn:hover {
-    background: #00ff88;
-    color: #111;
-}
-
-/* Infection Chain Phase Header */
-.phase-header {
-    cursor: pointer;
-    padding: 5px;
-    border-left: 3px solid #00ff88;
-    transition: background 0.3s, color 0.3s;
-}
-
-.phase-header:hover {
-    background: #222;
-    color: #33ccff;
-}
-
-/* Link Button inside Phase Detail */
-.link-btn {
-    display: inline-block;
-    margin-top: 5px;
-    background: #111;
-    color: #3399ff;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-decoration: none;
-    border: 1px solid #3399ff;
-    font-size: 0.9em;
-}
-
-.link-btn:hover {
-    background: #3399ff;
-    color: #111;
 }
