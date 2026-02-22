@@ -273,23 +273,36 @@ let completedTasks = 0;
 function updateProgress() {
     document.getElementById("progress").innerText =
         "Progress: " + completedTasks + " / 4 Tasks Completed";
-
-    if (completedTasks === 4) {
-        setTimeout(() => {
-            document.getElementById("labCompleteOverlay")
-                .classList.remove("hidden");
-        }, 500);
-    }
 }
 
-    
+function revealSection(id) {
+    const section = document.getElementById(id);
+    section.classList.remove("section-hidden");
+    section.classList.add("section-visible");
+}
 
-function checkTask1() {
+function lockInput(inputId) {
+    document.getElementById(inputId).disabled = true;
+}
+
+function handleEnter(inputId, buttonId) {
+    document.getElementById(inputId).addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById(buttonId).click();
+        }
+    });
+}
+
+/* ===================== */
+/* TASK 1 */
+/* ===================== */
+
+document.getElementById("btn1").addEventListener("click", function() {
     const input = document.getElementById("task1");
-    const answer = input.value.trim();
     const output = document.getElementById("output1");
 
-    if (answer === "4624") {
+    if (input.value.trim() === "4624") {
         output.innerHTML = "✔ Correct. Successful RDP authentication detected.";
         output.className = "success";
 
@@ -298,20 +311,23 @@ function checkTask1() {
             updateProgress();
         }
 
-        input.disabled = true;
-        document.getElementById("task2-section").classList.remove("hidden");
+        lockInput("task1");
+        setTimeout(() => revealSection("task2-section"), 500);
 
     } else {
         output.innerHTML = "✖ Incorrect. Review authentication Event IDs.";
         output.className = "error";
     }
-}
+});
 
-    
-function checkTask2() {
+/* ===================== */
+/* TASK 2 */
+/* ===================== */
+
+document.getElementById("btn2").addEventListener("click", function() {
     const input = document.getElementById("task2");
-    const answer = input.value.trim().toLowerCase();
     const output = document.getElementById("output2");
+    const answer = input.value.trim().toLowerCase();
 
     if (answer === "lsass.exe" || answer === "lsass") {
         output.innerHTML = "✔ Correct. LSASS memory access indicates credential dumping.";
@@ -322,21 +338,24 @@ function checkTask2() {
             updateProgress();
         }
 
-        input.disabled = true;
-        document.getElementById("task3-section").classList.remove("hidden");
+        lockInput("task2");
+        setTimeout(() => revealSection("task3-section"), 500);
 
     } else {
         output.innerHTML = "✖ Incorrect. Identify the Windows authentication subsystem.";
         output.className = "error";
     }
-}
+});
 
-function checkTask3() {
+/* ===================== */
+/* TASK 3 */
+/* ===================== */
+
+document.getElementById("btn3").addEventListener("click", function() {
     const input = document.getElementById("task3");
-    const answer = input.value.trim();
     const output = document.getElementById("output3");
 
-    if (answer === "7045") {
+    if (input.value.trim() === "7045") {
         output.innerHTML = "✔ Correct. Service installation used for lateral movement.";
         output.className = "success";
 
@@ -345,54 +364,75 @@ function checkTask3() {
             updateProgress();
         }
 
-        input.disabled = true;
-        document.getElementById("task4-section").classList.remove("hidden");
+        lockInput("task3");
+        setTimeout(() => revealSection("task4-section"), 500);
 
     } else {
         output.innerHTML = "✖ Incorrect. Check service creation Event IDs.";
         output.className = "error";
     }
-}
+});
 
-    
-function checkTask4() {
-    const answer = document.getElementById("task4").value.trim().toLowerCase();
+/* ===================== */
+/* TASK 4 */
+/* ===================== */
+
+document.getElementById("btn4").addEventListener("click", function() {
+    const input = document.getElementById("task4");
     const output = document.getElementById("output4");
+    const answer = input.value.trim().toLowerCase();
 
     if (answer.includes("shadow")) {
         output.innerHTML = "✔ Correct. Shadow copies are deleted to prevent recovery.";
         output.className = "success";
 
-        // Prevent double counting
-        if (!document.getElementById("task4").disabled) {
+        if (!input.disabled) {
             completedTasks++;
             updateProgress();
         }
 
-        // Disable input after correct answer
-        document.getElementById("task4").disabled = true;
-
-        document.getElementById("completion-section").classList.remove("hidden");
+        lockInput("task4");
+        setTimeout(() => {
+            revealSection("completion-section");
+            document.getElementById("labCompleteOverlay")
+                .classList.remove("hidden");
+        }, 600);
 
     } else {
         output.innerHTML = "✖ Incorrect. Consider Windows backup recovery mechanisms.";
         output.className = "error";
     }
+});
+
+/* ===================== */
+/* ENTER KEY SUPPORT */
+/* ===================== */
+
+handleEnter("task1", "btn1");
+handleEnter("task2", "btn2");
+handleEnter("task3", "btn3");
+handleEnter("task4", "btn4");
+
+/* ===================== */
+/* CLOSE OVERLAY */
+/* ===================== */
+
+function closeOverlay() {
+    document.getElementById("labCompleteOverlay")
+        .classList.add("hidden");
 }
 
-
-    
 </script>
-    
-<div id="labCompleteOverlay" class="overlay hidden">
+
+    <div id="labCompleteOverlay" class="overlay hidden">
     <div class="completion-card">
         <h1>LAB COMPLETE</h1>
         <p>Incident response simulation successfully completed.</p>
         <p>All adversary behaviors identified and analyzed.</p>
+        <button onclick="closeOverlay()">Return to Lab</button>
+        <br><br>
+        <a href="projects.html" class="exit-btn">Exit to Projects</a>
     </div>
 </div>
 
     
-
-</body>
-</html>
