@@ -24,7 +24,51 @@
 This lab environment was designed to replicate human-operated ransomware
 behavior within a controlled Active Directory infrastructure.
 </p>
+<!-- INSERT NEW SECTION HERE -->
 
+<h3>Reproduction Methodology – Controlled Enterprise Simulation Guide</h3>
+
+<p>
+This lab can be replicated in a local virtualized environment using
+VirtualBox, VMware Workstation, or Hyper-V. The following build configuration
+was used to simulate enterprise ransomware tradecraft in a safe, isolated lab.
+</p>
+
+<h4>Step 1 – Infrastructure Deployment</h4>
+<ul>
+<li>Deploy Windows Server 2019 as Domain Controller</li>
+<li>Install Active Directory Domain Services (AD DS)</li>
+<li>Create domain users and groups</li>
+<li>Deploy two Windows 10 Enterprise clients</li>
+<li>Join clients to the domain</li>
+</ul>
+
+<h4>Step 2 – Logging Configuration</h4>
+<ul>
+<li>Enable Advanced Audit Policy Configuration</li>
+<li>Enable Process Creation auditing (Event ID 4688)</li>
+<li>Enable Logon auditing (4624 / 4625)</li>
+<li>Enable Directory Service Access logging</li>
+</ul>
+
+<h4>Step 3 – Controlled Simulation Execution</h4>
+<ul>
+<li>Simulate RDP authentication attempts</li>
+<li>Observe Security Event logs</li>
+<li>Simulate privilege escalation via group nesting</li>
+<li>Simulate lateral movement via administrative shares</li>
+<li>Monitor service creation logs (7045)</li>
+</ul>
+
+<h4>Step 4 – Defensive Validation</h4>
+<ul>
+<li>Filter logs in Event Viewer</li>
+<li>Document detection gaps</li>
+<li>Map activity to MITRE ATT&CK</li>
+<li>Capture screenshots as forensic evidence</li>
+</ul>
+
+<h3>Environment Architecture</h3>
 <h3>Environment Architecture</h3>
 <ul>
 <li>1 Windows Server Domain Controller</li>
