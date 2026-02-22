@@ -306,3 +306,20 @@ ul {
     75% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
     100% { text-shadow: 2px 0 #00ff88, -2px 0 #ff00ff; }
 }
+
+/* Smooth Reveal Animation */
+.section-hidden {
+    opacity: 0;
+    transform: translateY(15px);
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+}
+
+.section-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    height: auto;
+}
