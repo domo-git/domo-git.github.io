@@ -1,132 +1,589 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ransomware Technique Analysis | Domenico</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ransomware Technique Analysis – Domenico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --border-accent: #30363d;
+    --green: #39d353;
+    --green-dim: #1a6b2a;
+    --red: #f85149;
+    --yellow: #e3b341;
+    --blue: #58a6ff;
+    --cyan: #79c0ff;
+    --purple: #bc8cff;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --text-bright: #f0f6fc;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand { font-family: var(--font-mono); color: var(--green); font-size: 0.85rem; letter-spacing: 0.05em; }
+  .nav-links { display: flex; gap: 0; list-style: none; }
+  .nav-links a {
+    color: var(--text-dim); text-decoration: none; font-family: var(--font-ui); font-weight: 600;
+    font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 1.2rem;
+    height: 56px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--text-bright); border-bottom-color: var(--green); }
+
+  /* LAYOUT */
+  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .breadcrumb { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem; }
+  .breadcrumb a { color: var(--green); text-decoration: none; }
+  .breadcrumb span { margin: 0 0.4rem; }
+  .page-title {
+    font-size: 1.8rem; font-weight: 700; color: var(--text-bright); letter-spacing: 0.02em;
+    text-transform: uppercase; display: flex; align-items: center; gap: 0.75rem;
+  }
+  .page-title::before { content: '//'; color: var(--green); font-family: var(--font-mono); font-size: 1.2rem; }
+  .page-subtitle { margin-top: 0.5rem; color: var(--text-dim); font-size: 0.95rem; font-weight: 500; }
+
+  .section { margin-bottom: 2.5rem; }
+  .section-title {
+    font-family: var(--font-ui); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--green); margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-bottom: 1rem; }
+
+  /* ATTACK CHAIN TIMELINE */
+  .chain {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .chain-phase {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .chain-phase:last-child { border-bottom: none; }
+
+  .chain-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .chain-phase-header:hover { background: rgba(255,255,255,0.02); }
+
+  .phase-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-initial   { background: rgba(248,81,73,0.12);   color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
+  .badge-exec      { background: rgba(227,179,65,0.12);  color: var(--yellow); border: 1px solid rgba(227,179,65,0.3); }
+  .badge-cred      { background: rgba(188,140,255,0.12); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+  .badge-lateral   { background: rgba(88,166,255,0.1);   color: var(--blue);   border: 1px solid rgba(88,166,255,0.25); }
+  .badge-impact    { background: rgba(248,81,73,0.18);   color: var(--red);    border: 1px solid rgba(248,81,73,0.4); }
+
+  .phase-title { font-weight: 700; font-size: 0.95rem; color: var(--text-bright); flex: 1; }
+
+  .phase-mitre {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .phase-chevron {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    transition: transform 0.25s;
+    margin-left: 0.5rem;
+  }
+
+  .chain-phase.open .phase-chevron { transform: rotate(90deg); }
+
+  .chain-phase-body {
+    display: none;
+    padding: 0 1.5rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .chain-phase.open .chain-phase-body { display: block; }
+
+  .phase-detail { font-size: 0.9rem; color: var(--text); line-height: 1.7; margin-bottom: 0.75rem; margin-top: 0.85rem; }
+
+  .telemetry-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 0 4px 4px 0;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--cyan);
+    line-height: 1.7;
+    margin-top: 0.6rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .telemetry-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+  }
+
+  /* DETECTION TABLE */
+  .detect-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .detect-table thead tr {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detect-table th {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .detect-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .detect-table tr:last-child td { border-bottom: none; }
+  .detect-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+  .detect-table td:first-child { font-family: var(--font-mono); font-size: 0.78rem; color: var(--cyan); white-space: nowrap; }
+  .detect-table td:nth-child(2) { color: var(--text); font-weight: 500; }
+
+  /* WEAKNESS LIST */
+  .weakness-list {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .weakness-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .weakness-item:last-child { border-bottom: none; }
+
+  .weakness-icon {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--red);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  /* STRATEGIC VALUE */
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .value-card {
+    background: var(--bg2);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .value-card-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .value-card-text {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* NAV LINK */
+  .page-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid var(--green-dim);
+    border-radius: 4px;
+    padding: 0.55rem 1.1rem;
+    background: rgba(57,211,83,0.05);
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    font-family: var(--font-ui);
+    letter-spacing: 0.05em;
+  }
+
+  .page-nav-link:hover { background: rgba(57,211,83,0.12); border-color: var(--green); }
+  .page-nav-link::after { content: '→'; font-family: var(--font-mono); }
+
+  /* BINARY DECORATION */
+  .binary-strip {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--border-accent);
+    letter-spacing: 0.15em;
+    line-height: 1.6;
+    padding: 1rem 1.5rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: none;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 1.5rem 1rem; }
+    .nav-links a { padding: 0 0.6rem; font-size: 0.72rem; }
+    .detect-table { font-size: 0.8rem; }
+    .detect-table th, .detect-table td { padding: 0.6rem 0.75rem; }
+  }
+</style>
 </head>
-<body class="dark-theme">
+<body>
 
-<!-- Exit Button -->
-<div style="text-align: right; margin-bottom: 10px;">
-    <a href="projects.html" class="exit-btn">Exit to Projects</a>
-</div>
-
-<h1 class="matrix-header glitch-hover">Ransomware Technique Analysis</h1>
-<hr>
-
-<!-- Navigation -->
 <nav>
-    <a href="index.html" class="link-btn">Home</a> |
-    <a href="projects.html" class="link-btn">Projects</a> |
-    <a href="about.html" class="link-btn">About</a>
+  <div class="nav-brand">[ DOMENICO :: OPSEC ]</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
 </nav>
-<hr>
 
-<div class="project-block">
+<div class="container">
 
-<h2 class="glitch-hover">Overview</h2>
-<p>
-This analysis examines real-world ransomware campaigns through the lens of MITRE ATT&CK,
-mapping each phase and highlighting observable telemetry for purple team correlation.
-</p>
-
-<h2 class="glitch-hover">Infection Chain</h2>
-
-<div class="infection-chain">
-
-    <div class="phase">
-        <div class="phase-header glitch-hover" onclick="togglePhase('phase1')">
-            <strong>Initial Access</strong> (click to expand)
-        </div>
-        <div id="phase1" class="phase-detail hidden terminal-style">
-            <p>Phishing emails with macro-enabled attachments or exposed RDP endpoints.</p>
-            <p>Telemetry: Event IDs <code>4625</code>, <code>4624</code>. Weak password hygiene exploited.</p>
-            <a href="adversary-lab.html" class="link-btn">→ Go to Emulation Lab</a>
-        </div>
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="projects.html">Projects</a>
+      <span>/</span>
+      Ransomware Technique Analysis
     </div>
+    <h1 class="page-title">Ransomware Technique Analysis</h1>
+    <p class="page-subtitle">MITRE ATT&amp;CK mapping · Purple team correlation · Detection engineering</p>
+  </div>
 
-    <div class="phase">
-        <div class="phase-header glitch-hover" onclick="togglePhase('phase2')">
-            <strong>Execution</strong>
-        </div>
-        <div id="phase2" class="phase-detail hidden terminal-style">
-            Malicious binaries executed; persistence via registry keys & scheduled tasks.
-            Tools: PowerShell scripts, remote services.
-        </div>
+  <!-- OVERVIEW -->
+  <div class="section">
+    <div class="section-title">Overview</div>
+    <div class="card">
+      This analysis examines real-world ransomware campaigns through the lens of MITRE ATT&amp;CK,
+      mapping each phase of the attack chain and highlighting observable telemetry for purple team
+      correlation. Each stage documents attacker tradecraft alongside SIEM-ready detection signals
+      for defenders.
     </div>
-
-    <div class="phase">
-        <div class="phase-header glitch-hover" onclick="togglePhase('phase3')">
-            <strong>Credential Access</strong>
-        </div>
-        <div id="phase3" class="phase-detail hidden terminal-style">
-            LSASS memory dumps, stolen cached credentials.
-            Weak password policies exploited.
-        </div>
+    <div class="binary-strip">
+      01010101011010100101010101010101 10101001101010101001010101010101 01101010101011010100101010101010 11010101010110101010101010010101
     </div>
+  </div>
 
-    <div class="phase">
-        <div class="phase-header glitch-hover" onclick="togglePhase('phase4')">
-            <strong>Lateral Movement</strong>
+  <!-- INFECTION CHAIN -->
+  <div class="section">
+    <div class="section-title">Infection Chain – Click Phase to Expand</div>
+    <div class="chain">
+
+      <div class="chain-phase" onclick="togglePhase(this)">
+        <div class="chain-phase-header">
+          <span class="phase-badge badge-initial">Initial Access</span>
+          <span class="phase-title">Phishing &amp; Exposed RDP</span>
+          <span class="phase-mitre">T1566 · T1078</span>
+          <span class="phase-chevron">›</span>
         </div>
-        <div id="phase4" class="phase-detail hidden terminal-style">
-            SMB shares, administrative access, remote PowerShell sessions.
+        <div class="chain-phase-body">
+          <div class="phase-detail">
+            Phishing emails deliver macro-enabled Office attachments or compressed executables.
+            Alternatively, attackers exploit internet-facing RDP endpoints with weak or default credentials,
+            conducting automated brute-force campaigns prior to successful authentication.
+          </div>
+          <div class="telemetry-label">Telemetry Signals</div>
+          <div class="telemetry-block">Event ID: 4625  — Failed Logon (repeated, same source IP)
+Event ID: 4624  — Successful Logon | LogonType: 10 (RemoteInteractive)
+Source IP:      External — flag for geo-anomaly
+Threshold:      >20 failures in 2 min → brute-force indicator</div>
+          <br>
+          <a href="adversary-lab.html" class="page-nav-link">Go to Emulation Lab</a>
         </div>
+      </div>
+
+      <div class="chain-phase" onclick="togglePhase(this)">
+        <div class="chain-phase-header">
+          <span class="phase-badge badge-exec">Execution</span>
+          <span class="phase-title">Malicious Binary &amp; Persistence</span>
+          <span class="phase-mitre">T1059 · T1053 · T1547</span>
+          <span class="phase-chevron">›</span>
+        </div>
+        <div class="chain-phase-body">
+          <div class="phase-detail">
+            Malicious binaries are executed via PowerShell or cmd.exe. Persistence is established through
+            registry run keys, scheduled tasks, or new service installation. Remote services are leveraged
+            for staging payloads across the environment.
+          </div>
+          <div class="telemetry-label">Telemetry Signals</div>
+          <div class="telemetry-block">Event ID: 4688  — Process Creation (PowerShell with encoded args)
+Event ID: 7045  — New Service Installed
+Key:            HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+Sched Task:     schtasks /create — monitor for unusual names/paths</div>
+        </div>
+      </div>
+
+      <div class="chain-phase" onclick="togglePhase(this)">
+        <div class="chain-phase-header">
+          <span class="phase-badge badge-cred">Credential Access</span>
+          <span class="phase-title">LSASS Dump &amp; Credential Harvesting</span>
+          <span class="phase-mitre">T1003.001 · T1552</span>
+          <span class="phase-chevron">›</span>
+        </div>
+        <div class="chain-phase-body">
+          <div class="phase-detail">
+            Attackers target LSASS memory to extract plaintext credentials and NTLM hashes.
+            Weak password policies and credential reuse across systems accelerate lateral movement.
+            Harvested credentials enable pass-the-hash and pass-the-ticket attacks.
+          </div>
+          <div class="telemetry-label">Telemetry Signals</div>
+          <div class="telemetry-block">Event ID: 4656  — Handle to LSASS requested (GrantedAccess: 0x1010)
+Event ID: 4688  — Process Created: mimikatz.exe / procdump.exe
+WinDefend:      LSASS memory read blocked (if protected)
+Alert:          Unexpected access to lsass.exe from non-system process</div>
+        </div>
+      </div>
+
+      <div class="chain-phase" onclick="togglePhase(this)">
+        <div class="chain-phase-header">
+          <span class="phase-badge badge-lateral">Lateral Movement</span>
+          <span class="phase-title">SMB Pivoting &amp; Remote Execution</span>
+          <span class="phase-mitre">T1021.002 · T1021.006 · T1570</span>
+          <span class="phase-chevron">›</span>
+        </div>
+        <div class="chain-phase-body">
+          <div class="phase-detail">
+            Using harvested credentials, attackers move laterally via SMB administrative shares,
+            remote PowerShell sessions (WinRM), or PsExec-style service creation on target hosts.
+            Payload staging often occurs through ADMIN$ or C$ shares.
+          </div>
+          <div class="telemetry-label">Telemetry Signals</div>
+          <div class="telemetry-block">Event ID: 4624  — Logon Type 3 (Network) to internal hosts
+Event ID: 5140  — Network Share Object Accessed (ADMIN$, C$)
+Event ID: 7045  — New service on remote host (lateral exec)
+Alert:          Workstation → Workstation SMB (unusual in most orgs)</div>
+        </div>
+      </div>
+
+      <div class="chain-phase" onclick="togglePhase(this)">
+        <div class="chain-phase-header">
+          <span class="phase-badge badge-impact">Impact</span>
+          <span class="phase-title">File Encryption &amp; Shadow Copy Deletion</span>
+          <span class="phase-mitre">T1486 · T1490</span>
+          <span class="phase-chevron">›</span>
+        </div>
+        <div class="chain-phase-body">
+          <div class="phase-detail">
+            The encryptor is deployed and executed across all reachable hosts. Before or during
+            encryption, shadow copies and backup catalogs are deleted to prevent recovery.
+            Ransom notes are dropped in every encrypted directory.
+          </div>
+          <div class="telemetry-label">Telemetry Signals</div>
+          <div class="telemetry-block">Command:  vssadmin delete shadows /all /quiet
+Command:  wbadmin delete catalog -quiet
+Command:  bcdedit /set {default} recoveryenabled No
+Alert:    Rapid file rename events (extension change) across multiple dirs
+Alert:    Volume Shadow Copy deletion by non-system process</div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <div class="phase">
-        <div class="phase-header glitch-hover" onclick="togglePhase('phase5')">
-            <strong>Impact</strong>
-        </div>
-        <div id="phase5" class="phase-detail hidden terminal-style">
-            File encryption simulations; shadow copy deletion:
-            <code>vssadmin delete shadows /all /quiet</code>
-        </div>
+  <!-- DETECTION TABLE -->
+  <div class="section">
+    <div class="section-title">Observed Behavior &amp; Detection Signals</div>
+    <table class="detect-table">
+      <thead>
+        <tr>
+          <th>Event ID</th>
+          <th>Behavior</th>
+          <th>Detection Context</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>4625 → 4624</td>
+          <td>Brute-force then successful RDP logon</td>
+          <td>Repeated failures from same IP followed by Type 10 success</td>
+        </tr>
+        <tr>
+          <td>4688</td>
+          <td>Suspicious process creation</td>
+          <td>Encoded PowerShell args, mimikatz, procdump spawned</td>
+        </tr>
+        <tr>
+          <td>4656</td>
+          <td>LSASS handle request</td>
+          <td>GrantedAccess 0x1010 from non-system process</td>
+        </tr>
+        <tr>
+          <td>5140</td>
+          <td>Admin share access</td>
+          <td>ADMIN$ / C$ accessed from workstation — lateral pivot</td>
+        </tr>
+        <tr>
+          <td>7045</td>
+          <td>New service installed</td>
+          <td>Unexpected binary path, random service name</td>
+        </tr>
+        <tr>
+          <td>VSS event</td>
+          <td>Shadow copy deletion</td>
+          <td>vssadmin / wmic triggered by non-backup process</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WEAK PASSWORD HYGIENE -->
+  <div class="section">
+    <div class="section-title">Weak Password Hygiene – Attack Enablers</div>
+    <div class="weakness-list">
+      <div class="weakness-item">
+        <span class="weakness-icon">[!]</span>
+        <span>Passwords under 8 characters or default system/vendor passwords left unchanged.</span>
+      </div>
+      <div class="weakness-item">
+        <span class="weakness-icon">[!]</span>
+        <span>Credentials reused across multiple systems and services, enabling lateral movement post-dump.</span>
+      </div>
+      <div class="weakness-item">
+        <span class="weakness-icon">[!]</span>
+        <span>Passwords stored in plaintext within scripts, config files, or Group Policy Preferences.</span>
+      </div>
+      <div class="weakness-item">
+        <span class="weakness-icon">[!]</span>
+        <span>No enforced password complexity policy or multi-factor authentication on critical accounts.</span>
+      </div>
     </div>
+  </div>
 
-</div>
+  <!-- STRATEGIC VALUE -->
+  <div class="section">
+    <div class="section-title">Strategic Value</div>
+    <div class="value-grid">
+      <div class="value-card">
+        <div class="value-card-label">SIEM Rules</div>
+        <div class="value-card-text">Actionable detection logic derived from emulated attack telemetry — event IDs, thresholds, and correlation rules.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-card-label">Enterprise Insight</div>
+        <div class="value-card-text">Maps attack phases to real enterprise weaknesses — credential sprawl, over-privileged accounts, and detection gaps.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-card-label">Purple Team</div>
+        <div class="value-card-text">Bridges offensive technique documentation with defensive validation exercises, enabling iterative detection improvement.</div>
+      </div>
+    </div>
+  </div>
 
-<h2 class="glitch-hover">Weak Password Hygiene</h2>
-<ul class="terminal-style">
-    <li>Passwords under 8 characters or default system passwords</li>
-    <li>Reused across multiple systems/services</li>
-    <li>Stored in plaintext scripts/config files</li>
-    <li>No enforced complexity or MFA</li>
-</ul>
-
-<h2 class="glitch-hover">Observed Behavior & Detection</h2>
-<ul class="terminal-style">
-    <li>Abnormal logon failures → successful RDP authentication</li>
-    <li>Suspicious LSASS memory access</li>
-    <li>Unexpected service creation (Event ID <code>7045</code>)</li>
-    <li>Shadow copy deletion</li>
-    <li>Lateral authentication anomalies</li>
-</ul>
-
-<h2 class="glitch-hover">Strategic Value</h2>
-<ul class="terminal-style">
-    <li>Actionable SIEM rules</li>
-    <li>Insight into enterprise weaknesses</li>
-    <li>Purple team exercises bridging offense & defense</li>
-</ul>
-
-</div>
-
-<!-- Animated Binary Overlay -->
-<div class="binary-stream">
-    <span>01010101011010100101010101010101</span>
-    <span>10101001101010101001010101010101</span>
-    <span>01101010101011010100101010101010</span>
 </div>
 
 <script>
-// Toggle Infection Chain Phases
-function togglePhase(id) {
-    const el = document.getElementById(id);
-    el.classList.toggle('hidden');
-}
+  function togglePhase(el) {
+    el.classList.toggle('open');
+  }
 </script>
-
 </body>
 </html>
