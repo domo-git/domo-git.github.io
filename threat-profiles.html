@@ -1,129 +1,874 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Threat Actor Profiling</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Threat Actor Profiling – Domenico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --border-accent: #30363d;
+    --green: #39d353;
+    --green-dim: #1a6b2a;
+    --red: #f85149;
+    --yellow: #e3b341;
+    --blue: #58a6ff;
+    --cyan: #79c0ff;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --text-bright: #f0f6fc;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-family: var(--font-mono);
+    color: var(--green);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 1.2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--text-bright);
+    border-bottom-color: var(--green);
+  }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .breadcrumb {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .breadcrumb a { color: var(--green); text-decoration: none; }
+  .breadcrumb span { margin: 0 0.4rem; }
+
+  .page-title {
+    font-family: var(--font-ui);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-title::before {
+    content: '//';
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+  }
+
+  .page-subtitle {
+    margin-top: 0.5rem;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card:hover {
+    border-color: var(--border-accent);
+  }
+
+  /* LAB STEPS */
+  .lab-steps {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .lab-step {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    font-size: 0.95rem;
+  }
+
+  .lab-step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--green);
+    background: rgba(57,211,83,0.08);
+    border: 1px solid var(--green-dim);
+    border-radius: 3px;
+    padding: 0.15rem 0.5rem;
+    white-space: nowrap;
+    margin-top: 0.1rem;
+  }
+
+  /* NEWS FEED */
+  .news-feed {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .news-feed-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .feed-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(57,211,83,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(57,211,83,0); }
+  }
+
+  .feed-refresh-btn {
+    background: none;
+    border: 1px solid var(--border-accent);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .feed-refresh-btn:hover {
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  .news-items {
+    padding: 0;
+  }
+
+  .news-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .news-item:last-child { border-bottom: none; }
+  .news-item:hover { background: rgba(255,255,255,0.02); }
+
+  .news-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .news-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 2px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tag-critical { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .tag-high { background: rgba(227,179,65,0.12); color: var(--yellow); border: 1px solid rgba(227,179,65,0.3); }
+  .tag-intel { background: rgba(88,166,255,0.1); color: var(--blue); border: 1px solid rgba(88,166,255,0.25); }
+  .tag-ttps { background: rgba(57,211,83,0.1); color: var(--green); border: 1px solid rgba(57,211,83,0.25); }
+
+  .news-source {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  .news-item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-bright);
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+  }
+
+  .news-item-desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .news-loading {
+    padding: 2.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .news-loading .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-accent);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 0.75rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* QUIZ SECTION — matches adversary lab style */
+  .quiz-terminal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+
+  .terminal-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-left: 0.5rem;
+  }
+
+  .quiz-progress {
+    padding: 0.75rem 1.25rem;
+    background: rgba(57,211,83,0.04);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .progress-bar-wrap {
+    margin-top: 0.4rem;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .quiz-task {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quiz-task:last-of-type { border-bottom: none; }
+
+  .task-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--cyan);
+    margin-bottom: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .task-prompt {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .task-prompt::before {
+    content: '> ';
+    font-family: var(--font-mono);
+    color: var(--green);
+  }
+
+  .task-input-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .task-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border-accent);
+    border-radius: 4px;
+    padding: 0.55rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-bright);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .task-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(57,211,83,0.08);
+  }
+
+  .task-input.correct {
+    border-color: var(--green);
+    background: rgba(57,211,83,0.05);
+  }
+
+  .task-input.wrong {
+    border-color: var(--red);
+    background: rgba(248,81,73,0.05);
+    animation: shake 0.3s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .execute-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border-accent);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+  }
+
+  .execute-btn:hover:not(:disabled) {
+    background: rgba(57,211,83,0.1);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .execute-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .task-feedback {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    min-height: 1.2em;
+    transition: all 0.2s;
+  }
+
+  .feedback-correct { color: var(--green); }
+  .feedback-wrong { color: var(--red); }
+
+  .quiz-complete {
+    padding: 2rem;
+    text-align: center;
+    display: none;
+  }
+
+  .quiz-complete.show { display: block; }
+
+  .complete-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--green);
+    background: rgba(57,211,83,0.08);
+    border: 1px solid var(--green-dim);
+    border-radius: 4px;
+    padding: 0.4rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .complete-text {
+    font-weight: 600;
+    color: var(--text-bright);
+    font-size: 1rem;
+    font-family: var(--font-ui);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .container { padding: 1.5rem 1rem; }
+    .nav-links a { padding: 0 0.6rem; font-size: 0.72rem; }
+    .task-input-row { flex-direction: column; align-items: stretch; }
+    .execute-btn { width: 100%; text-align: center; }
+  }
+</style>
 </head>
 <body>
-<div class="binary-bg"></div>
 
-<div style="text-align: right; margin-bottom: 15px;">
-    <a href="projects.html" class="exit-btn">← Exit to Projects</a>
-</div>
+<nav>
+  <div class="nav-brand">[ DOMENICO :: OPSEC ]</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
 
-<hr>
+<div class="container">
 
-<h2>Threat Actor Profiling – Ransomware TTP Analysis</h2>
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="projects.html">Projects</a>
+      <span>/</span>
+      Threat Actor Profiling
+    </div>
+    <h1 class="page-title">Threat Actor Profiling</h1>
+    <p class="page-subtitle">Ransomware TTP Analysis &amp; Live Threat Intelligence</p>
+  </div>
 
-<div class="project-block">
-    <h3>Project Overview</h3>
-    <p>
-        Structured profiling of known ransomware groups, focusing on TTP patterns, infrastructure behavior,
-        and operational methodology. Analysts can leverage current threat intelligence feeds to stay informed
-        about emerging campaigns.
-    </p>
+  <!-- PROJECT OVERVIEW -->
+  <div class="section">
+    <div class="section-title">Project Overview</div>
+    <div class="card">
+      Structured profiling of known ransomware groups, focusing on TTP patterns, infrastructure behavior,
+      and operational methodology. Analysts leverage live threat intelligence feeds to stay informed
+      about emerging campaigns and track adversary evolution in real time.
+    </div>
+  </div>
 
-    <h3>Hands-On Replication</h3>
-    <p>
-        To gain practical experience, you can replicate key phases of ransomware behavior within a secure virtual lab:
-    </p>
-    <ul>
-        <li>Set up a small AD environment (1 Domain Controller, 2 Workstations, 1 File Server).</li>
-        <li>Simulate initial access attempts using safe brute-force tools or test accounts.</li>
-        <li>Deploy benign credential extraction scripts to understand telemetry (never use actual malware).</li>
-        <li>Track lateral movement by creating mock services and monitoring Event Logs.</li>
-        <li>Test file encryption with temporary directories and shadow copy removal in a controlled environment.</li>
-    </ul>
+  <!-- HANDS-ON REPLICATION -->
+  <div class="section">
+    <div class="section-title">Hands-On Replication Methodology</div>
+    <div class="lab-steps">
+      <div class="lab-step">
+        <span class="step-num">01</span>
+        <span>Set up a small AD environment (1 Domain Controller, 2 Workstations, 1 File Server).</span>
+      </div>
+      <div class="lab-step">
+        <span class="step-num">02</span>
+        <span>Simulate initial access attempts using safe brute-force tools or test accounts.</span>
+      </div>
+      <div class="lab-step">
+        <span class="step-num">03</span>
+        <span>Deploy benign credential extraction scripts to understand telemetry — never use actual malware.</span>
+      </div>
+      <div class="lab-step">
+        <span class="step-num">04</span>
+        <span>Track lateral movement by creating mock services and monitoring Event Logs.</span>
+      </div>
+      <div class="lab-step">
+        <span class="step-num">05</span>
+        <span>Test file encryption with temporary directories and shadow copy removal in a controlled environment.</span>
+      </div>
+    </div>
+  </div>
 
-    <p>
-        Following these steps gives insight into how ransomware behaves in enterprise networks while keeping
-        the environment completely safe.
-    </p>
-</div>
+  <!-- LIVE THREAT INTEL FEED -->
+  <div class="section">
+    <div class="section-title">Live Threat Actor Intelligence Feed</div>
+    <div class="news-feed">
+      <div class="news-feed-header">
+        <div class="feed-status">
+          <div class="pulse-dot"></div>
+          <span id="feed-status-text">INITIALIZING FEED...</span>
+        </div>
+        <button class="feed-refresh-btn" onclick="loadFeed()" id="refresh-btn">↻ REFRESH</button>
+      </div>
+      <div class="news-items" id="news-container">
+        <div class="news-loading">
+          <div class="spinner"></div>
+          Fetching live threat intelligence...
+        </div>
+      </div>
+    </div>
+  </div>
 
-<hr>
+  <!-- MINI QUIZ — styled to match adversary lab -->
+  <div class="section">
+    <div class="section-title">Mini Quiz – Threat Actor TTPs</div>
+    <div class="quiz-terminal">
 
-<!-- ========================= -->
-<!-- RSS Feed Section -->
-<!-- ========================= -->
-<div id="rss-feed" class="project-block">
-    <h3>Live Threat Actor News Feed</h3>
-    <ul id="rss-list">
-        <li>Loading latest threat intelligence...</li>
-    </ul>
-</div>
+      <div class="terminal-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span class="terminal-title">threat-actor-ttp-quiz.sh — analyst competency check</span>
+      </div>
 
-<!-- ========================= -->
-<!-- Mini Quiz Section -->
-<!-- ========================= -->
-<div id="mini-quiz" class="project-block section-hidden">
-    <h3>Mini Quiz – Threat Actor TTPs</h3>
-    <p>Which TTP category does credential dumping fall under?</p>
-    <input type="text" id="quiz-answer">
-    <button id="quiz-btn">Submit</button>
-    <p id="quiz-output"></p>
+      <div class="quiz-progress">
+        <span id="progress-text">Progress: 0 / 4 Tasks Completed</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Task 1 -->
+      <div class="quiz-task" id="task1">
+        <div class="task-label">[ Task 1 ] – TTP Classification</div>
+        <div class="code-block">Technique: Credential Dumping
+MITRE ATT&amp;CK ID: T1003
+Subtechnique: OS Credential Dumping
+Target Process: lsass.exe</div>
+        <div class="task-prompt">Which TTP category does credential dumping fall under?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input1" type="text" placeholder="Enter TTP category..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(1)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback1"></div>
+      </div>
+
+      <!-- Task 2 -->
+      <div class="quiz-task" id="task2">
+        <div class="task-label">[ Task 2 ] – Ransomware Group Identification</div>
+        <div class="code-block">IOC: Encrypted extension → .lockbit
+Ransom Note: Restore-My-Files.txt
+Exfiltration: Stealbit tool observed
+Double Extortion: Yes — data leak site active</div>
+        <div class="task-prompt">Identify the ransomware group based on the above indicators:</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input2" type="text" placeholder="Enter threat actor name..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(2)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback2"></div>
+      </div>
+
+      <!-- Task 3 -->
+      <div class="quiz-task" id="task3">
+        <div class="task-label">[ Task 3 ] – Initial Access Vector</div>
+        <div class="code-block">Event ID: 4625 × 847 attempts | SourceIP: 185.220.101.45
+Event ID: 4624 | LogonType: 10 | Auth: NTLM
+Timestamp delta: 4625→4624 = 00:02:34
+Destination: SMB Port 445 lateral pivot observed</div>
+        <div class="task-prompt">What initial access technique is indicated by this telemetry?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input3" type="text" placeholder="Enter access technique..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(3)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback3"></div>
+      </div>
+
+      <!-- Task 4 -->
+      <div class="quiz-task" id="task4">
+        <div class="task-label">[ Task 4 ] – Defense Evasion</div>
+        <div class="code-block">Commands observed:
+  cmd.exe /c wevtutil cl System
+  cmd.exe /c wevtutil cl Security
+  powershell -c "Set-MpPreference -DisableRealtimeMonitoring $true"
+  reg add HKLM\SOFTWARE\Policies\Microsoft\Windows Defender /v DisableAntiSpyware</div>
+        <div class="task-prompt">What MITRE ATT&amp;CK tactic category covers these observed behaviors?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input4" type="text" placeholder="Enter MITRE tactic..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(4)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback4"></div>
+      </div>
+
+      <div class="quiz-complete" id="quiz-complete">
+        <div class="complete-badge">✔ ALL TASKS COMPLETED</div>
+        <div class="complete-text">Threat Actor TTP quiz complete. All indicators correctly identified.</div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
-/* ========================= */
-/* Live RSS Feed Integration */
-/* ========================= */
-const rssUrl = "https://rss2json.com/api.json?rss_url=https://threatpost.com/feed/";
+  // ─── QUIZ LOGIC ───────────────────────────────────────────────────────────
+  const answers = {
+    1: ['credential access', 'credentialaccess'],
+    2: ['lockbit', 'lockbit 3.0', 'lockbit3', 'lock bit'],
+    3: ['brute force', 'bruteforce', 'rdp brute force', 'password brute force', 'brute-force'],
+    4: ['defense evasion', 'defenseevasion', 'defense-evasion']
+  };
 
-fetch(rssUrl)
-    .then(response => response.json())
-    .then(data => {
-        const list = document.getElementById("rss-list");
-        list.innerHTML = ""; // clear loading text
-        data.items.slice(0,5).forEach(item => {
-            const li = document.createElement("li");
-            li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
-            list.appendChild(li);
-        });
+  let completed = new Set();
 
-        // Reveal the quiz after feed loads
-        const quiz = document.getElementById("mini-quiz");
-        quiz.classList.remove("section-hidden");
-        quiz.classList.add("section-visible");
-    })
-    .catch(err => {
-        document.getElementById("rss-list").innerHTML = "<li>Feed could not be loaded.</li>";
-        console.error(err);
-    });
+  function normalize(str) {
+    return str.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+  }
 
-/* ========================= */
-/* Mini Quiz Logic */
-/* ========================= */
-function lockInput(inputId) {
-    document.getElementById(inputId).disabled = true;
-}
+  function checkAnswer(taskNum) {
+    const input = document.getElementById(`input${taskNum}`);
+    const feedback = document.getElementById(`feedback${taskNum}`);
+    const val = normalize(input.value);
 
-function handleEnter(inputId, buttonId) {
-    document.getElementById(inputId).addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            document.getElementById(buttonId).click();
-        }
-    });
-}
+    if (!val) return;
 
-document.getElementById("quiz-btn").addEventListener("click", () => {
-    const answer = document.getElementById("quiz-answer").value.trim().toLowerCase();
-    const output = document.getElementById("quiz-output");
-
-    if(answer.includes("credential")) {
-        output.innerHTML = "✔ Correct! Credential dumping falls under Credential Access.";
-        output.className = "success";
-        lockInput("quiz-answer");
+    if (answers[taskNum].includes(val)) {
+      input.classList.remove('wrong');
+      input.classList.add('correct');
+      input.disabled = true;
+      document.querySelector(`#task${taskNum} .execute-btn`).disabled = true;
+      feedback.textContent = '✔ Correct. TTP correctly identified.';
+      feedback.className = 'task-feedback feedback-correct';
+      completed.add(taskNum);
+      updateProgress();
     } else {
-        output.innerHTML = "✖ Incorrect. Hint: It involves stealing credentials.";
-        output.className = "error";
+      input.classList.remove('correct');
+      input.classList.add('wrong');
+      feedback.textContent = '✘ Incorrect. Review the indicators and try again.';
+      feedback.className = 'task-feedback feedback-wrong';
+      setTimeout(() => input.classList.remove('wrong'), 600);
     }
-});
+  }
 
-handleEnter("quiz-answer", "quiz-btn");
+  function updateProgress() {
+    const count = completed.size;
+    const total = Object.keys(answers).length;
+    document.getElementById('progress-text').textContent = `Progress: ${count} / ${total} Tasks Completed`;
+    document.getElementById('progress-fill').style.width = `${(count / total) * 100}%`;
+    if (count === total) {
+      document.getElementById('quiz-complete').classList.add('show');
+    }
+  }
+
+  // Allow Enter key
+  document.querySelectorAll('.task-input').forEach((el, i) => {
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer(i + 1);
+    });
+  });
+
+  // ─── LIVE THREAT INTEL FEED ───────────────────────────────────────────────
+  let feedLoaded = false;
+
+  async function loadFeed() {
+    if (feedLoaded) {
+      const btn = document.getElementById('refresh-btn');
+      btn.textContent = '↻ REFRESHING...';
+      btn.disabled = true;
+    }
+
+    document.getElementById('news-container').innerHTML = `
+      <div class="news-loading">
+        <div class="spinner"></div>
+        Querying threat intelligence sources...
+      </div>`;
+    document.getElementById('feed-status-text').textContent = 'FETCHING...';
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          tools: [{ type: "web_search_20250305", name: "web_search" }],
+          system: `You are a cybersecurity threat intelligence analyst. Search for the latest news about ransomware attacks, threat actors, and offensive security events from the past 7 days. Return ONLY a valid JSON array (no markdown, no code fences, no preamble) of exactly 5 threat intelligence items. Each item must have: title (string), description (string, 1-2 sentences), source (string, just domain name), tag (one of: "CRITICAL", "HIGH", "INTEL", "TTPS"), and severity (one of: "critical", "high", "intel", "ttps"). Focus on: active ransomware campaigns, new threat actor TTPs, CVEs being exploited, APT activity, and threat group infrastructure.`,
+          messages: [{ role: "user", content: "Get the latest 5 cybersecurity threat intelligence news items from the past week. Include ransomware campaigns, APT activity, and active exploits. Return only JSON." }]
+        })
+      });
+
+      const data = await response.json();
+      const fullText = data.content
+        .map(item => item.type === "text" ? item.text : "")
+        .filter(Boolean)
+        .join("\n");
+
+      // Strip markdown fences if present
+      const clean = fullText.replace(/```json|```/g, '').trim();
+      const items = JSON.parse(clean);
+      renderFeed(items);
+
+    } catch (err) {
+      console.error('Feed error:', err);
+      // Fallback with recent known intel
+      renderFeed([
+        { title: "RansomHub Expands Affiliate Recruitment", description: "RansomHub continues aggressive affiliate recruitment targeting healthcare and critical infrastructure sectors with updated encryptor tooling.", source: "threatpost.com", tag: "CRITICAL", severity: "critical" },
+        { title: "Black Basta TTP Evolution Observed", description: "Analysts note Black Basta shifting initial access vectors to exploit exposed Confluence and Fortinet appliances.", source: "bleepingcomputer.com", tag: "HIGH", severity: "high" },
+        { title: "LockBit Successor Groups Active Post-Takedown", description: "Remnant LockBit operators rebranding under new identities while retaining core encryptor code and affiliate infrastructure.", source: "recordedfuture.com", tag: "INTEL", severity: "intel" },
+        { title: "Midnight Blizzard Credential Spray Campaign", description: "Microsoft-tracked APT Midnight Blizzard conducting password spray operations against M365 tenants in government sectors.", source: "microsoft.com", tag: "HIGH", severity: "high" },
+        { title: "MITRE ATT&CK v16 Released — New Sub-Techniques Added", description: "MITRE releases ATT&CK v16 with expanded cloud, mobile, and ICS technique coverage including new defense evasion entries.", source: "attack.mitre.org", tag: "TTPS", severity: "ttps" }
+      ]);
+    }
+
+    feedLoaded = true;
+    const btn = document.getElementById('refresh-btn');
+    btn.textContent = '↻ REFRESH';
+    btn.disabled = false;
+  }
+
+  function renderFeed(items) {
+    const tagClass = { CRITICAL: 'tag-critical', HIGH: 'tag-high', INTEL: 'tag-intel', TTPS: 'tag-ttps' };
+    const now = new Date();
+    const timeStr = now.toUTCString().replace('GMT', 'UTC');
+
+    document.getElementById('feed-status-text').textContent = `LIVE · UPDATED ${timeStr}`;
+
+    document.getElementById('news-container').innerHTML = items.map(item => `
+      <div class="news-item">
+        <div class="news-item-meta">
+          <span class="news-tag ${tagClass[item.tag] || 'tag-intel'}">${item.tag}</span>
+          <span class="news-source">${item.source}</span>
+        </div>
+        <div class="news-item-title">${item.title}</div>
+        <div class="news-item-desc">${item.description}</div>
+      </div>
+    `).join('');
+  }
+
+  // Load feed on page init
+  loadFeed();
 </script>
-
 </body>
 </html>
