@@ -111,24 +111,33 @@
   .room-progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
   /* Task cards */
-  .task-card { border-bottom: 1px solid var(--border); overflow: hidden; }
-  .task-card:last-of-type { border-bottom: none; }
+  .task-card { overflow: hidden; }
 
-  .task-card.locked .task-card-inner { opacity: 0.3; pointer-events: none; filter: blur(0.5px); }
-  .task-card.locked .task-lock-bar { display: flex; }
-  .task-card.completed { background: rgba(57,211,83,0.025); }
-  .task-card.completed .task-card-inner { opacity: 0.6; }
+  /* LOCKED — completely hidden, no border, no space */
+  .task-card.locked { display: none; }
+
+  /* COMPLETED — dimmed summary row */
+  .task-card.completed { border-bottom: 1px solid var(--border); background: rgba(57,211,83,0.025); }
+  .task-card.completed .task-card-inner { opacity: 0.55; }
   .task-card.completed .task-input { border-color: var(--green); background: rgba(57,211,83,0.05); color: var(--green); }
   .task-card.completed .execute-btn { display: none; }
   .task-card.completed .task-completed-badge { display: flex !important; }
-  .task-card.active .task-card-inner { animation: slideIn 0.45s cubic-bezier(0.4,0,0.2,1); }
 
-  @keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes unlockFlash { 0%{background:rgba(57,211,83,0.1)} 100%{background:transparent} }
-  .task-card.unlocking { animation: unlockFlash 0.7s ease forwards; }
+  /* ACTIVE — current task, full opacity, slide-in on reveal */
+  .task-card.active { border-bottom: 1px solid var(--border); }
+  .task-card.active .task-card-inner { animation: slideIn 0.5s cubic-bezier(0.4,0,0.2,1); }
 
-  .task-lock-bar { display: none; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--border-accent); background: rgba(0,0,0,0.2); }
-  .task-lock-bar::before { content: '🔒'; font-size: 0.6rem; }
+  @keyframes slideIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Green scan flash when task unlocks */
+  @keyframes unlockFlash {
+    0%   { background: rgba(57,211,83,0.12); box-shadow: inset 0 0 0 1px rgba(57,211,83,0.4); }
+    100% { background: transparent; box-shadow: none; }
+  }
+  .task-card.unlocking { animation: unlockFlash 0.8s ease forwards; }
+
+  /* hide lock bar — no longer needed visually */
+  .task-lock-bar { display: none !important; }
 
   .task-card-inner { padding: 1.25rem 1.5rem; }
   .task-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
@@ -437,13 +446,18 @@ function checkAnswer(n) {
 
 function unlockTask(n) {
   const card = document.getElementById(`task${n}`);
+  // Remove locked (display:none) first, then trigger animation on next frame
   card.classList.remove('locked');
-  card.classList.add('active','unlocking');
-  setTimeout(() => card.classList.remove('unlocking'), 700);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.classList.add('active', 'unlocking');
+      setTimeout(() => card.classList.remove('unlocking'), 800);
+    });
+  });
   setTimeout(() => {
     document.getElementById(`input${n}`).focus();
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 400);
+  }, 450);
 }
 
 function updateProgress() {
@@ -468,6 +482,7 @@ function resetRoom() {
     input.value = ''; input.disabled = false; input.className = 'task-input';
     feedback.textContent = ''; feedback.className = 'task-feedback';
     btn.disabled = false; btn.style.display = '';
+    // Task 1 starts active, all others hidden (locked)
     card.className = 'task-card' + (i === 1 ? ' active' : ' locked');
   }
   updateProgress();
