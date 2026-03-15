@@ -9,7 +9,7 @@ and threat actor profiling. All lab work is conducted in controlled, isolated en
 
 **Live site:** [domo-git.github.io](https://domo-git.github.io)
 
-Built with HTML and CSS using a dark terminal/cyberpunk theme. Features interactive
+Built mainly with HTML and bit of CSS using a dark terminal/cyberpunk theme. Features interactive
 lab simulations, a live AI-powered threat intelligence feed, and analyst competency checks.
 
 ---
