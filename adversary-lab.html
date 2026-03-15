@@ -1,386 +1,753 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Adversary Emulation Lab</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adversary Emulation Lab – Domenico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --border-accent: #30363d;
+    --green: #39d353;
+    --green-dim: #1a6b2a;
+    --red: #f85149;
+    --yellow: #e3b341;
+    --blue: #58a6ff;
+    --cyan: #79c0ff;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --text-bright: #f0f6fc;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 16px; line-height: 1.6; min-height: 100vh; }
+  body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 9999; }
+
+  /* NAV */
+  nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { font-family: var(--font-mono); color: var(--green); font-size: 0.85rem; letter-spacing: 0.05em; }
+  .nav-links { display: flex; gap: 0; list-style: none; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; font-family: var(--font-ui); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 1.2rem; height: 56px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--text-bright); border-bottom-color: var(--green); }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .breadcrumb { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem; }
+  .breadcrumb a { color: var(--green); text-decoration: none; }
+  .breadcrumb span { margin: 0 0.4rem; }
+  .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-bright); letter-spacing: 0.02em; text-transform: uppercase; display: flex; align-items: center; gap: 0.75rem; }
+  .page-title::before { content: '//'; color: var(--green); font-family: var(--font-mono); font-size: 1.2rem; }
+  .page-subtitle { margin-top: 0.5rem; color: var(--text-dim); font-size: 0.95rem; font-weight: 500; }
+
+  .section { margin-bottom: 2.5rem; }
+  .section-title { font-family: var(--font-ui); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; }
+
+  /* OBJECTIVE CARDS */
+  .obj-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .obj-card { background: var(--bg2); padding: 1.25rem 1.5rem; }
+  .obj-card-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .obj-card-text { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
+
+  /* ARCH DIAGRAM */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-node {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .arch-node:hover { border-color: var(--border-accent); }
+
+  .arch-node-icon {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    background: rgba(57,211,83,0.08);
+    border: 1px solid var(--green-dim);
+    border-radius: 3px;
+    padding: 0.15rem 0.45rem;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.03em;
+  }
+
+  .arch-node-name { font-weight: 700; font-size: 0.85rem; color: var(--text-bright); margin-bottom: 0.2rem; }
+  .arch-node-detail { font-size: 0.75rem; color: var(--text-dim); }
+
+  .arch-node.attacker { border-color: rgba(248,81,73,0.3); }
+  .arch-node.attacker .arch-node-icon { background: rgba(248,81,73,0.1); color: var(--red); border-color: rgba(248,81,73,0.3); }
+
+  /* LAB STEPS */
+  .lab-phase {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .lab-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .lab-phase-header:hover { background: rgba(255,255,255,0.02); }
+
+  .step-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    background: rgba(57,211,83,0.08);
+    border: 1px solid var(--green-dim);
+    border-radius: 3px;
+    padding: 0.2rem 0.55rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .lab-phase-title { font-weight: 700; font-size: 0.95rem; color: var(--text-bright); flex: 1; }
+  .lab-phase-chevron { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim); transition: transform 0.25s; }
+  .lab-phase.open .lab-phase-chevron { transform: rotate(90deg); }
+
+  .lab-phase-body {
+    display: none;
+    padding: 0 1.5rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .lab-phase.open .lab-phase-body { display: block; }
+
+  .step-list { list-style: none; margin-top: 0.85rem; }
+  .step-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before { content: '›'; font-family: var(--font-mono); color: var(--green); flex-shrink: 0; margin-top: 0.05rem; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    background: rgba(57,211,83,0.07);
+    color: var(--cyan);
+    border: 1px solid rgba(57,211,83,0.15);
+    border-radius: 3px;
+    padding: 0.1em 0.4em;
+  }
+
+  /* BOOT SEQUENCE */
+  .boot-sequence {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .boot-bar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .boot-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-left: 0.5rem; }
+
+  .boot-body {
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--text-dim);
+  }
+
+  .boot-line .prompt { color: var(--green); }
+  .boot-line .ok { color: var(--green); }
+  .boot-line .warn { color: var(--yellow); }
+  .boot-line .info { color: var(--blue); }
+  .boot-line .sep { color: var(--border-accent); }
+
+  /* SOC VALIDATION / QUIZ */
+  .soc-terminal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .terminal-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-left: 0.5rem; }
+
+  .quiz-progress {
+    padding: 0.75rem 1.25rem;
+    background: rgba(57,211,83,0.04);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .progress-bar-wrap { margin-top: 0.4rem; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.5s ease; }
+
+  .soc-intro {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.1);
+  }
+
+  .soc-intro-line {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.9;
+  }
+
+  .soc-intro-line .arrow { color: var(--green); }
+
+  .quiz-task {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quiz-task:last-of-type { border-bottom: none; }
+
+  .task-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--cyan);
+    margin-bottom: 0.9rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .task-prompt {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .task-prompt::before { content: '> '; font-family: var(--font-mono); color: var(--green); }
+
+  .task-input-row { display: flex; gap: 0.6rem; align-items: center; }
+
+  .task-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border-accent);
+    border-radius: 4px;
+    padding: 0.55rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-bright);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .task-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(57,211,83,0.08); }
+  .task-input.correct { border-color: var(--green); background: rgba(57,211,83,0.05); }
+  .task-input.wrong { border-color: var(--red); background: rgba(248,81,73,0.05); animation: shake 0.3s ease; }
+
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+  .execute-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border-accent);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+  }
+
+  .execute-btn:hover:not(:disabled) { background: rgba(57,211,83,0.1); border-color: var(--green); color: var(--green); }
+  .execute-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .task-feedback { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.78rem; min-height: 1.2em; }
+  .feedback-correct { color: var(--green); }
+  .feedback-wrong { color: var(--red); }
+
+  .lab-complete {
+    display: none;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .lab-complete.show { display: block; }
+
+  .complete-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--green);
+    background: rgba(57,211,83,0.08);
+    border: 1px solid var(--green-dim);
+    border-radius: 4px;
+    padding: 0.4rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .complete-title {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .complete-sub { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.25rem; }
+
+  .return-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid var(--green-dim);
+    border-radius: 4px;
+    padding: 0.55rem 1.1rem;
+    background: rgba(57,211,83,0.05);
+    transition: all 0.2s;
+    font-family: var(--font-ui);
+    letter-spacing: 0.05em;
+    margin: 0 0.4rem;
+  }
+
+  .return-link:hover { background: rgba(57,211,83,0.12); border-color: var(--green); }
+
+  @media (max-width: 600px) {
+    .container { padding: 1.5rem 1rem; }
+    .nav-links a { padding: 0 0.6rem; font-size: 0.72rem; }
+    .task-input-row { flex-direction: column; align-items: stretch; }
+    .execute-btn { width: 100%; text-align: center; }
+    .arch-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
-
 <body>
-<div class="binary-bg"></div>
 
-<div style="text-align: right; margin-bottom: 15px;">
-    <a href="projects.html" class="exit-btn">← Exit to Projects</a>
-</div>
+<nav>
+  <div class="nav-brand">[ DOMENICO :: OPSEC ]</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
 
-<hr>
+<div class="container">
 
-<h2>Adversary Emulation Lab – Enterprise Ransomware Simulation</h2>
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="projects.html">Projects</a>
+      <span>/</span>
+      Adversary Emulation Lab
+    </div>
+    <h1 class="page-title">Adversary Emulation Lab</h1>
+    <p class="page-subtitle">Enterprise ransomware simulation · Active Directory · SOC validation</p>
+  </div>
 
-<div class="project-block">
+  <!-- OBJECTIVE + STRATEGIC VALUE -->
+  <div class="section">
+    <div class="section-title">Lab Objective &amp; Strategic Value</div>
+    <div class="obj-grid">
+      <div class="obj-card">
+        <div class="obj-card-label">Objective</div>
+        <div class="obj-card-text">Replicate human-operated ransomware behavior within a controlled Active Directory infrastructure to generate real detection telemetry.</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-card-label">Strategic Value</div>
+        <div class="obj-card-text">Bridges theoretical threat intelligence with hands-on detection engineering validation — producing actionable SIEM rules and analyst competency benchmarks.</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-card-label">Scope</div>
+        <div class="obj-card-text">All simulation phases are conducted in an isolated virtualized environment. No actual malware is deployed at any stage.</div>
+      </div>
+    </div>
+  </div>
 
-<h3>Lab Objective</h3>
-<p>
-This lab environment was designed to replicate human-operated ransomware
-behavior within a controlled Active Directory infrastructure.
-</p>
-    
-<h3>Strategic Value</h3>
-<p>
-This adversary emulation lab bridges theoretical threat intelligence
-with hands-on detection engineering validation.
-</p>
+  <!-- ENVIRONMENT ARCHITECTURE -->
+  <div class="section">
+    <div class="section-title">Environment Architecture</div>
+    <div class="arch-grid">
+      <div class="arch-node">
+        <div class="arch-node-icon">DC-01</div>
+        <div class="arch-node-name">Domain Controller</div>
+        <div class="arch-node-detail">Windows Server 2019 · AD DS</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-node-icon">WS-01</div>
+        <div class="arch-node-name">Workstation 1</div>
+        <div class="arch-node-detail">Windows 10 Enterprise</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-node-icon">WS-02</div>
+        <div class="arch-node-name">Workstation 2</div>
+        <div class="arch-node-detail">Windows 10 Enterprise</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-node-icon">FS-01</div>
+        <div class="arch-node-name">File Server</div>
+        <div class="arch-node-detail">Shared storage target</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-node-icon">LOG</div>
+        <div class="arch-node-name">Event Forwarding</div>
+        <div class="arch-node-detail">Centralised WEF logging</div>
+      </div>
+      <div class="arch-node attacker">
+        <div class="arch-node-icon">ATK</div>
+        <div class="arch-node-name">Attacker VM</div>
+        <div class="arch-node-detail">Isolated · sandboxed</div>
+      </div>
+    </div>
+  </div>
 
-<!-- INSERT NEW SECTION HERE -->
+  <!-- BOOT SEQUENCE STATUS -->
+  <div class="section">
+    <div class="section-title">Lab Boot Status</div>
+    <div class="boot-sequence">
+      <div class="boot-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span class="boot-title">lab-init.sh — environment bootstrap</span>
+      </div>
+      <div class="boot-body">
+        <div class="boot-line"><span class="prompt">$ </span>./lab-init.sh --env enterprise-ad</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> Domain Controller (WinSrv 2019) — ONLINE</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> Workstation-01 joined to domain — OK</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> Workstation-02 joined to domain — OK</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> File Server mounted — OK</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> Windows Event Forwarding — ACTIVE</div>
+        <div class="boot-line"><span class="ok">  [✔]</span> Audit Policy configured (4688, 4624, 4625, 7045)</div>
+        <div class="boot-line"><span class="warn">  [⚠]</span> Attacker VM — ISOLATED / network-segmented</div>
+        <div class="boot-line"><span class="sep">  ────────────────────────────────────────</span></div>
+        <div class="boot-line"><span class="info">  [→]</span> Lab ready. Proceed to Phase 1.</div>
+      </div>
+    </div>
+  </div>
 
-<h3>Reproduction Methodology – Controlled Enterprise Simulation Guide</h3>
+  <!-- REPRODUCTION METHODOLOGY -->
+  <div class="section">
+    <div class="section-title">Reproduction Methodology – Click Phase to Expand</div>
 
-<p>
-This lab can be replicated in a local virtualized environment using
-VirtualBox, VMware Workstation, or Hyper-V. The following build configuration
-was used to simulate enterprise ransomware tradecraft in a safe, isolated lab.
-</p>
+    <div class="lab-phase" onclick="togglePhase(this)">
+      <div class="lab-phase-header">
+        <span class="step-badge">STEP 01</span>
+        <span class="lab-phase-title">Infrastructure Deployment</span>
+        <span class="lab-phase-chevron">›</span>
+      </div>
+      <div class="lab-phase-body">
+        <ul class="step-list">
+          <li>Deploy Windows Server 2019 as Domain Controller in VirtualBox / VMware / Hyper-V</li>
+          <li>Install Active Directory Domain Services (<code>AD DS</code>) and promote to DC</li>
+          <li>Create domain users, groups, and OU structure mirroring enterprise layout</li>
+          <li>Deploy two Windows 10 Enterprise clients and join to the domain</li>
+          <li>Configure a file server with shared directories accessible by domain users</li>
+        </ul>
+      </div>
+    </div>
 
-<h3>Environment Architecture</h3>
-<ul>
-<li>1 Windows Server Domain Controller</li>
-<li>2 Windows 10 Enterprise Workstations</li>
-<li>1 File Server</li>
-<li>Centralized logging via Windows Event Forwarding</li>
-<li>Simulated external attacker machine</li>
-</ul>
-    
+    <div class="lab-phase" onclick="togglePhase(this)">
+      <div class="lab-phase-header">
+        <span class="step-badge">STEP 02</span>
+        <span class="lab-phase-title">Logging Configuration</span>
+        <span class="lab-phase-chevron">›</span>
+      </div>
+      <div class="lab-phase-body">
+        <ul class="step-list">
+          <li>Enable Advanced Audit Policy Configuration via Group Policy</li>
+          <li>Enable Process Creation auditing — <code>Event ID 4688</code> with command line logging</li>
+          <li>Enable Logon auditing — <code>4624</code> (success) / <code>4625</code> (failure)</li>
+          <li>Enable Directory Service Access logging and object access auditing</li>
+          <li>Configure Windows Event Forwarding to centralise logs from all hosts</li>
+        </ul>
+      </div>
+    </div>
 
-<h4>Step 1 – Infrastructure Deployment</h4>
-<ul>
-<li>Deploy Windows Server 2019 as Domain Controller</li>
-<li>Install Active Directory Domain Services (AD DS)</li>
-<li>Create domain users and groups</li>
-<li>Deploy two Windows 10 Enterprise clients</li>
-<li>Join clients to the domain</li>
-</ul>
+    <div class="lab-phase" onclick="togglePhase(this)">
+      <div class="lab-phase-header">
+        <span class="step-badge">STEP 03</span>
+        <span class="lab-phase-title">Controlled Simulation Execution</span>
+        <span class="lab-phase-chevron">›</span>
+      </div>
+      <div class="lab-phase-body">
+        <ul class="step-list">
+          <li>Simulate RDP brute-force authentication attempts from attacker VM — observe <code>4625</code> burst</li>
+          <li>Achieve successful logon (<code>4624</code> Type 10) — flag source IP anomaly</li>
+          <li>Simulate privilege escalation via group nesting and token impersonation</li>
+          <li>Execute benign LSASS access script — observe process handle events (<code>4656</code>)</li>
+          <li>Simulate lateral movement via <code>ADMIN$</code> share and remote service creation</li>
+          <li>Monitor <code>Event ID 7045</code> for new service installation on remote hosts</li>
+        </ul>
+      </div>
+    </div>
 
-<h4>Step 2 – Logging Configuration</h4>
-<ul>
-<li>Enable Advanced Audit Policy Configuration</li>
-<li>Enable Process Creation auditing (Event ID 4688)</li>
-<li>Enable Logon auditing (4624 / 4625)</li>
-<li>Enable Directory Service Access logging</li>
-</ul>
+    <div class="lab-phase" onclick="togglePhase(this)">
+      <div class="lab-phase-header">
+        <span class="step-badge">STEP 04</span>
+        <span class="lab-phase-title">Defensive Validation</span>
+        <span class="lab-phase-chevron">›</span>
+      </div>
+      <div class="lab-phase-body">
+        <ul class="step-list">
+          <li>Filter Event Viewer and forwarded logs to surface all emulated attack telemetry</li>
+          <li>Document detection gaps — which techniques generated no alerts?</li>
+          <li>Map all observed activity to MITRE ATT&amp;CK techniques and sub-techniques</li>
+          <li>Capture screenshots and log exports as forensic evidence artifacts</li>
+          <li>Draft SIEM correlation rules based on observed event sequences</li>
+        </ul>
+      </div>
+    </div>
 
-<h4>Step 3 – Controlled Simulation Execution</h4>
-<ul>
-<li>Simulate RDP authentication attempts</li>
-<li>Observe Security Event logs</li>
-<li>Simulate privilege escalation via group nesting</li>
-<li>Simulate lateral movement via administrative shares</li>
-<li>Monitor service creation logs (7045)</li>
-</ul>
+  </div>
 
-<h4>Step 4 – Defensive Validation</h4>
-<ul>
-<li>Filter logs in Event Viewer</li>
-<li>Document detection gaps</li>
-<li>Map activity to MITRE ATT&CK</li>
-<li>Capture screenshots as forensic evidence</li>
-</ul>
+  <!-- SOC VALIDATION QUIZ -->
+  <div class="section">
+    <div class="section-title">Operational Validation – Analyst Competency Check</div>
 
-</div>
-<h3>Operational Validation – Analyst Competency Check</h3>
+    <div class="soc-terminal">
+      <div class="terminal-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span class="terminal-title">soc-validation.sh — incident telemetry review console</span>
+      </div>
 
-<p>
-The preceding emulation phases simulated enterprise ransomware tradecraft
-across authentication abuse, credential access, privilege escalation,
-lateral movement, and impact.
-</p>
+      <div class="soc-intro">
+        <div class="soc-intro-line"><span class="arrow">&gt;</span> Transitioning from emulation analysis to live SOC validation...</div>
+        <div class="soc-intro-line"><span class="arrow">&gt;</span> Loading incident telemetry review console...</div>
+        <div class="soc-intro-line"><span class="arrow">&gt;</span> Analyst response workflow initialized...</div>
+      </div>
 
-<p>
-In a real Security Operations Center (SOC), detection engineering does not
-end at observation — it requires validation of analyst response capability.
-The following interactive scenario serves as a structured competency check,
-requiring identification of critical telemetry artifacts observed during
-the simulation.
-</p>
+      <div class="quiz-progress">
+        <span id="progress-text">Progress: 0 / 4 Tasks Completed</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
 
-<p>
-Each task reflects a key detection decision point:
-</p>
-
-<ul>
-<li>Authentication anomaly recognition</li>
-<li>Credential theft identification</li>
-<li>Lateral movement artifact detection</li>
-<li>Ransomware recovery impact analysis</li>
-</ul>
-
-<p>
-Proceed as if reviewing live enterprise logs during an active incident.
-</p>
-
-    
-<hr>
-
-<p class="cursor">> Transitioning from emulation analysis to live SOC validation...</p>
-<p class="cursor">> Loading incident telemetry review console...</p>
-<p class="cursor">> Analyst response workflow initialized...</p>
-
-<p id="progress">Progress: 0 / 4 Tasks Completed</p>
-
-<div class="lab-terminal">
-
-<!-- TASK 1 -->
-
-<h3>[ Task 1 ] – Initial Access Detection</h3>
-
-<pre class="log-block">
+      <!-- Task 1 -->
+      <div class="quiz-task" id="task1">
+        <div class="task-label">[ Task 1 ] – Initial Access Detection</div>
+        <div class="code-block">Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
 Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
-Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
-Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14
-</pre>
+Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14</div>
+        <div class="task-prompt">Identify the Event ID confirming successful RDP authentication:</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input1" type="text" placeholder="Enter Event ID..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(1)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback1"></div>
+      </div>
 
-<p>> Identify the Event ID confirming successful RDP authentication:</p>
-
-<input type="text" id="task1">
-<button id="btn1">Execute</button>
-<p id="output1"></p>
-
-<!-- TASK 2 -->
-
-<div id="task2-section" class="section-hidden">
-
-<h3>[ Task 2 ] – Credential Access Identification</h3>
-
-<pre class="log-block">
-Process Created: mimikatz.exe
+      <!-- Task 2 -->
+      <div class="quiz-task" id="task2">
+        <div class="task-label">[ Task 2 ] – Credential Access Identification</div>
+        <div class="code-block">Process Created: mimikatz.exe
 Event ID: 4688
-Target Process Accessed: lsass.exe
-</pre>
+Target Process Accessed: lsass.exe</div>
+        <div class="task-prompt">Which Windows process is being targeted for credential extraction?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input2" type="text" placeholder="Enter process name..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(2)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback2"></div>
+      </div>
 
-<p>> Which Windows process is being targeted for credential extraction?</p>
-
-<input type="text" id="task2">
-<button id="btn2">Execute</button>
-<p id="output2"></p>
-
-</div>
-
-<!-- TASK 3 -->
-
-<div id="task3-section" class="section-hidden">
-
-<h3>[ Task 3 ] – Lateral Movement Artifact</h3>
-
-<pre class="log-block">
-New Service Installed
+      <!-- Task 3 -->
+      <div class="quiz-task" id="task3">
+        <div class="task-label">[ Task 3 ] – Lateral Movement Artifact</div>
+        <div class="code-block">New Service Installed
 Event ID: 7045
-Binary Path: \\192.168.1.15\ADMIN$\payload.exe
-</pre>
+Binary Path: \\192.168.1.15\ADMIN$\payload.exe</div>
+        <div class="task-prompt">What Event ID indicates service-based lateral movement?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input3" type="text" placeholder="Enter Event ID..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(3)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback3"></div>
+      </div>
 
-<p>> What Event ID indicates service-based lateral movement?</p>
+      <!-- Task 4 -->
+      <div class="quiz-task" id="task4">
+        <div class="task-label">[ Task 4 ] – Impact Analysis</div>
+        <div class="code-block">Command Executed:
+vssadmin delete shadows /all /quiet</div>
+        <div class="task-prompt">What Windows recovery feature is being targeted by this command?</div>
+        <div class="task-input-row">
+          <input class="task-input" id="input4" type="text" placeholder="Enter recovery feature..." autocomplete="off" />
+          <button class="execute-btn" onclick="checkAnswer(4)">Execute</button>
+        </div>
+        <div class="task-feedback" id="feedback4"></div>
+      </div>
 
-<input type="text" id="task3">
-<button id="btn3">Execute</button>
-<p id="output3"></p>
+      <div class="lab-complete" id="lab-complete">
+        <div class="complete-badge">✔ ALL TASKS COMPLETED</div>
+        <div class="complete-title">LAB COMPLETE</div>
+        <div class="complete-sub">Incident response simulation successfully completed. All adversary behaviors identified and analyzed.</div>
+        <a href="#" onclick="resetLab(); return false;" class="return-link">↺ Restart Lab</a>
+        <a href="projects.html" class="return-link">← Exit to Projects</a>
+      </div>
 
-</div>
-
-<!-- TASK 4 -->
-
-<div id="task4-section" class="section-hidden">
-
-<h3>[ Task 4 ] – Impact Analysis</h3>
-
-<pre class="log-block">
-Command Executed:
-vssadmin delete shadows /all /quiet
-</pre>
-
-<p>> What Windows recovery feature is being targeted by this command?</p>
-
-<input type="text" id="task4">
-<button id="btn4">Execute</button>
-<p id="output4"></p>
-
-</div>
-
-<div id="completion-section" class="hidden">
-<h3>Room Complete</h3>
-<p class="success">
-✔ All tasks completed successfully.
-</p>
-</div>
+    </div>
+  </div>
 
 </div>
 
 <script>
+  // ─── PHASE TOGGLES ────────────────────────────────────────────────────────
+  function togglePhase(el) {
+    el.classList.toggle('open');
+  }
 
-let completedTasks = 0;
+  // ─── QUIZ LOGIC ───────────────────────────────────────────────────────────
+  const answers = {
+    1: ['4624'],
+    2: ['lsass.exe', 'lsass'],
+    3: ['7045'],
+    4: ['volume shadow copies', 'shadow copies', 'vss', 'volume shadow copy service', 'shadow copy', 'windows shadow copies']
+  };
 
-function updateProgress() {
-    document.getElementById("progress").innerText =
-        "Progress: " + completedTasks + " / 4 Tasks Completed";
-}
+  let completed = new Set();
 
-function revealSection(id, focusId) {
-    const section = document.getElementById(id);
-    section.classList.remove("section-hidden");
-    section.classList.add("section-visible");
+  function normalize(str) {
+    return str.toLowerCase().replace(/[^a-z0-9. ]/g, '').trim();
+  }
 
-    if (focusId) {
-        setTimeout(() => {
-            document.getElementById(focusId).focus();
-        }, 200);
+  function checkAnswer(taskNum) {
+    const input = document.getElementById(`input${taskNum}`);
+    const feedback = document.getElementById(`feedback${taskNum}`);
+    const val = normalize(input.value);
+
+    if (!val) return;
+
+    if (answers[taskNum].includes(val)) {
+      input.classList.remove('wrong');
+      input.classList.add('correct');
+      input.disabled = true;
+      document.querySelector(`#task${taskNum} .execute-btn`).disabled = true;
+      feedback.textContent = '✔ Correct. Artifact identified.';
+      feedback.className = 'task-feedback feedback-correct';
+      completed.add(taskNum);
+      updateProgress();
+    } else {
+      input.classList.remove('correct');
+      input.classList.add('wrong');
+      feedback.textContent = '✘ Incorrect. Review the telemetry and try again.';
+      feedback.className = 'task-feedback feedback-wrong';
+      setTimeout(() => input.classList.remove('wrong'), 600);
     }
-}
+  }
 
-function lockInput(inputId) {
-    document.getElementById(inputId).disabled = true;
-}
+  function updateProgress() {
+    const count = completed.size;
+    const total = Object.keys(answers).length;
+    document.getElementById('progress-text').textContent = `Progress: ${count} / ${total} Tasks Completed`;
+    document.getElementById('progress-fill').style.width = `${(count / total) * 100}%`;
+    if (count === total) {
+      document.getElementById('lab-complete').classList.add('show');
+    }
+  }
 
-function handleEnter(inputId, buttonId) {
-    document.getElementById(inputId).addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            document.getElementById(buttonId).click();
-        }
+  function resetLab() {
+    completed.clear();
+    for (let i = 1; i <= 4; i++) {
+      const input = document.getElementById(`input${i}`);
+      const feedback = document.getElementById(`feedback${i}`);
+      const btn = document.querySelector(`#task${i} .execute-btn`);
+      input.value = '';
+      input.disabled = false;
+      input.className = 'task-input';
+      feedback.textContent = '';
+      feedback.className = 'task-feedback';
+      btn.disabled = false;
+    }
+    updateProgress();
+    document.getElementById('lab-complete').classList.remove('show');
+  }
+
+  // Enter key support
+  document.querySelectorAll('.task-input').forEach((el, i) => {
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer(i + 1);
     });
-}
-
-/* TASK 1 */
-document.getElementById("btn1").addEventListener("click", function() {
-
-    const input = document.getElementById("task1");
-    const output = document.getElementById("output1");
-
-    if (input.value.trim() === "4624") {
-
-        output.innerHTML = "✔ Correct. Successful RDP authentication detected.";
-        output.className = "success";
-
-        if (!input.disabled) {
-            completedTasks++;
-            updateProgress();
-        }
-
-        lockInput("task1");
-        revealSection("task2-section", "task2");
-
-    } else {
-        output.innerHTML = "✖ Incorrect. Review authentication Event IDs.";
-        output.className = "error";
-    }
-
-});
-
-/* TASK 2 */
-document.getElementById("btn2").addEventListener("click", function() {
-
-    const input = document.getElementById("task2");
-    const output = document.getElementById("output2");
-    const answer = input.value.trim().toLowerCase();
-
-    if (answer === "lsass.exe" || answer === "lsass") {
-
-        output.innerHTML = "✔ Correct. LSASS memory access indicates credential dumping.";
-        output.className = "success";
-
-        if (!input.disabled) {
-            completedTasks++;
-            updateProgress();
-        }
-
-        lockInput("task2");
-        revealSection("task3-section", "task3");
-
-    } else {
-        output.innerHTML = "✖ Incorrect. Identify the Windows authentication subsystem.";
-        output.className = "error";
-    }
-
-});
-
-/* TASK 3 */
-document.getElementById("btn3").addEventListener("click", function() {
-
-    const input = document.getElementById("task3");
-    const output = document.getElementById("output3");
-
-    if (input.value.trim() === "7045") {
-
-        output.innerHTML = "✔ Correct. Service installation used for lateral movement.";
-        output.className = "success";
-
-        if (!input.disabled) {
-            completedTasks++;
-            updateProgress();
-        }
-
-        lockInput("task3");
-        revealSection("task4-section", "task4");
-
-    } else {
-        output.innerHTML = "✖ Incorrect. Check service creation Event IDs.";
-        output.className = "error";
-    }
-
-});
-
-/* TASK 4 */
-document.getElementById("btn4").addEventListener("click", function() {
-
-    const input = document.getElementById("task4");
-    const output = document.getElementById("output4");
-    const answer = input.value.trim().toLowerCase();
-
-    if (answer.includes("shadow")) {
-
-        output.innerHTML = "✔ Correct. Shadow copies are deleted to prevent recovery.";
-        output.className = "success";
-
-        if (!input.disabled) {
-            completedTasks++;
-            updateProgress();
-        }
-
-        lockInput("task4");
-
-        setTimeout(() => {
-            revealSection("completion-section");
-            document.getElementById("labCompleteOverlay")
-                .classList.remove("hidden");
-        }, 500);
-
-    } else {
-        output.innerHTML = "✖ Incorrect. Consider Windows backup recovery mechanisms.";
-        output.className = "error";
-    }
-
-});
-
-/* ENTER KEY SUPPORT */
-handleEnter("task1", "btn1");
-handleEnter("task2", "btn2");
-handleEnter("task3", "btn3");
-handleEnter("task4", "btn4");
-
-/* CLOSE OVERLAY */
-function closeOverlay() {
-    document.getElementById("labCompleteOverlay")
-        .classList.add("hidden");
-}
-
+  });
 </script>
-
-<div id="labCompleteOverlay" class="overlay hidden">
-<div class="completion-card">
-<h1>LAB COMPLETE</h1>
-<p>Incident response simulation successfully completed.</p>
-<p>All adversary behaviors identified and analyzed.</p>
-<button onclick="closeOverlay()">Return to Lab</button>
-<br><br>
-<a href="projects.html" class="exit-btn">Exit to Projects</a>
-</div>
-</div>
-
 </body>
 </html>
