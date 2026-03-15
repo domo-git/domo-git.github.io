@@ -1,61 +1,221 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>About | Domenico</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About – Domenico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --border-accent: #30363d;
+    --green: #39d353;
+    --green-dim: #1a6b2a;
+    --red: #f85149;
+    --yellow: #e3b341;
+    --blue: #58a6ff;
+    --cyan: #79c0ff;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --text-bright: #f0f6fc;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 16px; line-height: 1.6; min-height: 100vh; }
+  body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 9999; }
+
+  nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { font-family: var(--font-mono); color: var(--green); font-size: 0.85rem; letter-spacing: 0.05em; }
+  .nav-links { display: flex; gap: 0; list-style: none; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; font-family: var(--font-ui); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 1.2rem; height: 56px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--text-bright); border-bottom-color: var(--green); }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-bright); letter-spacing: 0.02em; text-transform: uppercase; display: flex; align-items: center; gap: 0.75rem; }
+  .page-title::before { content: '//'; color: var(--green); font-family: var(--font-mono); font-size: 1.2rem; }
+  .page-subtitle { margin-top: 0.5rem; color: var(--text-dim); font-size: 0.95rem; font-weight: 500; }
+
+  .section { margin-bottom: 2.5rem; }
+  .section-title { font-family: var(--font-ui); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; }
+
+  .goal-text { font-size: 1rem; color: var(--text); line-height: 1.7; }
+  .goal-text strong { color: var(--text-bright); font-weight: 700; }
+
+  /* SKILLS GRID */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .skill-group { background: var(--bg2); padding: 1.25rem 1.5rem; }
+
+  .skill-group-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .skill-list { list-style: none; }
+  .skill-list li { font-size: 0.88rem; color: var(--text-dim); padding: 0.2rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .skill-list li::before { content: '›'; color: var(--green); font-family: var(--font-mono); font-size: 0.85rem; }
+
+  /* TOOLS */
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tool-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border-accent);
+    border-radius: 4px;
+    padding: 0.4rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+
+  .tool-badge:hover { border-color: var(--green); color: var(--green); }
+
+  /* CONTACT */
+  .contact-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.65rem 1.25rem;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .contact-link:hover { border-color: var(--green); color: var(--green); }
+  .contact-link .icon { font-family: var(--font-mono); font-size: 0.75rem; color: var(--green); }
+
+  @media (max-width: 600px) { .container { padding: 1.5rem 1rem; } .nav-links a { padding: 0 0.6rem; font-size: 0.72rem; } }
+</style>
 </head>
 <body>
 
-    <!-- Animated binary background -->
-    <div class="binary-bg"></div>
+<nav>
+  <div class="nav-brand">[ DOMENICO :: OPSEC ]</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+</nav>
 
-    <h1>About Me</h1>
+<div class="container">
 
-    <hr>
+  <div class="page-header">
+    <h1 class="page-title">About Me</h1>
+    <p class="page-subtitle">Aspiring ethical hacker focused on offensive security &amp; threat intelligence</p>
+  </div>
 
-    <nav>
-        <a href="index.html">Home</a> |
-        <a href="projects.html">Projects</a> |
-        <a href="about.html">About</a>
-    </nav>
-
-    <hr>
-
-    <h2>Professional Goal</h2>
-    <p>
-        I am an aspiring **ethical hacker** with a focus on offensive security and threat intelligence. 
-        My primary objective is to **track, analyze, and understand ransomware attacks**, adversary behavior, 
+  <div class="section">
+    <div class="section-title">Professional Goal</div>
+    <div class="card">
+      <p class="goal-text">
+        I am an aspiring <strong>ethical hacker</strong> with a focus on offensive security and threat intelligence.
+        My primary objective is to <strong>track, analyze, and understand ransomware attacks</strong>, adversary behavior,
         and threat actor methodologies to provide actionable insights and strengthen defenses.
-    </p>
+        I bridge offense and defense through hands-on lab work, real-world TTP emulation,
+        and structured threat actor profiling.
+      </p>
+    </div>
+  </div>
 
-    <h2>Core Skills & Expertise</h2>
-    <ul>
-        <li>Ransomware attack analysis and mitigation</li>
-        <li>Adversary emulation labs (Red Team simulations)</li>
-        <li>Threat actor profiling and TTP documentation</li>
-        <li>Threat intelligence collection and reporting</li>
-        <li>Purple Team operations: combining offense & defense</li>
-        <li>Technical documentation for professional stakeholders</li>
-    </ul>
-
-    <h2>Technical Tools & Interests</h2>
-    <p>
-        I regularly work with:
-        <ul>
-            <li>TryHackMe labs for offensive/defensive training</li>
-            <li>Security monitoring and SIEM platforms</li>
-            <li>Network and endpoint analysis tools</li>
-            <li>Threat intelligence feeds & data aggregation</li>
-            <li>Custom lab setups for adversary emulation</li>
+  <div class="section">
+    <div class="section-title">Core Skills &amp; Expertise</div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="skill-group-title">Offensive</div>
+        <ul class="skill-list">
+          <li>Ransomware attack analysis</li>
+          <li>Adversary emulation labs</li>
+          <li>Red team simulations</li>
+          <li>Exploit chain documentation</li>
         </ul>
-    </p>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Intelligence</div>
+        <ul class="skill-list">
+          <li>Threat actor profiling</li>
+          <li>TTP documentation (ATT&CK)</li>
+          <li>Threat intel collection</li>
+          <li>Campaign attribution</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Defense</div>
+        <ul class="skill-list">
+          <li>Purple team operations</li>
+          <li>SIEM detection engineering</li>
+          <li>Event log analysis</li>
+          <li>Technical stakeholder reporting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
-    <h2>Contact & Collaboration</h2>
-    <p>
-        I am open to mentorship, collaboration, and professional opportunities in offensive security.
-        Feel free to connect via <a href="https://github.com/domo-git">GitHub</a> or LinkedIn.
+  <div class="section">
+    <div class="section-title">Technical Tools &amp; Platforms</div>
+    <div class="tools-row">
+      <span class="tool-badge">TryHackMe</span>
+      <span class="tool-badge">Splunk / SIEM</span>
+      <span class="tool-badge">Wireshark</span>
+      <span class="tool-badge">Velociraptor</span>
+      <span class="tool-badge">MITRE ATT&CK Navigator</span>
+      <span class="tool-badge">Windows Event Forwarding</span>
+      <span class="tool-badge">VirtualBox / VMware</span>
+      <span class="tool-badge">Active Directory</span>
+      <span class="tool-badge">PowerShell</span>
+      <span class="tool-badge">Threat Intel Feeds</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Contact &amp; Collaboration</div>
+    <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">
+      Open to mentorship, collaboration, and professional opportunities in offensive security.
     </p>
+    <div class="contact-links">
+      <a href="https://github.com/domo-git" class="contact-link" target="_blank" rel="noopener">
+        <span class="icon">[GH]</span> GitHub
+      </a>
+      <a href="#" class="contact-link">
+        <span class="icon">[LI]</span> LinkedIn
+      </a>
+    </div>
+  </div>
+
+</div>
 
 </body>
 </html>
