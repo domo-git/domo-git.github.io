@@ -1,40 +1,41 @@
-# Domenico's Offensive Security Portfolio
+# Domenico – Offensive Security Portfolio
 
-Welcome to my offensive security portfolio.  
-
-I am an **ethical hacker** focused on:
-- **Ransomware Technique Analysis**  
-- **Adversary Emulation Labs**  
-- **Threat Actor Profiling**  
-- **Threat Intelligence & Purple Team Awareness**
+An offensive security portfolio focused on adversary emulation, ransomware analysis,
+and threat actor profiling. All lab work is conducted in controlled, isolated environments.
 
 ---
 
-## 🔹 Portfolio Website
+## Portfolio Website
 
-You can view my portfolio live here: [domo-git.github.io](https://domo-git.github.io)
+**Live site:** [domo-git.github.io](https://domo-git.github.io)
 
-It is built with **HTML, CSS**, and a **Matrix/Y2K cyber fantasy theme**, showcasing my technical projects in offensive security.
-
----
-
-## 🔹 Projects Overview
-
-1. **Ransomware Technique Analysis** – Mapping real-world ransomware campaigns to MITRE ATT&CK.  
-2. **Adversary Emulation Lab** – Controlled simulations replicating attacker workflows.  
-3. **Threat Actor Profiling** – Structured analysis of ransomware groups, TTPs, and operational patterns.  
+Built with HTML and CSS using a dark terminal/cyberpunk theme. Features interactive
+lab simulations, a live AI-powered threat intelligence feed, and analyst competency checks.
 
 ---
 
-## 🔹 Skills Demonstrated
+## Projects
 
-- Offensive security methodologies  
-- Threat actor profiling & intelligence gathering  
-- Red & Purple team operations  
-- Reporting & documentation for professional audiences  
+| Project | Description |
+|---|---|
+| **Ransomware Technique Analysis** | Real-world campaign mapping to MITRE ATT&CK with detection telemetry |
+| **Adversary Emulation Lab** | Controlled AD simulation replicating ransomware tradecraft end-to-end |
+| **Threat Actor Profiling** | Structured TTP analysis of known ransomware groups with live intel feed |
 
 ---
 
-## 🔹 Contact
+## Skills Demonstrated
 
-Feel free to reach out via GitHub or LinkedIn for collaboration or inquiries.
+- Adversary emulation & red team simulation
+- MITRE ATT&CK mapping and TTP documentation
+- Threat actor profiling & intelligence gathering
+- Detection engineering & SIEM rule development
+- Purple team operations bridging offense and defense
+- Technical reporting for professional stakeholders
+
+---
+
+## Contact
+
+Open to mentorship, collaboration, and opportunities in offensive security.
+Connect via [GitHub](https://github.com/domo-git) or LinkedIn.
