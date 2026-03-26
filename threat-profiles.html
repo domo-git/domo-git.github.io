@@ -902,18 +902,59 @@ renderTier(0);
 // ─── LIVE NEWS FEED ─────────────────────────────────────────────────────────
 let shownTitles = [];
 
+// Trusted source homepages — always valid, never 404
+const TRUSTED_SOURCES = {
+  'bleepingcomputer.com':  'https://www.bleepingcomputer.com/news/security/',
+  'therecord.media':       'https://therecord.media/ransomware',
+  'darkreading.com':       'https://www.darkreading.com/threat-intelligence',
+  'threatpost.com':        'https://threatpost.com/',
+  'krebs on security':     'https://krebsonsecurity.com/',
+  'krebsonsecurity.com':   'https://krebsonsecurity.com/',
+  'securityweek.com':      'https://www.securityweek.com/category/ransomware/',
+  'cisa.gov':              'https://www.cisa.gov/news-events/cybersecurity-advisories',
+  'microsoft.com':         'https://www.microsoft.com/en-us/security/blog/',
+  'attack.mitre.org':      'https://attack.mitre.org/',
+  'unit42.paloaltonetworks.com': 'https://unit42.paloaltonetworks.com/',
+  'crowdstrike.com':       'https://www.crowdstrike.com/blog/',
+  'mandiant.com':          'https://www.mandiant.com/resources/blog',
+  'sentinelone.com':       'https://www.sentinelone.com/blog/',
+  'recordedfuture.com':    'https://www.recordedfuture.com/blog',
+};
+
+// Large fallback pool — randomly sampled so repeats are very unlikely
+const FALLBACK_POOL = [
+  { title:"RansomHub Surpasses LockBit as Most Active RaaS Group", description:"RansomHub has overtaken LockBit in victim volume, recruiting former affiliates and targeting healthcare and critical infrastructure.", source:"bleepingcomputer.com", tag:"CRITICAL" },
+  { title:"Black Basta Shifts Initial Access to Fortinet Exploits", description:"Analysts observe Black Basta operators pivoting from phishing to exploit exposed Fortinet VPN appliances for initial access.", source:"darkreading.com", tag:"HIGH" },
+  { title:"Midnight Blizzard Targets M365 Tenants via Password Spray", description:"Microsoft-tracked Russian APT Midnight Blizzard is conducting sustained password spray operations against government M365 environments.", source:"microsoft.com", tag:"HIGH" },
+  { title:"CISA Adds Actively Exploited Ivanti CVE to KEV Catalog", description:"CISA issued an emergency directive requiring federal agencies to patch a critical Ivanti Connect Secure vulnerability being exploited in the wild.", source:"cisa.gov", tag:"CRITICAL" },
+  { title:"Volt Typhoon Maintains Persistent Access in US Utilities", description:"Chinese state-sponsored threat actor Volt Typhoon continues pre-positioning inside US power and water utility networks for potential disruption.", source:"therecord.media", tag:"HIGH" },
+  { title:"LockBit Rebuilds Infrastructure After Law Enforcement Takedown", description:"Remnant LockBit operators have relaunched infrastructure and resumed affiliate recruitment despite Operation Cronos disruption.", source:"krebsonsecurity.com", tag:"INTEL" },
+  { title:"Scattered Spider Targets Financial Sector with Vishing Attacks", description:"The Scattered Spider group is conducting voice phishing campaigns against help desks to gain initial access at major financial institutions.", source:"crowdstrike.com", tag:"HIGH" },
+  { title:"ALPHV/BlackCat Executes Exit Scam After MGM Attack Ransom", description:"BlackCat shut down operations and disappeared with the ransom payment after the MGM Resorts breach, leaving affiliates unpaid.", source:"bleepingcomputer.com", tag:"INTEL" },
+  { title:"Lazarus Group Deploys New RAT in Supply Chain Campaign", description:"North Korea's Lazarus Group has been observed deploying a novel remote access trojan via compromised software supply chains targeting defence contractors.", source:"mandiant.com", tag:"HIGH" },
+  { title:"Play Ransomware Adopts Intermittent Encryption for Speed", description:"The Play ransomware group has updated its encryptor to use intermittent encryption, significantly reducing time-to-ransom while evading file-based detection.", source:"sentinelone.com", tag:"TTPS" },
+  { title:"Cl0p Moves to Zero-Day Exploitation of File Transfer Products", description:"Cl0p continues its pattern of mass-exploiting zero-days in enterprise file transfer software to steal data from hundreds of organisations simultaneously.", source:"securityweek.com", tag:"CRITICAL" },
+  { title:"New BumbleBee Loader Variant Evades EDR via DLL Sideloading", description:"A new variant of the BumbleBee loader has been observed using DLL sideloading against legitimate signed binaries to bypass endpoint detection.", source:"unit42.paloaltonetworks.com", tag:"TTPS" },
+  { title:"APT29 Expands Targeting to European Diplomatic Missions", description:"Cozy Bear / APT29 has broadened its espionage operations to target European diplomatic missions using updated WellMess and GraphicalProton malware.", source:"recordedfuture.com", tag:"INTEL" },
+  { title:"Akira Ransomware Exploits Cisco ASA Vulnerabilities for Access", description:"Akira ransomware operators are actively exploiting unpatched Cisco ASA/FTD appliances as a primary initial access vector across multiple sectors.", source:"bleepingcomputer.com", tag:"CRITICAL" },
+  { title:"New Credential Harvesting Campaign Abuses OAuth Device Flow", description:"Threat actors are abusing the OAuth device code authentication flow to steal Microsoft 365 tokens without triggering multi-factor authentication prompts.", source:"microsoft.com", tag:"HIGH" },
+  { title:"Medusa Ransomware Targets Critical Infrastructure Globally", description:"The Medusa ransomware group has significantly increased its operational tempo, with confirmed attacks against water, energy, and transport operators.", source:"therecord.media", tag:"CRITICAL" },
+  { title:"GhostLocker RaaS Opens Affiliate Programme on Dark Web", description:"A newly emerged ransomware-as-a-service operation called GhostLocker is recruiting affiliates with an 85/15 revenue split and custom negotiation portal.", source:"darkreading.com", tag:"INTEL" },
+  { title:"Sandworm Deploys AcidPour Wiper Against European Telecoms", description:"Russian military GRU unit Sandworm has deployed a new data wiper called AcidPour against telecommunications infrastructure in Eastern Europe.", source:"mandiant.com", tag:"HIGH" },
+  { title:"TA577 Switches to HTML Smuggling for Initial Access Delivery", description:"The TA577 threat group has moved from macro-enabled documents to HTML smuggling techniques to deliver Qakbot payloads and evade email gateway detection.", source:"sentinelone.com", tag:"TTPS" },
+  { title:"MITRE ATT&CK Updated with New Cloud and Container Techniques", description:"MITRE has released a framework update expanding cloud, Kubernetes, and container-specific attack techniques across multiple tactics.", source:"attack.mitre.org", tag:"TTPS" },
+];
+
 async function loadFeed() {
   const btn = document.getElementById('refresh-btn');
   btn.textContent = '↻ REFRESHING...'; btn.disabled = true;
   document.getElementById('news-container').innerHTML = `<div class="news-loading"><div class="spinner"></div>Querying threat intelligence sources...</div>`;
   document.getElementById('feed-status-text').textContent = 'FETCHING...';
 
-  // Unique seed forces a genuinely fresh search every time
-  const seed  = Math.random().toString(36).slice(2, 8).toUpperCase();
-  const now   = new Date();
-  const stamp = now.toUTCString();
+  const seed  = Math.random().toString(36).slice(2, 9).toUpperCase();
+  const stamp = new Date().toUTCString();
   const avoid = shownTitles.length
-    ? `Do NOT repeat or closely paraphrase any of these previously shown headlines: ${shownTitles.slice(-10).join(' | ')}.`
+    ? `IMPORTANT — do NOT include any of these topics already shown: ${shownTitles.slice(-10).join(' | ')}.`
     : '';
 
   try {
@@ -924,8 +965,34 @@ async function loadFeed() {
         model: "claude-sonnet-4-20250514",
         max_tokens: 1400,
         tools: [{ type: "web_search_20250305", name: "web_search" }],
-        system: `You are a live cybersecurity threat intelligence feed. The current UTC time is ${stamp}. Request seed: ${seed}. Perform a FRESH web search RIGHT NOW for the very latest ransomware attacks, APT activity, threat actor news, and CVE exploits published in the last 72 hours. ${avoid} Return ONLY a valid JSON array (no markdown, no fences) of exactly 5 DIFFERENT items not seen before. Each item: title (string), description (1-2 sentences), source (domain only), url (full https article URL), tag (one of CRITICAL/HIGH/INTEL/TTPS). Prioritise breaking news over evergreen content.`,
-        messages: [{ role: "user", content: `Seed: ${seed} | Time: ${stamp} | Fetch 5 brand-new cybersecurity threat intelligence headlines published in the last 72 hours. Return only a JSON array.` }]
+        system: `You are a live cybersecurity threat intelligence analyst. Current UTC time: ${stamp}. Seed: ${seed}.
+
+Search the web RIGHT NOW for the 5 most significant cybersecurity news stories from the past 7 days — ransomware attacks, APT campaigns, exploited CVEs, threat actor activity.
+
+${avoid}
+
+Return ONLY a valid JSON array of exactly 5 items. No markdown, no code fences, no explanation — just the raw JSON array.
+
+Each item must have EXACTLY these fields:
+- title: short news headline (string)
+- description: 1-2 sentence summary (string)  
+- source: domain name only, e.g. "bleepingcomputer.com" (string)
+- url: ONLY use the homepage or main section URL for the source — do NOT invent specific article paths. Use only these safe URLs based on source:
+  bleepingcomputer.com → https://www.bleepingcomputer.com/news/security/
+  therecord.media → https://therecord.media/ransomware
+  darkreading.com → https://www.darkreading.com/threat-intelligence
+  krebsonsecurity.com → https://krebsonsecurity.com/
+  securityweek.com → https://www.securityweek.com/category/ransomware/
+  cisa.gov → https://www.cisa.gov/news-events/cybersecurity-advisories
+  microsoft.com → https://www.microsoft.com/en-us/security/blog/
+  unit42.paloaltonetworks.com → https://unit42.paloaltonetworks.com/
+  crowdstrike.com → https://www.crowdstrike.com/blog/
+  mandiant.com → https://www.mandiant.com/resources/blog
+  sentinelone.com → https://www.sentinelone.com/blog/
+  recordedfuture.com → https://www.recordedfuture.com/blog
+  attack.mitre.org → https://attack.mitre.org/
+- tag: one of CRITICAL, HIGH, INTEL, or TTPS`,
+        messages: [{ role: "user", content: `Seed ${seed} | ${stamp} | Search for 5 fresh cybersecurity threat intel stories from the past 7 days. Return only the JSON array.` }]
       })
     });
 
@@ -933,30 +1000,28 @@ async function loadFeed() {
     const fullText = data.content.map(i => i.type === 'text' ? i.text : '').filter(Boolean).join('\n');
     const clean = fullText.replace(/```json|```/g,'').trim();
     const items = JSON.parse(clean);
-    shownTitles.push(...items.map(i => i.title));
-    renderFeed(items);
+
+    // Ensure every URL is a trusted homepage — never a fabricated path
+    const sanitised = items.map(item => {
+      const knownUrl = TRUSTED_SOURCES[item.source.toLowerCase()];
+      return { ...item, url: knownUrl || `https://${item.source}` };
+    });
+
+    shownTitles.push(...sanitised.map(i => i.title));
+    renderFeed(sanitised);
 
   } catch(err) {
     console.error('Feed error:', err);
-    // Rotate through varied fallback sets so even the fallback doesn't repeat
-    const fallbacks = [
-      [
-        { title: "RansomHub Expands Affiliate Recruitment", description: "RansomHub continues aggressive affiliate recruitment targeting healthcare and critical infrastructure with updated encryptor tooling.", source: "bleepingcomputer.com", url: "https://www.bleepingcomputer.com/news/security/", tag: "CRITICAL" },
-        { title: "Black Basta TTP Evolution Observed", description: "Analysts note Black Basta shifting initial access vectors to exploit exposed Confluence and Fortinet appliances.", source: "bleepingcomputer.com", url: "https://www.bleepingcomputer.com/news/security/", tag: "HIGH" },
-        { title: "LockBit Successor Groups Active Post-Takedown", description: "Remnant LockBit operators rebranding under new identities while retaining core encryptor code and affiliate infrastructure.", source: "therecord.media", url: "https://therecord.media/ransomware", tag: "INTEL" },
-        { title: "Midnight Blizzard Credential Spray Campaign", description: "Microsoft-tracked APT Midnight Blizzard conducting password spray operations against M365 tenants in government sectors.", source: "microsoft.com", url: "https://www.microsoft.com/en-us/security/blog/", tag: "HIGH" },
-        { title: "MITRE ATT&CK v16 Released — New Sub-Techniques Added", description: "MITRE releases ATT&CK v16 with expanded cloud, mobile, and ICS technique coverage including new defense evasion entries.", source: "attack.mitre.org", url: "https://attack.mitre.org/", tag: "TTPS" }
-      ],
-      [
-        { title: "Cl0p Gang Exploits MOVEit Successor Vulnerability", description: "Cl0p ransomware operators pivot to a newly disclosed file-transfer vulnerability, compromising dozens of enterprise targets.", source: "therecord.media", url: "https://therecord.media/ransomware", tag: "CRITICAL" },
-        { title: "ALPHV/BlackCat Infrastructure Seized by FBI", description: "Law enforcement operations disrupt BlackCat ransomware infrastructure, obtaining decryption keys for hundreds of victims.", source: "bleepingcomputer.com", url: "https://www.bleepingcomputer.com/news/security/", tag: "INTEL" },
-        { title: "Volt Typhoon Pre-Positions in US Critical Infrastructure", description: "Chinese state-sponsored actors detected maintaining persistent access to US power and water utility networks.", source: "cisa.gov", url: "https://www.cisa.gov/news-events/alerts", tag: "HIGH" },
-        { title: "New Credential Harvesting Campaign Targets Azure AD", description: "Threat actors abuse OAuth device code flow to steal tokens from Microsoft 365 environments without triggering MFA.", source: "microsoft.com", url: "https://www.microsoft.com/en-us/security/blog/", tag: "HIGH" },
-        { title: "CISA Adds 3 CVEs to Known Exploited Vulnerabilities Catalog", description: "CISA issues binding directive covering actively exploited flaws in Palo Alto, Ivanti, and Cisco network appliances.", source: "cisa.gov", url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog", tag: "CRITICAL" }
-      ]
-    ];
-    const set = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-    renderFeed(set);
+    // Randomly pick 5 from the large pool, avoiding recently shown titles
+    const available = FALLBACK_POOL.filter(f => !shownTitles.includes(f.title));
+    const pool = available.length >= 5 ? available : FALLBACK_POOL;
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 5);
+    const withUrls = shuffled.map(f => ({
+      ...f,
+      url: TRUSTED_SOURCES[f.source] || `https://${f.source}`
+    }));
+    shownTitles.push(...withUrls.map(i => i.title));
+    renderFeed(withUrls);
   }
 
   btn.textContent = '↻ REFRESH'; btn.disabled = false;
