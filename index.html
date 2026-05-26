@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -371,7 +371,7 @@
     <a class="nav-link" href="threat-profiles.html" data-nav>INTEL FEED</a>
     <a class="nav-link" href="osint-tools.html" data-nav>OSINT <span class="nav-badge">NEW</span></a>
     <a class="nav-link" href="about.html" data-nav>ABOUT</a>
-    <button class="theme-btn" data-theme-toggle>☀ LIGHT</button>
+    <button class="theme-btn" data-theme-toggle aria-label="Switch to dark mode">☽ DARK</button>
   </div>
 </nav>
 
@@ -422,10 +422,10 @@
         <p class="pipe-sub">Controlled lab replication</p>
       </a>
       <div class="pipe-arrow">→</div>
-      <a class="pipe-node active" href="adversary-lab.html#cyber-range" data-nav>
+      <a class="pipe-node active" href="https://github.com/domo-git/pi-cyber-range" target="_blank" rel="noopener">
         <p class="pipe-phase">PHASE 03</p>
-        <p class="pipe-title">Cyber Range</p>
-        <p class="pipe-sub">Live environment testing</p>
+        <p class="pipe-title">Pi Cyber Range</p>
+        <p class="pipe-sub">Wazuh SIEM · Kali · Fail2ban</p>
       </a>
       <div class="pipe-arrow">→</div>
       <div class="pipe-node">
@@ -459,7 +459,7 @@
             <p class="cdesc">Controlled lab simulations replicating attacker workflows from initial access through post-exploitation.</p>
             <div class="cfoot">
               <span class="clink">VIEW PROJECT →</span>
-              <span class="conn-badge"><span class="conn-dot"></span>LINKED → CYBER RANGE</span>
+              <a href="https://github.com/domo-git/pi-cyber-range" target="_blank" rel="noopener" class="conn-badge" style="text-decoration:none;"><span class="conn-dot"></span>LINKED → PI CYBER RANGE</a>
             </div>
           </a>
 
@@ -548,6 +548,12 @@
   </div>
 </footer>
 
+<!-- Set your Anthropic API key here — match however threat-profiles.html sets it -->
+<script>
+  // Copy the exact line from threat-profiles.html that sets your API key
+  // It will look something like: window.ANTHROPIC_API_KEY = 'sk-ant-...';
+  window.ANTHROPIC_API_KEY = '';
+</script>
 <script src="matrix.js"></script>
 </body>
 </html>
