@@ -1,60 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projects – Domenico</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0a0c0f;--bg2:#0d1117;--bg3:#161b22;--border:#21262d;--border-accent:#30363d;--green:#39d353;--green-dim:#1a6b2a;--red:#f85149;--yellow:#e3b341;--blue:#58a6ff;--cyan:#79c0ff;--text:#c9d1d9;--text-dim:#8b949e;--text-bright:#f0f6fc;--font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;}
+  [data-theme="dark"]{--bg:#0a0c0f;--bg2:#0d1117;--bg3:#161b22;--border:#21262d;--border-accent:#30363d;--green:#39d353;--green-dim:#1a6b2a;--green-glow:rgba(57,211,83,0.12);--red:#f85149;--yellow:#e3b341;--blue:#58a6ff;--cyan:#79c0ff;--text:#c9d1d9;--text-dim:#8b949e;--text-bright:#f0f6fc;--nav-bg:rgba(13,17,23,0.88);--scanline:rgba(0,0,0,0.04);--rain-opacity:0.25;}
+  [data-theme="light"]{--bg:#f0f4f0;--bg2:#ffffff;--bg3:#e6ece6;--border:#d0dbd0;--border-accent:#b8ccb8;--green:#1a7a2e;--green-dim:#c8e6c9;--green-glow:rgba(26,122,46,0.10);--red:#b02020;--yellow:#9a6008;--blue:#1a5fa0;--cyan:#1a7a8a;--text:#0e1f0e;--text-dim:#3d6640;--text-bright:#0a140a;--nav-bg:rgba(240,244,240,0.88);--scanline:rgba(0,80,0,0.015);--rain-opacity:0.12;}
+  :root{--font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;}
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.6;min-height:100vh;}
-  #binary-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;}
-  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:9999;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.6;min-height:100vh;transition:background 0.25s,color 0.25s;}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:9999;}
+  #matrix-rain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:var(--rain-opacity);}
   nav,.container{position:relative;z-index:1;}
-  nav{background:rgba(13,17,23,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
-  .nav-brand{font-family:var(--font-mono);color:var(--green);font-size:0.85rem;letter-spacing:0.05em;text-shadow:0 0 12px rgba(57,211,83,0.5);}
-  .nav-links{display:flex;list-style:none;}
+  nav{background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;transition:background 0.25s,border-color 0.25s;}
+  .nav-brand{font-family:var(--font-mono);color:var(--green);font-size:0.85rem;letter-spacing:0.05em;text-decoration:none;}
+  .nav-links{display:flex;list-style:none;align-items:center;}
   .nav-links a{color:var(--text-dim);text-decoration:none;font-family:var(--font-ui);font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;padding:0 1.2rem;height:56px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all 0.2s;}
-  .nav-links a:hover,.nav-links a.active{color:var(--text-bright);border-bottom-color:var(--green);text-shadow:0 0 8px rgba(57,211,83,0.4);}
+  .nav-links a:hover,.nav-links a.active{color:var(--text-bright);border-bottom-color:var(--green);}
+  .theme-toggle-btn{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);background:var(--green-glow);border:1px solid var(--border-accent);border-radius:4px;padding:0.3rem 0.75rem;cursor:pointer;letter-spacing:0.08em;margin-left:1rem;transition:color 0.2s,border-color 0.2s;}
+  .theme-toggle-btn:hover{color:var(--green);border-color:var(--green);}
   .container{max-width:960px;margin:0 auto;padding:2.5rem 2rem;}
   .page-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
-  .breadcrumb{font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem;}
-  .breadcrumb a{color:var(--green);text-decoration:none;}
-  .breadcrumb span{margin:0 0.4rem;}
-  .page-title{font-size:1.8rem;font-weight:700;color:var(--text-bright);letter-spacing:0.02em;text-transform:uppercase;display:flex;align-items:center;gap:0.75rem;text-shadow:0 0 30px rgba(57,211,83,0.1);}
-  .page-title::before{content:'//';color:var(--green);font-family:var(--font-mono);font-size:1.2rem;text-shadow:0 0 10px rgba(57,211,83,0.6);animation:glitch 5s infinite;}
-  @keyframes glitch{0%,88%,100%{transform:translate(0);text-shadow:0 0 10px rgba(57,211,83,0.6);}89%{transform:translate(-2px,1px);text-shadow:2px 0 #79c0ff;}90%{transform:translate(2px,-1px);text-shadow:-2px 0 #f85149;}91%{transform:translate(0);text-shadow:0 0 10px rgba(57,211,83,0.6);}93%{transform:translate(1px,1px);text-shadow:-1px 0 #79c0ff;}94%{transform:translate(0);text-shadow:0 0 10px rgba(57,211,83,0.6);}}
+  .page-title{font-size:1.8rem;font-weight:700;color:var(--text-bright);letter-spacing:0.02em;text-transform:uppercase;display:flex;align-items:center;gap:0.75rem;}
+  .page-title::before{content:'//';color:var(--green);font-family:var(--font-mono);font-size:1.2rem;animation:glitch 5s infinite;}
+  @keyframes glitch{0%,88%,100%{transform:translate(0)}89%{transform:translate(-2px,1px)}90%{transform:translate(2px,-1px)}91%,94%{transform:translate(0)}93%{transform:translate(1px,1px)}}
   .page-subtitle{margin-top:0.5rem;color:var(--text-dim);font-size:0.95rem;font-weight:500;}
   .section{margin-bottom:2.5rem;}
   .section-title{font-family:var(--font-ui);font-weight:700;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;position:relative;overflow:hidden;}
-  .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--green);border-radius:2px;box-shadow:0 0 6px var(--green);animation:barPulse 2.5s ease-in-out infinite;}
-  .section-title::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(57,211,83,0.07),transparent);animation:sweep 4s ease-in-out infinite;}
-  @keyframes barPulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.4;box-shadow:none}}
+  .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--green);border-radius:2px;animation:barPulse 2.5s ease-in-out infinite;}
+  .section-title::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--green-glow),transparent);animation:sweep 4s ease-in-out infinite;}
+  @keyframes barPulse{0%,100%{opacity:1}50%{opacity:0.4}}
   @keyframes sweep{0%{left:-60%}50%{left:160%}100%{left:160%}}
   .project-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1.75rem;margin-bottom:1px;display:flex;gap:1.5rem;align-items:flex-start;transition:all 0.2s;text-decoration:none;color:inherit;}
-  .project-card:hover{border-color:var(--green-dim);box-shadow:0 0 20px rgba(57,211,83,0.06);}
-  .project-card:hover .project-title{color:var(--green);text-shadow:0 0 8px rgba(57,211,83,0.3);}
-  .project-icon{font-family:var(--font-mono);font-size:0.65rem;color:var(--green);background:rgba(57,211,83,0.08);border:1px solid var(--green-dim);border-radius:3px;padding:0.3rem 0.5rem;white-space:nowrap;margin-top:0.15rem;text-shadow:0 0 6px rgba(57,211,83,0.4);}
+  .project-card:hover{border-color:var(--green-dim);}
+  .project-card:hover .project-title{color:var(--green);}
+  .project-icon{font-family:var(--font-mono);font-size:0.65rem;color:var(--green);background:var(--green-glow);border:1px solid var(--green-dim);border-radius:3px;padding:0.3rem 0.5rem;white-space:nowrap;margin-top:0.15rem;}
   .project-body{flex:1;}
-  .project-title{font-weight:700;font-size:1.1rem;color:var(--text-bright);margin-bottom:0.5rem;transition:all 0.2s;}
+  .project-title{font-weight:700;font-size:1.1rem;color:var(--text-bright);margin-bottom:0.5rem;transition:color 0.2s;}
   .project-desc{font-size:0.9rem;color:var(--text-dim);line-height:1.6;margin-bottom:1rem;}
   .project-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
   .tag{font-family:var(--font-mono);font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:2px;background:var(--bg3);border:1px solid var(--border-accent);color:var(--text-dim);letter-spacing:0.05em;}
-  .project-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--green);text-decoration:none;font-weight:600;font-size:0.82rem;letter-spacing:0.05em;transition:all 0.2s;text-shadow:0 0 6px rgba(57,211,83,0.3);}
-  .project-link:hover{text-shadow:0 0 12px rgba(57,211,83,0.6);}
+  .project-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--green);text-decoration:none;font-weight:600;font-size:0.82rem;letter-spacing:0.05em;transition:all 0.2s;}
   .project-link::after{content:'→';}
   @media(max-width:600px){.container{padding:1.5rem 1rem;}.nav-links a{padding:0 0.6rem;font-size:0.72rem;}.project-card{flex-direction:column;gap:0.75rem;}}
 </style>
 </head>
 <body>
-<canvas id="binary-canvas"></canvas>
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
 <nav>
-  <div class="nav-brand" data-glitch>[ DOMENICO :: OPSEC ]</div>
+  <a class="nav-brand" href="index.html" data-nav data-glitch>[ DOMENICO :: OPSEC ]</a>
   <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="projects.html" class="active">Projects</a></li>
-    <li><a href="about.html">About</a></li>
+    <li><a href="index.html" data-nav>Home</a></li>
+    <li><a href="projects.html" class="active" data-nav>Projects</a></li>
+    <li><a href="threat-profiles.html" data-nav>Intel Feed</a></li>
+    <li><a href="osint-tools.html" data-nav>OSINT</a></li>
+    <li><a href="about.html" data-nav>About</a></li>
+    <button class="theme-toggle-btn" data-theme-toggle aria-label="Switch to dark mode">☽ DARK</button>
   </ul>
 </nav>
 <div class="container">
@@ -64,35 +67,45 @@
   </div>
   <div class="section">
     <div class="section-title">Active Research</div>
-    <div class="project-card">
+    <a class="project-card" href="ransomware-analysis.html" data-nav>
       <div class="project-icon">T1486</div>
       <div class="project-body">
-        <div class="project-title" data-scramble>Ransomware Technique Analysis</div>
+        <div class="project-title" data-scramble="Ransomware Technique Analysis">Ransomware Technique Analysis</div>
         <div class="project-desc">Technical breakdowns of real-world ransomware campaigns mapped to the MITRE ATT&CK framework, analyzing initial access vectors, privilege escalation techniques, lateral movement, and impact stages.</div>
         <div class="project-tags"><span class="tag">MITRE ATT&CK</span><span class="tag">Purple Team</span><span class="tag">SIEM</span><span class="tag">Detection Engineering</span></div>
-        <a href="ransomware-analysis.html" class="project-link">View Analysis</a>
+        <span class="project-link">View Analysis</span>
       </div>
-    </div>
-    <div class="project-card">
+    </a>
+    <a class="project-card" href="adversary-lab.html" data-nav>
       <div class="project-icon">RED TEAM</div>
       <div class="project-body">
-        <div class="project-title" data-scramble>Adversary Emulation Lab</div>
+        <div class="project-title" data-scramble="Adversary Emulation Lab">Adversary Emulation Lab</div>
         <div class="project-desc">Controlled lab simulations replicating real-world attacker workflows including enumeration, exploitation, persistence, and post-exploitation validation in an isolated Active Directory environment.</div>
         <div class="project-tags"><span class="tag">Active Directory</span><span class="tag">WinEvent Logs</span><span class="tag">Lateral Movement</span><span class="tag">Post-Exploitation</span></div>
-        <a href="adversary-lab.html" class="project-link">View Lab Documentation</a>
+        <span class="project-link">View Lab Documentation</span>
       </div>
-    </div>
-    <div class="project-card">
+    </a>
+    <a class="project-card" href="threat-profiles.html" data-nav>
       <div class="project-icon">PROFILING</div>
       <div class="project-body">
-        <div class="project-title" data-scramble>Threat Actor Profiling</div>
+        <div class="project-title" data-scramble="Threat Actor Profiling">Threat Actor Profiling</div>
         <div class="project-desc">Structured profiling of known ransomware groups, focusing on TTP patterns, infrastructure behavior, and operational methodology. Includes live threat intel feed and progressive TTP quiz room.</div>
         <div class="project-tags"><span class="tag">Threat Intel</span><span class="tag">TTP Analysis</span><span class="tag">RaaS Groups</span><span class="tag">Live Feed</span></div>
-        <a href="threat-profiles.html" class="project-link">View Profiles</a>
+        <span class="project-link">View Profiles</span>
       </div>
-    </div>
+    </a>
+    <a class="project-card" href="https://github.com/domo-git/pi-cyber-range" target="_blank" rel="noopener">
+      <div class="project-icon">CYBER RANGE</div>
+      <div class="project-body">
+        <div class="project-title" data-scramble="Pi Zero 2W Cyber Range">Pi Zero 2W Cyber Range</div>
+        <div class="project-desc">Home cyber range built on a Raspberry Pi Zero 2W. Wazuh SIEM deployed on Fedora, Kali Linux attack simulation, Fail2ban, UFW, DVWA, and Tailscale remote access. Brute force detection validated via Hydra with full MITRE ATT&CK pipeline.</div>
+        <div class="project-tags"><span class="tag">Wazuh SIEM</span><span class="tag">Kali Linux</span><span class="tag">Fail2ban</span><span class="tag">Raspberry Pi</span><span class="tag">T1110.001</span></div>
+        <span class="project-link">View on GitHub</span>
+      </div>
+    </a>
   </div>
 </div>
+<script>window.ANTHROPIC_API_KEY = 'YOUR-API-KEY-HERE';</script>
 <script src="matrix.js"></script>
 </body>
 </html>
