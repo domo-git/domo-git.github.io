@@ -1,147 +1,553 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Domenico – Offensive Security Portfolio</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:#0a0c0f;--bg2:#0d1117;--bg3:#161b22;--border:#21262d;--border-accent:#30363d;
-    --green:#39d353;--green-dim:#1a6b2a;--red:#f85149;--yellow:#e3b341;
-    --blue:#58a6ff;--cyan:#79c0ff;--text:#c9d1d9;--text-dim:#8b949e;--text-bright:#f0f6fc;
-    --font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.6;min-height:100vh;}
-  #binary-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;}
-  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:9999;}
-  nav,.hero,.container{position:relative;z-index:1;}
-  nav{background:rgba(13,17,23,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
-  .nav-brand{font-family:var(--font-mono);color:var(--green);font-size:0.85rem;letter-spacing:0.05em;text-shadow:0 0 12px rgba(57,211,83,0.5);}
-  .nav-links{display:flex;list-style:none;}
-  .nav-links a{color:var(--text-dim);text-decoration:none;font-family:var(--font-ui);font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;padding:0 1.2rem;height:56px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all 0.2s;}
-  .nav-links a:hover,.nav-links a.active{color:var(--text-bright);border-bottom-color:var(--green);text-shadow:0 0 8px rgba(57,211,83,0.4);}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domenico – Offensive Security Portfolio</title>
+  <meta name="description" content="Offensive security portfolio specialising in adversary emulation, ransomware analysis and threat intelligence." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --mono: 'Share Tech Mono', 'Courier New', monospace;
+      --ui: 'Rajdhani', system-ui, sans-serif;
+    }
 
-  .hero{border-bottom:1px solid var(--border);padding:4rem 2rem;max-width:960px;margin:0 auto;}
-  .hero-eyebrow{font-family:var(--font-mono);font-size:0.75rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;text-shadow:0 0 8px rgba(57,211,83,0.5);}
-  .hero-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:var(--green);box-shadow:0 0 6px var(--green);}
-  .hero-name{font-size:3.5rem;font-weight:700;color:var(--text-bright);letter-spacing:-0.01em;line-height:1.1;margin-bottom:0.5rem;text-shadow:0 0 40px rgba(57,211,83,0.12);}
-  .hero-title{font-size:1.1rem;font-weight:600;color:var(--green);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem;font-family:var(--font-mono);text-shadow:0 0 10px rgba(57,211,83,0.4);min-height:1.5em;}
-  .hero-desc{max-width:560px;color:var(--text);font-size:1rem;line-height:1.7;margin-bottom:2rem;}
-  .hero-actions{display:flex;gap:0.75rem;flex-wrap:wrap;}
-  .btn-primary{background:var(--green);color:#0a0c0f;font-family:var(--font-ui);font-weight:700;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.65rem 1.5rem;border-radius:4px;transition:all 0.2s;box-shadow:0 0 16px rgba(57,211,83,0.3);}
-  .btn-primary:hover{opacity:0.85;box-shadow:0 0 28px rgba(57,211,83,0.55);}
-  .btn-secondary{background:transparent;color:var(--text);font-family:var(--font-ui);font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.65rem 1.5rem;border-radius:4px;border:1px solid var(--border-accent);transition:all 0.2s;}
-  .btn-secondary:hover{border-color:var(--green);color:var(--green);text-shadow:0 0 8px rgba(57,211,83,0.4);}
+    [data-theme="dark"] {
+      --bg:          #0a0c0f;
+      --bg2:         #0f1215;
+      --bg3:         #141820;
+      --green:       #39d353;
+      --green-dim:   rgba(57,211,83,0.10);
+      --green-b:     rgba(57,211,83,0.20);
+      --text:        #ccdacc;
+      --text2:       #6a8a6a;
+      --text3:       #384838;
+      --border:      rgba(57,211,83,0.14);
+      --border2:     rgba(57,211,83,0.06);
+      --blue:        #4a9eff;
+      --amber:       #f5a623;
+      --red:         #e84040;
+      --nav-bg:      rgba(10,12,15,0.80);
+      --ticker-bg:   rgba(57,211,83,0.05);
+      --scanline:    rgba(0,255,0,0.016);
+    }
 
-  .container{max-width:960px;margin:0 auto;padding:3rem 2rem;}
-  .section{margin-bottom:3rem;}
-  .section-title{font-family:var(--font-ui);font-weight:700;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;position:relative;overflow:hidden;}
-  .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--green);border-radius:2px;box-shadow:0 0 6px var(--green);animation:barPulse 2.5s ease-in-out infinite;}
-  .section-title::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(57,211,83,0.07),transparent);animation:sweep 4s ease-in-out infinite;}
-  @keyframes barPulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.4;box-shadow:none}}
-  @keyframes sweep{0%{left:-60%}50%{left:160%}100%{left:160%}}
+    [data-theme="light"] {
+      --bg:          #f0f4f0;
+      --bg2:         #ffffff;
+      --bg3:         #e6ece6;
+      --green:       #1a7a2e;
+      --green-dim:   rgba(26,122,46,0.08);
+      --green-b:     rgba(26,122,46,0.22);
+      --text:        #0e1f0e;
+      --text2:       #3d6640;
+      --text3:       #8aaa8a;
+      --border:      rgba(26,122,46,0.20);
+      --border2:     rgba(26,122,46,0.08);
+      --blue:        #1a5fa0;
+      --amber:       #9a6008;
+      --red:         #b02020;
+      --nav-bg:      rgba(240,244,240,0.85);
+      --ticker-bg:   rgba(26,122,46,0.05);
+      --scanline:    rgba(0,100,0,0.010);
+    }
 
-  .focus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .focus-card{background:var(--bg2);padding:1.5rem;transition:all 0.25s;text-decoration:none;color:inherit;display:block;}
-  .focus-card:hover{background:var(--bg3);box-shadow:inset 0 0 30px rgba(57,211,83,0.04);}
-  .focus-card:hover .focus-card-title{color:var(--green);text-shadow:0 0 8px rgba(57,211,83,0.3);}
-  .focus-icon{font-family:var(--font-mono);font-size:0.7rem;color:var(--green);background:rgba(57,211,83,0.08);border:1px solid var(--green-dim);border-radius:3px;padding:0.2rem 0.5rem;display:inline-block;margin-bottom:0.9rem;text-shadow:0 0 6px rgba(57,211,83,0.4);}
-  .focus-card-title{font-weight:700;font-size:1rem;color:var(--text-bright);margin-bottom:0.4rem;transition:all 0.2s;}
-  .focus-card-desc{font-size:0.875rem;color:var(--text-dim);line-height:1.5;}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .stat-item{background:var(--bg2);padding:1.25rem 1.5rem;text-align:center;}
-  .stat-value{font-family:var(--font-mono);font-size:1.8rem;color:var(--green);display:block;line-height:1.1;margin-bottom:0.3rem;text-shadow:0 0 12px rgba(57,211,83,0.5);}
-  .stat-label{font-size:0.75rem;color:var(--text-dim);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.25s, color 0.25s;
+    }
 
-  .terminal{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 0 24px rgba(57,211,83,0.04);}
-  .terminal-bar{background:var(--bg3);border-bottom:1px solid var(--border);padding:0.6rem 1rem;display:flex;align-items:center;gap:0.5rem;}
-  .dot{width:10px;height:10px;border-radius:50%;}
-  .dot-red{background:#ff5f57;}.dot-yellow{background:#febc2e;}.dot-green{background:#28c840;}
-  .terminal-title{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;}
-  .terminal-body{padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.82rem;line-height:1.8;color:var(--text-dim);}
-  .terminal-body .prompt{color:var(--green);text-shadow:0 0 6px rgba(57,211,83,0.4);}
-  .terminal-body .cmd{color:var(--text-bright);}
-  .terminal-body .out{padding-left:1rem;}
-  .terminal-body .out.ok{color:var(--green);text-shadow:0 0 4px rgba(57,211,83,0.3);}
-  .terminal-body .out.warn{color:var(--yellow);}
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--scanline) 0px, var(--scanline) 1px,
+        transparent 1px, transparent 3px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
 
-  @media(max-width:600px){.hero-name{font-size:2.2rem;}.container{padding:2rem 1rem;}.nav-links a{padding:0 0.6rem;font-size:0.72rem;}}
-</style>
+    #matrix-rain {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.20;
+    }
+    [data-theme="light"] #matrix-rain { opacity: 0.12; }
+
+    #transition-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    #transition-overlay.active { opacity: 1; pointer-events: all; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 50px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 0.5px solid var(--border);
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .nav-brand {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--green); letter-spacing: 2px; text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-link {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text2); text-decoration: none;
+      letter-spacing: 1.5px; position: relative;
+      transition: color 0.2s;
+    }
+    .nav-link:hover, .nav-link.active { color: var(--green); }
+    .nav-link.active::after {
+      content: ''; position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--green);
+    }
+    .nav-badge {
+      font-size: 8px; color: var(--green);
+      background: var(--green-dim); border: 0.5px solid var(--green-b);
+      border-radius: 3px; padding: 1px 5px;
+      vertical-align: super; letter-spacing: 1px;
+    }
+    .theme-btn {
+      font-family: var(--mono); font-size: 11px; color: var(--text2);
+      background: var(--green-dim); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 5px 10px; cursor: pointer;
+      letter-spacing: 1px; transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-btn:hover { color: var(--green); border-color: var(--green-b); }
+
+    /* TICKER */
+    .ticker-bar {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 24px;
+      background: var(--ticker-bg);
+      border-bottom: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+    .ticker-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+      animation: pdot 1.6s ease-in-out infinite;
+    }
+    @keyframes pdot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .ticker-label {
+      font-family: var(--mono); font-size: 9px; color: var(--green);
+      background: var(--green-dim); border: 0.5px solid var(--green-b);
+      border-radius: 3px; padding: 2px 7px; letter-spacing: 2px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .ticker-wrap {
+      flex: 1; overflow: hidden;
+      mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+    }
+    #ticker-track {
+      display: inline-flex; white-space: nowrap;
+      animation: ticker 52s linear infinite;
+    }
+    #ticker-track:hover { animation-play-state: paused; }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .ticker-item { font-family: var(--mono); font-size: 11px; color: var(--text2); padding: 0 6px; }
+    .ticker-sep  { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 0 4px; }
+    .ticker-refresh {
+      font-family: var(--mono); font-size: 11px; color: var(--text3);
+      background: none; border: none; cursor: pointer; flex-shrink: 0;
+      transition: color 0.2s;
+    }
+    .ticker-refresh:hover { color: var(--green); }
+
+    /* LAYOUT */
+    .page { position: relative; z-index: 2; }
+
+    /* HERO */
+    .hero {
+      padding: 44px 24px 36px;
+      border-bottom: 0.5px solid var(--border2);
+    }
+    .hero-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 3px; margin-bottom: 12px; }
+    .hero-name {
+      font-family: var(--mono); font-size: clamp(26px,5vw,42px);
+      color: var(--green); letter-spacing: 6px; line-height: 1;
+      margin-bottom: 10px;
+      text-shadow: 0 0 36px rgba(57,211,83,0.22);
+    }
+    [data-theme="light"] .hero-name { text-shadow: none; }
+    .hero-sub { font-family: var(--mono); font-size: 12px; color: var(--text2); margin-bottom: 24px; line-height: 1.8; }
+    .hero-sub em { color: var(--green); font-style: normal; }
+    .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-p {
+      font-family: var(--mono); font-size: 11px; color: var(--green);
+      background: var(--green-dim); border: 0.5px solid var(--green);
+      border-radius: 4px; padding: 8px 16px; cursor: pointer;
+      letter-spacing: 1.5px; text-decoration: none; display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-p:hover { background: rgba(57,211,83,0.17); }
+    .btn-g {
+      font-family: var(--mono); font-size: 11px; color: var(--text2);
+      background: transparent; border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 8px 16px; cursor: pointer;
+      letter-spacing: 1.5px; text-decoration: none; display: inline-block;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-g:hover { color: var(--green); border-color: var(--green-b); }
+
+    /* SECTION HEADER */
+    .shdr { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .shdr-bar { width: 3px; height: 14px; background: var(--green); border-radius: 1px; flex-shrink: 0; }
+    .shdr-txt { font-family: var(--mono); font-size: 10px; color: var(--text2); letter-spacing: 3px; }
+    .shdr-link {
+      margin-left: auto; font-family: var(--mono); font-size: 10px;
+      color: var(--green); text-decoration: none; letter-spacing: 1px; opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+    .shdr-link:hover { opacity: 1; }
+
+    /* SECTION */
+    .section { padding: 28px 24px; border-bottom: 0.5px solid var(--border2); }
+
+    /* PIPELINE */
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr;
+      align-items: center; gap: 0;
+    }
+    .pipe-node {
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: 6px; padding: 13px 12px;
+      text-align: center; text-decoration: none;
+      display: block; transition: border-color 0.2s;
+    }
+    .pipe-node:hover { border-color: var(--border); }
+    .pipe-node.active { border-color: var(--green-b); border-left: 2px solid var(--green); border-radius: 0 6px 6px 0; }
+    .pipe-phase { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 2px; margin-bottom: 5px; }
+    .pipe-node.active .pipe-phase { color: var(--green); }
+    .pipe-title { font-family: var(--ui); font-size: 12px; color: var(--text); font-weight: 600; margin-bottom: 3px; }
+    .pipe-node.active .pipe-title { color: var(--green); }
+    .pipe-sub { font-family: var(--mono); font-size: 9px; color: var(--text3); }
+    .pipe-arrow { text-align: center; font-family: var(--mono); font-size: 13px; color: var(--text3); }
+
+    /* TWO COL */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+
+    /* PROJECT CARDS */
+    .proj-cards { display: flex; flex-direction: column; gap: 10px; }
+    .proj-card {
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: 8px; padding: 15px 16px;
+      text-decoration: none; display: block;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .proj-card:hover { border-color: var(--border); transform: translateY(-1px); }
+    .proj-card.feat { border-left: 2px solid var(--green); border-radius: 0 8px 8px 0; }
+
+    .ctag {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--green); background: var(--green-dim);
+      border-radius: 3px; padding: 2px 7px;
+      display: inline-block; margin-bottom: 8px;
+    }
+    .ctag.blue  { color: var(--blue);  background: rgba(74,158,255,0.09); }
+    .ctag.amber { color: var(--amber); background: rgba(245,166,35,0.09); }
+
+    .ctitle { font-family: var(--ui); font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+    .cdesc  { font-family: var(--ui); font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; }
+    .cfoot  { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+    .clink  { font-family: var(--mono); font-size: 10px; color: var(--green); letter-spacing: 1px; }
+
+    .conn-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: var(--mono); font-size: 9px; color: var(--text3);
+      border: 0.5px solid var(--border2); border-radius: 3px; padding: 2px 7px;
+    }
+    .conn-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+
+    /* FEED PANEL */
+    .feed-panel {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    #feed-preview { display: flex; flex-direction: column; }
+    .feed-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 0.5px solid var(--border2);
+    }
+    .feed-item:last-child { border-bottom: none; }
+    .fdot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-top: 5px; flex-shrink: 0; }
+    .fbody { flex: 1; }
+    .ftext { font-family: var(--ui); font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 4px; }
+    .fmeta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .fsource { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+    .ftag {
+      font-family: var(--mono); font-size: 9px; color: var(--green);
+      background: var(--green-dim); border-radius: 3px; padding: 1px 6px;
+    }
+    .feed-loading { font-family: var(--mono); font-size: 11px; color: var(--text3); padding: 18px 0; text-align: center; }
+    .blink { animation: bl 1s step-end infinite; }
+    @keyframes bl { 0%,100%{opacity:1} 50%{opacity:0} }
+    .feed-more {
+      display: block; text-align: right;
+      font-family: var(--mono); font-size: 10px; color: var(--green);
+      text-decoration: none; margin-top: 10px; letter-spacing: 1px; opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .feed-more:hover { opacity: 1; }
+
+    /* OSINT GRID */
+    .osint-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .osint-card {
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: 6px; padding: 14px 10px; text-align: center;
+      text-decoration: none; display: block;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .osint-card:hover { border-color: var(--border); transform: translateY(-1px); }
+    .oname { font-family: var(--mono); font-size: 10px; color: var(--text2); letter-spacing: 1.5px; margin-bottom: 3px; }
+    .ocat  { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+    .oico  { font-size: 18px; margin-bottom: 7px; line-height: 1; }
+
+    /* METRICS */
+    .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .mcard { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 6px; padding: 16px 14px; }
+    .mval { font-family: var(--mono); font-size: 24px; color: var(--green); font-weight: 700; margin-bottom: 4px; }
+    .mlbl { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 2px; }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 2;
+      padding: 20px 24px;
+      border-top: 0.5px solid var(--border2);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .fbrand { font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 2px; }
+    .flinks { display: flex; gap: 18px; }
+    .flink  { font-family: var(--mono); font-size: 10px; color: var(--text3); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
+    .flink:hover { color: var(--green); }
+
+    .pipeline-wrap { overflow-x: auto; }
+
+    @media (max-width:800px) {
+      .two-col { grid-template-columns: 1fr; }
+      .pipeline { min-width: 600px; }
+      .metrics { grid-template-columns: repeat(2,1fr); }
+      .osint-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
 </head>
 <body>
-<canvas id="binary-canvas"></canvas>
+
+<div id="transition-overlay"></div>
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<!-- NAV -->
 <nav>
-  <div class="nav-brand" data-glitch>[ DOMENICO :: OPSEC ]</div>
-  <ul class="nav-links">
-    <li><a href="index.html" class="active">Home</a></li>
-    <li><a href="projects.html">Projects</a></li>
-    <li><a href="about.html">About</a></li>
-  </ul>
+  <a class="nav-brand" href="index.html" data-nav data-glitch>[ DOMENICO :: OPSEC ]</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="index.html" data-nav>HOME</a>
+    <a class="nav-link" href="projects.html" data-nav>PROJECTS</a>
+    <a class="nav-link" href="threat-profiles.html" data-nav>INTEL FEED</a>
+    <a class="nav-link" href="osint-tools.html" data-nav>OSINT <span class="nav-badge">NEW</span></a>
+    <a class="nav-link" href="about.html" data-nav>ABOUT</a>
+    <button class="theme-btn" data-theme-toggle>☀ LIGHT</button>
+  </div>
 </nav>
-<div class="hero">
-  <div class="hero-eyebrow">Offensive Security Portfolio</div>
-  <h1 class="hero-name" data-glitch>Domenico</h1>
-  <div class="hero-title" data-typewriter="Adversary Emulation · Threat Intelligence" data-delay="500" data-speed="42"></div>
-  <p class="hero-desc">Specializing in adversary emulation and ransomware attack analysis. I study real-world threat actor methodologies, replicate attack chains in controlled lab environments, and document offensive techniques alongside defensive detection considerations.</p>
-  <div class="hero-actions">
-    <a href="projects.html" class="btn-primary" data-scramble>View Projects</a>
-    <a href="about.html" class="btn-secondary" data-scramble>About Me</a>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-dot"></div>
+  <span class="ticker-label">LIVE INTEL</span>
+  <div class="ticker-wrap">
+    <div id="ticker-track">
+      <span class="ticker-item">Loading latest threat intelligence<span class="blink">_</span></span>
+    </div>
   </div>
+  <button class="ticker-refresh" onclick="MatrixOS.refreshTicker()" title="Refresh">↺</button>
 </div>
-<div class="container">
-  <div class="section">
-    <div class="section-title">Portfolio Highlights</div>
-    <div class="focus-grid">
-      <a href="ransomware-analysis.html" class="focus-card">
-        <div class="focus-icon">T1486</div>
-        <div class="focus-card-title" data-scramble>Ransomware Technique Analysis</div>
-        <div class="focus-card-desc">Technical breakdowns of real-world campaigns mapped to MITRE ATT&CK across all attack chain phases.</div>
-      </a>
-      <a href="adversary-lab.html" class="focus-card">
-        <div class="focus-icon">RED TEAM</div>
-        <div class="focus-card-title" data-scramble>Adversary Emulation Lab</div>
-        <div class="focus-card-desc">Controlled lab simulations replicating attacker workflows from initial access through post-exploitation.</div>
-      </a>
-      <a href="threat-profiles.html" class="focus-card">
-        <div class="focus-icon">PROFILING</div>
-        <div class="focus-card-title" data-scramble>Threat Actor Profiling</div>
-        <div class="focus-card-desc">Structured profiling of known ransomware groups — TTP patterns, infrastructure, and operational methodology.</div>
-      </a>
+
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero" data-fadein>
+    <p class="hero-label">OFFENSIVE SECURITY PORTFOLIO</p>
+    <h1 class="hero-name" data-glitch>DOMENICO</h1>
+    <p class="hero-sub">
+      Specialising in adversary emulation · ransomware analysis · <em>threat intelligence</em>
+    </p>
+    <div class="hero-btns">
+      <a class="btn-p" href="projects.html" data-nav>VIEW PROJECTS</a>
+      <a class="btn-g" href="threat-profiles.html" data-nav>INTEL FEED →</a>
+      <a class="btn-g" href="osint-tools.html" data-nav>OSINT TOOLS →</a>
     </div>
-  </div>
-  <div class="section">
-    <div class="section-title">Lab Environment</div>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
-        <span class="terminal-title">lab-status.sh</span>
+  </section>
+
+  <!-- ADVERSARY PIPELINE -->
+  <section class="section" data-fadein>
+    <div class="shdr">
+      <div class="shdr-bar"></div>
+      <span class="shdr-txt">ADVERSARY PIPELINE</span>
+    </div>
+    <div class="pipeline-wrap"><div class="pipeline">
+      <div class="pipe-node">
+        <p class="pipe-phase">PHASE 01</p>
+        <p class="pipe-title">Threat Profiling</p>
+        <p class="pipe-sub">TTP mapping · actor research</p>
       </div>
-      <div class="terminal-body">
-        <div><span class="prompt">$ </span><span class="cmd">./lab-status.sh --verbose</span></div>
-        <div class="out ok">✔ Domain Controller (WinSrv 2019) — ONLINE</div>
-        <div class="out ok">✔ Workstation-01 (Win10 Ent) — ONLINE</div>
-        <div class="out ok">✔ Workstation-02 (Win10 Ent) — ONLINE</div>
-        <div class="out ok">✔ File Server — ONLINE</div>
-        <div class="out ok">✔ Windows Event Forwarding — ACTIVE</div>
-        <div class="out warn">⚠ Attacker VM (Kali) — ISOLATED/SANDBOXED</div>
-        <div><span class="prompt">$ </span><span class="cmd">./map-to-mitre.sh --framework ATT&CK</span></div>
-        <div class="out ok">✔ Techniques mapped: T1078, T1003, T1021, T1486, T1490</div>
+      <div class="pipe-arrow">→</div>
+      <a class="pipe-node active" href="adversary-lab.html" data-nav>
+        <p class="pipe-phase">PHASE 02</p>
+        <p class="pipe-title">Adversary Emulation</p>
+        <p class="pipe-sub">Controlled lab replication</p>
+      </a>
+      <div class="pipe-arrow">→</div>
+      <a class="pipe-node active" href="adversary-lab.html#cyber-range" data-nav>
+        <p class="pipe-phase">PHASE 03</p>
+        <p class="pipe-title">Cyber Range</p>
+        <p class="pipe-sub">Live environment testing</p>
+      </a>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <p class="pipe-phase">PHASE 04</p>
+        <p class="pipe-title">Detection Engineering</p>
+        <p class="pipe-sub">Sigma · SIEM tuning</p>
       </div>
+    </div></div>
+  </section>
+  <section class="section" data-fadein>
+    <div class="two-col">
+
+      <div>
+        <div class="shdr">
+          <div class="shdr-bar"></div>
+          <span class="shdr-txt">PROJECTS</span>
+          <a class="shdr-link" href="projects.html" data-nav>ALL →</a>
+        </div>
+        <div class="proj-cards">
+
+          <a class="proj-card feat" href="ransomware-analysis.html" data-nav>
+            <span class="ctag">T1486 · RANSOMWARE</span>
+            <h2 class="ctitle" data-scramble="Ransomware Technique Analysis">Ransomware Technique Analysis</h2>
+            <p class="cdesc">MITRE ATT&CK–mapped breakdowns of real-world campaigns across all kill chain phases. Includes interactive infection chain and 16-question analyst challenge.</p>
+            <div class="cfoot"><span class="clink">VIEW PROJECT →</span></div>
+          </a>
+
+          <a class="proj-card feat" href="adversary-lab.html" data-nav>
+            <span class="ctag blue">RED TEAM</span>
+            <h2 class="ctitle" data-scramble="Adversary Emulation Lab">Adversary Emulation Lab</h2>
+            <p class="cdesc">Controlled lab simulations replicating attacker workflows from initial access through post-exploitation.</p>
+            <div class="cfoot">
+              <span class="clink">VIEW PROJECT →</span>
+              <span class="conn-badge"><span class="conn-dot"></span>LINKED → CYBER RANGE</span>
+            </div>
+          </a>
+
+          <a class="proj-card" href="threat-profiles.html" data-nav>
+            <span class="ctag amber">PROFILING</span>
+            <h2 class="ctitle" data-scramble="Threat Actor Profiling">Threat Actor Profiling</h2>
+            <p class="cdesc">Structured profiles of ransomware groups — TTP patterns, infrastructure fingerprinting, operational methodology mapped to ATT&CK.</p>
+            <div class="cfoot"><span class="clink">VIEW PROJECT →</span></div>
+          </a>
+
+        </div>
+      </div>
+
+      <div>
+        <div class="shdr">
+          <div class="shdr-bar"></div>
+          <span class="shdr-txt">LATEST INTELLIGENCE</span>
+          <button onclick="MatrixOS.refreshFeed()" style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;letter-spacing:1px;transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text3)'">↺ REFRESH</button>
+        </div>
+        <div class="feed-panel">
+          <div id="feed-preview">
+            <div class="feed-loading">Fetching latest intelligence<span class="blink">_</span></div>
+          </div>
+          <a class="feed-more" href="threat-profiles.html" data-nav>FULL INTELLIGENCE FEED →</a>
+        </div>
+      </div>
+
     </div>
-  </div>
-  <div class="section">
-    <div class="section-title">Metrics</div>
-    <div class="stats-row">
-      <div class="stat-item"><span class="stat-value" data-glitch>3</span><span class="stat-label">Active Projects</span></div>
-      <div class="stat-item"><span class="stat-value" data-glitch>5+</span><span class="stat-label">TTPs Emulated</span></div>
-      <div class="stat-item"><span class="stat-value">ATT&CK</span><span class="stat-label">Framework</span></div>
-      <div class="stat-item"><span class="stat-value" data-glitch>4</span><span class="stat-label">Lab Machines</span></div>
+  </section>
+
+  <!-- OSINT TOOLS -->
+  <section class="section" data-fadein>
+    <div class="shdr">
+      <div class="shdr-bar"></div>
+      <span class="shdr-txt">OSINT TOOLS</span>
+      <a class="shdr-link" href="osint-tools.html" data-nav>FULL TOOLKIT →</a>
     </div>
+    <div class="osint-grid">
+      <a class="osint-card" href="https://www.shodan.io" target="_blank" rel="noopener">
+        <div class="oico">🔭</div><div class="oname">SHODAN</div><div class="ocat">INFRASTRUCTURE RECON</div>
+      </a>
+      <a class="osint-card" href="https://search.censys.io" target="_blank" rel="noopener">
+        <div class="oico">🌐</div><div class="oname">CENSYS</div><div class="ocat">HOST / CERT SEARCH</div>
+      </a>
+      <a class="osint-card" href="https://www.maltego.com" target="_blank" rel="noopener">
+        <div class="oico">🕸</div><div class="oname">MALTEGO</div><div class="ocat">LINK ANALYSIS</div>
+      </a>
+      <a class="osint-card" href="https://hunter.io" target="_blank" rel="noopener">
+        <div class="oico">📡</div><div class="oname">HUNTER.IO</div><div class="ocat">EMAIL / SOCMINT</div>
+      </a>
+      <a class="osint-card" href="https://www.virustotal.com" target="_blank" rel="noopener">
+        <div class="oico">🦠</div><div class="oname">VIRUSTOTAL</div><div class="ocat">MALWARE ANALYSIS</div>
+      </a>
+      <a class="osint-card" href="https://lookup.icann.org" target="_blank" rel="noopener">
+        <div class="oico">📋</div><div class="oname">WHOIS / ICANN</div><div class="ocat">PASSIVE DNS</div>
+      </a>
+      <a class="osint-card" href="https://urlscan.io" target="_blank" rel="noopener">
+        <div class="oico">🖥</div><div class="oname">URLSCAN.IO</div><div class="ocat">URL / PHISHING INTEL</div>
+      </a>
+      <a class="osint-card" href="https://www.spiderfoot.net" target="_blank" rel="noopener">
+        <div class="oico">🕷</div><div class="oname">SPIDERFOOT</div><div class="ocat">ATTACK SURFACE</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <section class="section" data-fadein>
+    <div class="shdr"><div class="shdr-bar"></div><span class="shdr-txt">METRICS</span></div>
+    <div class="metrics">
+      <div class="mcard"><div class="mval">3</div><div class="mlbl">ACTIVE PROJECTS</div></div>
+      <div class="mcard"><div class="mval">5+</div><div class="mlbl">TTPs EMULATED</div></div>
+      <div class="mcard"><div class="mval">ATT&CK</div><div class="mlbl">FRAMEWORK</div></div>
+      <div class="mcard"><div class="mval">LIVE</div><div class="mlbl">INTEL FEED</div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="fbrand">[ DOMENICO :: OPSEC ] © 2026</span>
+  <div class="flinks">
+    <a class="flink" href="https://github.com/domo-git" target="_blank" rel="noopener">GITHUB</a>
+    <a class="flink" href="https://www.linkedin.com/in/domenico-g-43a203204/" target="_blank" rel="noopener">LINKEDIN</a>
+    <a class="flink" href="threat-profiles.html" data-nav>INTEL FEED</a>
+    <a class="flink" href="about.html" data-nav>ABOUT</a>
   </div>
-</div>
+</footer>
+
 <script src="matrix.js"></script>
 </body>
 </html>
