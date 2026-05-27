@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("opsec-theme")||"light");</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OSINT Tools – Domenico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ── EARTHY FALL LIGHT ───────────────────────────────────── */
+  [data-theme="light"] {
+    --bg:          #f5ede0;
+    --bg2:         #ede0cd;
+    --bg3:         #e3d2b8;
+    --border:      rgba(139,58,15,0.22);
+    --border2:     rgba(139,58,15,0.10);
+    --accent:      #c4622d;
+    --accent2:     rgba(196,98,45,0.12);
+    --text:        #2c1810;
+    --text2:       #7a4a30;
+    --text3:       #b8865a;
+    --nav-bg:      rgba(245,237,224,0.92);
+    --scanline:    rgba(139,58,15,0.015);
+    --rain-opacity:0.18;
+    --hover-row:   rgba(139,58,15,0.04);
+    --card-scan:   none;
+    /* tier colours */
+    --tier-nov:    #3d6b20;
+    --tier-int:    #1a5a8a;
+    --tier-hrd:    #8a5500;
+    --tier-exp:    #8a1e1e;
+    --pip-nov:     rgba(61,107,32,0.18);
+    --pip-int:     rgba(26,90,138,0.18);
+    --pip-hrd:     rgba(138,85,0,0.18);
+    --pip-exp:     rgba(138,30,30,0.18);
+    --green-dim:   rgba(61,107,32,0.20);
+    --green-glow:  rgba(196,98,45,0.10);
+    --green:       #c4622d;
+    --red:         #8a1e1e;
+    --yellow:      #8a5500;
+    --blue:        #1a5a8a;
+    --cyan:        #2a6a5a;
+    --purple:      #6a2a6a;
+  }
+
+  /* ── CYBERPUNK CHARTREUSE DARK ───────────────────────────── */
+  [data-theme="dark"] {
+    --bg:          #04060a;
+    --bg2:         #080c12;
+    --bg3:         #0d1118;
+    --border:      rgba(180,255,0,0.18);
+    --border2:     rgba(180,255,0,0.07);
+    --accent:      #b4ff00;
+    --accent2:     rgba(180,255,0,0.09);
+    --text:        #e8f4e0;
+    --text2:       #5a7a4a;
+    --text3:       #2a3a1a;
+    --nav-bg:      rgba(4,6,10,0.94);
+    --scanline:    rgba(180,255,0,0.012);
+    --rain-opacity:0.22;
+    --hover-row:   rgba(180,255,0,0.03);
+    --card-scan:   repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(180,255,0,0.012) 3px,rgba(180,255,0,0.012) 6px);
+    /* tier colours */
+    --tier-nov:    #b4ff00;
+    --tier-int:    #ff2d78;
+    --tier-hrd:    #ffe000;
+    --tier-exp:    #ff4400;
+    --pip-nov:     rgba(180,255,0,0.10);
+    --pip-int:     rgba(255,45,120,0.10);
+    --pip-hrd:     rgba(255,224,0,0.10);
+    --pip-exp:     rgba(255,68,0,0.10);
+    --green-dim:   rgba(180,255,0,0.20);
+    --green-glow:  rgba(180,255,0,0.09);
+    --green:       #b4ff00;
+    --red:         #ff4400;
+    --yellow:      #ffe000;
+    --blue:        #4488ff;
+    --cyan:        #00ddff;
+    --purple:      #cc00cc;
+  }
+
+  
+  
+  :root{--font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:16px;line-height:1.6;min-height:100vh;transition:background 0.25s,color 0.25s;}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:9999;}
+  #matrix-rain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:var(--rain-opacity);}
+  nav,.container{position:relative;z-index:1;}
+  nav{background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;transition:background 0.25s,border-color 0.25s;}
+  .nav-brand{font-family:var(--font-mono);color:var(--green);font-size:0.85rem;letter-spacing:0.05em;text-decoration:none;}
+  .nav-links{display:flex;list-style:none;align-items:center;}
+  .nav-links a{color:var(--text-dim);text-decoration:none;font-family:var(--font-ui);font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;padding:0 1.2rem;height:56px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all 0.2s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--text-bright);border-bottom-color:var(--green);}
+  .theme-toggle-btn{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);background:var(--green-glow);border:1px solid var(--border-accent);border-radius:4px;padding:0.3rem 0.75rem;cursor:pointer;letter-spacing:0.08em;margin-left:1rem;transition:color 0.2s,border-color 0.2s;}
+  .theme-toggle-btn:hover{color:var(--green);border-color:var(--green);}
+  .container{max-width:960px;margin:0 auto;padding:2.5rem 2rem;}
+  .page-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+  .breadcrumb{font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem;}
+  .breadcrumb a{color:var(--green);text-decoration:none;}
+  .breadcrumb span{margin:0 0.4rem;}
+  .page-title{font-size:1.8rem;font-weight:700;color:var(--text-bright);letter-spacing:0.02em;text-transform:uppercase;display:flex;align-items:center;gap:0.75rem;}
+  .page-title::before{content:'//';color:var(--green);font-family:var(--font-mono);font-size:1.2rem;animation:glitch 5s infinite;}
+  @keyframes glitch{0%,88%,100%{transform:translate(0)}89%{transform:translate(-2px,1px)}90%{transform:translate(2px,-1px)}91%,94%{transform:translate(0)}93%{transform:translate(1px,1px)}}
+  .page-subtitle{margin-top:0.5rem;color:var(--text-dim);font-size:0.95rem;font-weight:500;}
+  .section{margin-bottom:2.5rem;}
+  .section-title{font-family:var(--font-ui);font-weight:700;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;position:relative;overflow:hidden;}
+  .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--green);border-radius:2px;animation:barPulse 2.5s ease-in-out infinite;}
+  .section-title::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--green-glow),transparent);animation:sweep 4s ease-in-out infinite;}
+  @keyframes barPulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  @keyframes sweep{0%{left:-60%}50%{left:160%}100%{left:160%}}
+
+  /* CATEGORY LABEL */
+  .cat-label{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);letter-spacing:2px;margin-bottom:12px;padding-left:2px;}
+
+  /* TOOL GRID */
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:2rem;}
+
+  .tool-card{
+    background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+    padding:16px 14px;text-decoration:none;display:flex;flex-direction:column;gap:6px;
+    transition:border-color 0.2s,transform 0.15s;color:inherit;
+  }
+  .tool-card:hover{border-color:var(--green-dim);transform:translateY(-2px);}
+
+  .tool-card-top{display:flex;align-items:center;gap:10px;}
+  .tool-icon{font-size:18px;line-height:1;flex-shrink:0;}
+  .tool-name{font-family:var(--font-mono);font-size:11px;color:var(--text-bright);letter-spacing:1.5px;font-weight:600;}
+  .tool-cat{font-family:var(--font-mono);font-size:9px;color:var(--green);background:var(--green-glow);border:1px solid var(--green-dim);border-radius:3px;padding:1px 6px;letter-spacing:1px;align-self:flex-start;}
+  .tool-desc{font-family:var(--font-ui);font-size:12px;color:var(--text-dim);line-height:1.5;margin-top:2px;}
+  .tool-link{font-family:var(--font-mono);font-size:10px;color:var(--green);margin-top:auto;padding-top:6px;opacity:0.75;}
+  .tool-card:hover .tool-link{opacity:1;}
+
+  /* METHODOLOGY */
+  .method-steps{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .method-step{display:flex;gap:16px;align-items:flex-start;padding:14px 18px;border-bottom:1px solid var(--border);font-size:0.9rem;}
+  .method-step:last-child{border-bottom:none;}
+  .method-num{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);background:var(--green-glow);border:1px solid var(--green-dim);border-radius:3px;padding:0.15rem 0.5rem;white-space:nowrap;margin-top:2px;flex-shrink:0;}
+  .method-text{color:var(--text-dim);line-height:1.55;}
+  .method-text strong{color:var(--text);}
+
+  /* FRAMEWORK TABLE */
+  .fw-table{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:0.875rem;}
+  .fw-table thead tr{background:var(--bg3);border-bottom:1px solid var(--border);}
+  .fw-table th{font-family:var(--font-mono);font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;padding:0.75rem 1rem;text-align:left;}
+  .fw-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5;}
+  .fw-table tr:last-child td{border-bottom:none;}
+  .fw-table tr:hover td{background:var(--hover-row);}
+  .fw-table td:first-child{font-family:var(--font-mono);font-size:0.78rem;color:var(--cyan);white-space:nowrap;}
+  .fw-table td:nth-child(2){color:var(--text);font-weight:500;}
+
+  @media(max-width:600px){.container{padding:1.5rem 1rem;}.nav-links a{padding:0 0.6rem;font-size:0.72rem;}.tool-grid{grid-template-columns:repeat(2,1fr);}}
+
+    /* ── ORBITRON NAME ─────────────────────────────────────── */
+    .page-title, .hero-name {
+      font-family: 'Orbitron', var(--font-mono, monospace) !important;
+      font-weight: 900 !important;
+      color: var(--accent) !important;
+      letter-spacing: 5px;
+    }
+    [data-theme="dark"] .page-title,
+    [data-theme="dark"] .hero-name {
+      filter: drop-shadow(0 0 8px var(--accent));
+    }
+    /* ── CIRCUIT HERO CORNERS ─────────────────────────────── */
+    .page-header {
+      position: relative;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--accent) 0%, transparent 40%) top left / 50px 0.5px no-repeat,
+        linear-gradient(180deg, var(--accent) 0%, transparent 60%) top left / 0.5px 34px no-repeat,
+        linear-gradient(270deg, var(--accent) 0%, transparent 40%) bottom right / 50px 0.5px no-repeat,
+        linear-gradient(0deg, var(--accent) 0%, transparent 60%) bottom right / 0.5px 34px no-repeat;
+      opacity: 0.4;
+    }
+    /* ── WHOAMI CARD (light) ─────────────────────────────── */
+    .whoami-card {
+      border: 0.5px solid var(--border);
+      border-radius: 5px; overflow: hidden;
+      margin-bottom: 16px; display: none;
+    }
+    [data-theme="light"] .whoami-card { display: block; }
+    .wc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 13px; border-bottom: 0.5px solid var(--border);
+      background: var(--bg2);
+    }
+    .wc-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent2); border: 0.5px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono, monospace); font-size: 10px;
+      color: var(--accent); font-weight: 700; flex-shrink: 0;
+    }
+    .wc-name { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text); font-weight: 600; letter-spacing: 1px; }
+    .wc-role { font-family: var(--font-mono, monospace); font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+    .wc-row {
+      display: flex; align-items: center;
+      border-bottom: 0.5px solid var(--border2);
+      font-family: var(--font-mono, monospace); font-size: 10px;
+      background: var(--bg2);
+    }
+    .wc-row:last-child { border-bottom: none; }
+    .wc-key { width: 70px; flex-shrink: 0; padding: 6px 11px; color: var(--text3); border-right: 0.5px solid var(--border2); letter-spacing: 1px; }
+    .wc-val { padding: 6px 11px; color: var(--text2); flex: 1; }
+    .wc-val em { color: var(--accent); font-style: normal; font-weight: 700; }
+    .online-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4a8a2a; margin-right: 5px; vertical-align: middle; }
+    /* ── WHOAMI TERMINAL (dark) ─────────────────────────── */
+    .whoami-terminal {
+      font-family: var(--font-mono, monospace); font-size: 11px; line-height: 2;
+      padding: 11px 13px; border: 0.5px solid var(--border);
+      border-radius: 4px; background: rgba(180,255,0,0.04);
+      color: var(--text2); margin-bottom: 16px; display: none;
+    }
+    .whoami-terminal::before {
+      content: 'OPSEC@portfolio:~$ whoami';
+      display: block; font-size: 10px; color: var(--text3);
+      margin-bottom: 5px; letter-spacing: 1px;
+    }
+    [data-theme="dark"] .whoami-terminal { display: block; }
+    .wt-key { color: var(--accent); }
+    .wt-val { color: var(--text2); }
+    .wt-good { color: #4aaa2a; }
+    .wt-cursor {
+      display: inline-block; width: 7px; height: 12px;
+      background: var(--accent); vertical-align: middle;
+      animation: blink-wt 1s step-end infinite;
+    }
+    @keyframes blink-wt { 0%,100%{opacity:1} 50%{opacity:0} }
+    /* ── TIER COLOURS ────────────────────────────────────── */
+    .tier-novice       { color: var(--tier-nov) !important; border-color: var(--tier-nov) !important; background: var(--pip-nov) !important; }
+    .tier-intermediate { color: var(--tier-int) !important; border-color: var(--tier-int) !important; background: var(--pip-int) !important; }
+    .tier-hard         { color: var(--tier-hrd) !important; border-color: var(--tier-hrd) !important; background: var(--pip-hrd) !important; }
+    .tier-expert       { color: var(--tier-exp) !important; border-color: var(--tier-exp) !important; background: var(--pip-exp) !important; }
+    .tier-pip.active[data-tier="0"] { border-color: var(--tier-nov) !important; color: var(--tier-nov) !important; background: var(--pip-nov) !important; }
+    .tier-pip.active[data-tier="1"] { border-color: var(--tier-int) !important; color: var(--tier-int) !important; background: var(--pip-int) !important; }
+    .tier-pip.active[data-tier="2"] { border-color: var(--tier-hrd) !important; color: var(--tier-hrd) !important; background: var(--pip-hrd) !important; }
+    .tier-pip.active[data-tier="3"] { border-color: var(--tier-exp) !important; color: var(--tier-exp) !important; background: var(--pip-exp) !important; }
+    /* ── CRT SCANLINES on dark cards ────────────────────── */
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .proj-card,
+    [data-theme="dark"] .project-card,
+    [data-theme="dark"] .news-feed,
+    [data-theme="dark"] .room-terminal,
+    [data-theme="dark"] .soc-terminal {
+      background-image: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(180,255,0,0.012) 3px,rgba(180,255,0,0.012) 6px) !important;
+    }
+
+  </style>
+</head>
+<body>
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<nav>
+  <a class="nav-brand" href="index.html" data-nav data-glitch>[ DOMENICO :: OPSEC ]</a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-nav>Home</a></li>
+    <li><a href="projects.html" data-nav>Projects</a></li>
+    <li><a href="threat-profiles.html" data-nav>Intel Feed</a></li>
+    <li><a href="osint-tools.html" class="active" data-nav>OSINT</a></li>
+    <li><a href="about.html" data-nav>About</a></li>
+    <button class="theme-toggle-btn" data-theme-toggle aria-label="Switch to dark mode">☽ DARK</button>
+  </ul>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <div class="breadcrumb"><a href="index.html">Home</a><span>/</span>OSINT Tools</div>
+    <h1 class="page-title">OSINT Tools</h1>
+
+    <!-- LIGHT MODE: Profile card -->
+    <div class="whoami-card">
+      <div class="wc-header">
+        <div class="wc-avatar">DG</div>
+        <div>
+          <div class="wc-name">DOMENICO G.</div>
+          <div class="wc-role">OFFENSIVE SECURITY ANALYST</div>
+        </div>
+      </div>
+      <div class="wc-row"><div class="wc-key">STATUS</div><div class="wc-val"><span class="online-dot"></span><em>Open to opportunities</em></div></div>
+      <div class="wc-row"><div class="wc-key">ROLE</div><div class="wc-val">Adversary Emulation · Threat Intel</div></div>
+      <div class="wc-row"><div class="wc-key">FOCUS</div><div class="wc-val">Certified Ethical Hacking</div></div>
+      <div class="wc-row"><div class="wc-key">GITHUB</div><div class="wc-val"><em>domo-git</em></div></div>
+    </div>
+    <!-- DARK MODE: Terminal whoami -->
+    <div class="whoami-terminal">
+      <span class="wt-key">  name   </span><span class="wt-val">→ Domenico G.</span><br>
+      <span class="wt-key">  role   </span><span class="wt-val">→ Offensive Security Analyst</span><br>
+      <span class="wt-key">  status </span><span class="wt-val">→ </span><span class="wt-good">open to opportunities</span><br>
+      <span class="wt-key">  focus  </span><span class="wt-val">→ Certified Ethical Hacking</span><br>
+      <span class="wt-key">  links  </span><span class="wt-val">→ github.com/domo-git</span><br>
+      <span class="wt-cursor"></span>
+    </div>
+
+    <p class="page-subtitle">Open-source intelligence toolkit for adversary research, infrastructure recon, and threat attribution</p>
+  </div>
+
+  <!-- INFRASTRUCTURE RECON -->
+  <div class="section">
+    <div class="section-title">Infrastructure Recon</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="https://www.shodan.io" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🔭</div><div class="tool-name">SHODAN</div></div>
+        <div class="tool-cat">INFRASTRUCTURE</div>
+        <div class="tool-desc">Internet-wide scanner. Find exposed services, banners, and device fingerprints by IP, port, or product name.</div>
+        <div class="tool-link">shodan.io →</div>
+      </a>
+      <a class="tool-card" href="https://search.censys.io" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🌐</div><div class="tool-name">CENSYS</div></div>
+        <div class="tool-cat">INFRASTRUCTURE</div>
+        <div class="tool-desc">Host and certificate search engine. Enumerate TLS certs, open ports, and identify attacker infrastructure clusters.</div>
+        <div class="tool-link">censys.io →</div>
+      </a>
+      <a class="tool-card" href="https://www.spiderfoot.net" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🕷</div><div class="tool-name">SPIDERFOOT</div></div>
+        <div class="tool-cat">ATTACK SURFACE</div>
+        <div class="tool-desc">Automated OSINT aggregator. Correlates IPs, domains, emails, and usernames across 200+ data sources.</div>
+        <div class="tool-link">spiderfoot.net →</div>
+      </a>
+      <a class="tool-card" href="https://urlscan.io" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🖥</div><div class="tool-name">URLSCAN.IO</div></div>
+        <div class="tool-cat">URL / PHISHING</div>
+        <div class="tool-desc">Sandbox and screenshot URLs. Analyse redirects, DOM content, and outbound connections from suspicious links.</div>
+        <div class="tool-link">urlscan.io →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- PASSIVE DNS & WHOIS -->
+  <div class="section">
+    <div class="section-title">Passive DNS &amp; Domain Intelligence</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="https://lookup.icann.org" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">📋</div><div class="tool-name">WHOIS / ICANN</div></div>
+        <div class="tool-cat">PASSIVE DNS</div>
+        <div class="tool-desc">Authoritative WHOIS lookup. Registrar, registrant, name servers, and registration timestamps for any domain.</div>
+        <div class="tool-link">lookup.icann.org →</div>
+      </a>
+      <a class="tool-card" href="https://www.virustotal.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🦠</div><div class="tool-name">VIRUSTOTAL</div></div>
+        <div class="tool-cat">MALWARE / IOC</div>
+        <div class="tool-desc">Multi-engine malware scanner and IOC pivot tool. Check files, URLs, IPs, and domains against 70+ AV engines.</div>
+        <div class="tool-link">virustotal.com →</div>
+      </a>
+      <a class="tool-card" href="https://www.robtex.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🔗</div><div class="tool-name">ROBTEX</div></div>
+        <div class="tool-cat">DNS GRAPH</div>
+        <div class="tool-desc">Visual DNS intelligence. Map shared hosting, reverse DNS, ASN relationships, and infrastructure overlaps.</div>
+        <div class="tool-link">robtex.com →</div>
+      </a>
+      <a class="tool-card" href="https://bgp.he.net" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">📡</div><div class="tool-name">HE BGP TOOLKIT</div></div>
+        <div class="tool-cat">ASN / BGP</div>
+        <div class="tool-desc">Hurricane Electric BGP lookup. Trace IP ranges, ASN ownership, and peering relationships for infrastructure attribution.</div>
+        <div class="tool-link">bgp.he.net →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- SOCMINT & EMAIL -->
+  <div class="section">
+    <div class="section-title">SOCMINT &amp; Email Intelligence</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="https://hunter.io" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">📧</div><div class="tool-name">HUNTER.IO</div></div>
+        <div class="tool-cat">EMAIL / SOCMINT</div>
+        <div class="tool-desc">Email format discovery and verification. Enumerate corporate email patterns from a domain name.</div>
+        <div class="tool-link">hunter.io →</div>
+      </a>
+      <a class="tool-card" href="https://www.maltego.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🕸</div><div class="tool-name">MALTEGO</div></div>
+        <div class="tool-cat">LINK ANALYSIS</div>
+        <div class="tool-desc">Visual link analysis platform. Build relationship graphs between people, infrastructure, and organisations.</div>
+        <div class="tool-link">maltego.com →</div>
+      </a>
+      <a class="tool-card" href="https://www.skopenow.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🔎</div><div class="tool-name">SKOPENOW</div></div>
+        <div class="tool-cat">PERSON LOOKUP</div>
+        <div class="tool-desc">Automated social media and public records aggregation. Surface aliases, accounts, and digital footprints.</div>
+        <div class="tool-link">skopenow.com →</div>
+      </a>
+      <a class="tool-card" href="https://haveibeenpwned.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🔓</div><div class="tool-name">HIBP</div></div>
+        <div class="tool-cat">BREACH DATA</div>
+        <div class="tool-desc">Check email addresses and domains against known data breach dumps. Identify exposed credentials for attribution.</div>
+        <div class="tool-link">haveibeenpwned.com →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- THREAT INTEL PLATFORMS -->
+  <div class="section">
+    <div class="section-title">Threat Intelligence Platforms</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="https://attack.mitre.org" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🛡</div><div class="tool-name">MITRE ATT&CK</div></div>
+        <div class="tool-cat">TTP FRAMEWORK</div>
+        <div class="tool-desc">The definitive adversary behaviour framework. Map TTPs, techniques, and sub-techniques to threat actors and campaigns.</div>
+        <div class="tool-link">attack.mitre.org →</div>
+      </a>
+      <a class="tool-card" href="https://www.recordedfuture.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">📰</div><div class="tool-name">RECORDED FUTURE</div></div>
+        <div class="tool-cat">THREAT INTEL</div>
+        <div class="tool-desc">Real-time threat intelligence aggregation from open web, dark web, and technical sources. IOC enrichment and actor tracking.</div>
+        <div class="tool-link">recordedfuture.com →</div>
+      </a>
+      <a class="tool-card" href="https://www.opencti.io" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">🗂</div><div class="tool-name">OPENCTI</div></div>
+        <div class="tool-cat">CTI PLATFORM</div>
+        <div class="tool-desc">Open-source cyber threat intelligence platform. Ingest, correlate, and share STIX/TAXII threat data from multiple feeds.</div>
+        <div class="tool-link">opencti.io →</div>
+      </a>
+      <a class="tool-card" href="https://otx.alienvault.com" target="_blank" rel="noopener">
+        <div class="tool-card-top"><div class="tool-icon">👾</div><div class="tool-name">ALIENVAULT OTX</div></div>
+        <div class="tool-cat">IOC SHARING</div>
+        <div class="tool-desc">Community-driven threat intelligence. Search and contribute IOC pulses — IPs, domains, file hashes, CVEs.</div>
+        <div class="tool-link">otx.alienvault.com →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- OSINT METHODOLOGY -->
+  <div class="section">
+    <div class="section-title">OSINT Investigation Methodology</div>
+    <div class="method-steps">
+      <div class="method-step"><span class="method-num">01</span><div class="method-text"><strong>Define the target.</strong> Establish what you're looking for — IP range, domain, threat actor alias, or email address. Set clear scope to avoid scope creep.</div></div>
+      <div class="method-step"><span class="method-num">02</span><div class="method-text"><strong>Passive recon first.</strong> Start with read-only sources — WHOIS, passive DNS, Shodan, Censys. Never touch the target directly at this stage.</div></div>
+      <div class="method-step"><span class="method-num">03</span><div class="method-text"><strong>Pivot on indicators.</strong> Each IOC is a pivot point. A domain leads to an IP → ASN → registrar pattern → other domains. Follow the thread.</div></div>
+      <div class="method-step"><span class="method-num">04</span><div class="method-text"><strong>Cross-reference sources.</strong> Validate findings across at least two independent sources. Single-source IOCs are unreliable for attribution.</div></div>
+      <div class="method-step"><span class="method-num">05</span><div class="method-text"><strong>Map to ATT&CK.</strong> Translate infrastructure and behavioural findings to MITRE ATT&CK techniques to build a structured threat profile.</div></div>
+      <div class="method-step"><span class="method-num">06</span><div class="method-text"><strong>Document and share responsibly.</strong> Record all findings with timestamps and source citations. Share IOCs via structured formats (STIX/TAXII) where appropriate.</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="section">
+    <div class="section-title">Quick Reference – Tool by Use Case</div>
+    <table class="fw-table">
+      <thead><tr><th>Use Case</th><th>Primary Tool</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Find open ports on a suspicious IP</td><td>Shodan · Censys</td><td>Search by IP or ASN; check historical data for C2 patterns</td></tr>
+        <tr><td>Investigate a phishing domain</td><td>URLScan.io · VirusTotal</td><td>Screenshot + DOM inspection; check cert transparency logs</td></tr>
+        <tr><td>Attribute infrastructure to an actor</td><td>Censys · Robtex · HE BGP</td><td>Shared TLS certs and ASN pivoting are the strongest signals</td></tr>
+        <tr><td>Find email format for a target org</td><td>Hunter.io</td><td>Pair with HIBP to check for exposed credentials</td></tr>
+        <tr><td>Map relationships between entities</td><td>Maltego · SpiderFoot</td><td>Maltego for manual deep dives; SpiderFoot for automated breadth</td></tr>
+        <tr><td>Enrich an IOC with context</td><td>VirusTotal · AlienVault OTX</td><td>Check community pulses for actor attribution and related samples</td></tr>
+        <tr><td>Map TTPs to a threat group</td><td>MITRE ATT&CK</td><td>Use ATT&CK Navigator to build heatmaps per actor</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>window.ANTHROPIC_API_KEY = 'YOUR-API-KEY-HERE';</script>
+<script src="matrix.js"></script>
+</body>
+</html>
