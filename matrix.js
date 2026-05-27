@@ -106,7 +106,7 @@
   }
 
   /* ── PAGE TRANSITIONS ────────────────────────────────────── */
-  const DISSOLVE_CHARS = '01アイウエオカキクケコサシスセソタチツテト';
+  const DISSOLVE_CHARS = '01001101001011001ABCDEF10110100111001011';
 
   function dissolveOut(cb) {
     const overlay = document.getElementById('transition-overlay');
@@ -199,7 +199,7 @@
   }
 
   /* ── SCRAMBLE EFFECT ─────────────────────────────────────── */
-  const SCRAMBLE_CHARS = '01アイウエカキクケコサシスセソタチツテトナニヌネ';
+  const SCRAMBLE_CHARS = '01010011010010110011010111001101001011001110ABCDEF';
 
   function scrambleText(el) {
     const target = el.getAttribute('data-scramble') || el.textContent;
