@@ -186,6 +186,25 @@
   @media(max-width:800px){.two-col{grid-template-columns:1fr;}.metrics{grid-template-columns:repeat(2,1fr);}.pipeline{min-width:600px;}nav{padding:0 16px;}.hero,.section{padding-left:16px;padding-right:16px;}.container{padding:1.5rem 1rem;}}
 
 
+  body {
+    background-image: url('https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=2069&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+  /* Dark mode: deep indigo-black overlay */
+  [data-theme="dark"]  body::before { background: rgba(4,2,20,0.78); }
+  /* Light mode: neutral steel-grey, lets city colours breathe */
+  [data-theme="light"] body::before { background: rgba(28,32,40,0.72); }
+
+
   .page-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border2);position:relative;}
   .page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--accent) 0%,transparent 30%) top left / 60px 0.5px no-repeat,linear-gradient(180deg,var(--accent) 0%,transparent 55%) top left / 0.5px 38px no-repeat,linear-gradient(270deg,var(--tier-int) 0%,transparent 30%) bottom right / 60px 0.5px no-repeat,linear-gradient(0deg,var(--tier-int) 0%,transparent 55%) bottom right / 0.5px 38px no-repeat;opacity:0.45;}
   .page-subtitle{margin-top:0.5rem;color:var(--text2);font-size:1rem;}
@@ -194,10 +213,10 @@
   .breadcrumb span{margin:0 0.4rem;}
 
   .lab-steps{background:var(--glass);background-image:var(--card-scan);border:1px solid var(--border2);border-radius:5px;overflow:hidden;}
-  .lab-step{padding:12px 16px;border-bottom:0.5px solid var(--border2);display:flex;gap:12px;align-items:flex-start;font-size:14px;}
+  .lab-step{padding:13px 16px;border-bottom:0.5px solid var(--border2);display:flex;gap:12px;align-items:flex-start;font-size:14px;}
   .lab-step:last-child{border-bottom:none;}
-  .step-num{font-family:var(--font-mono);font-size:9px;color:var(--accent);background:var(--accent2);border:0.5px solid var(--border);border-radius:3px;padding:2px 7px;white-space:nowrap;margin-top:2px;}
-  .step-txt{color:var(--text2);font-family:var(--font-ui);line-height:1.55;}
+  .step-num{font-family:var(--font-mono);font-size:9px;color:var(--accent);background:var(--accent2);border:0.5px solid var(--border);border-radius:3px;padding:2px 7px;white-space:nowrap;margin-top:2px;flex-shrink:0;}
+  .step-txt{color:var(--text2);font-family:var(--font-ui);line-height:1.6;}
   .card{background:var(--glass);background-image:var(--card-scan);border:1px solid var(--border2);border-radius:5px;padding:16px;margin-bottom:10px;}
   .news-feed{background:var(--glass);background-image:var(--card-scan);border:1px solid var(--border2);border-radius:5px;overflow:hidden;}
   .news-feed-header{background:var(--bg2);border-bottom:0.5px solid var(--border2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
@@ -233,7 +252,7 @@
   .room-progress-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:140px;}
   .room-progress-label{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
   .room-progress-bar{width:140px;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
-  .room-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);width:0%;}
+  .room-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.6s;width:0%;}
   .room-tier-badge{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;padding:2px 8px;border-radius:3px;font-weight:700;border:1px solid;display:inline-block;margin-bottom:4px;transition:all 0.4s;}
   .tier-novice{color:var(--tier-nov)!important;border-color:var(--tier-nov)!important;background:var(--pip-nov)!important;}
   .tier-intermediate{color:var(--tier-int)!important;border-color:var(--tier-int)!important;background:var(--pip-int)!important;}
@@ -245,9 +264,7 @@
   .tier-pip.active[data-tier="1"]{border-color:var(--tier-int)!important;color:var(--tier-int)!important;background:var(--pip-int)!important;}
   .tier-pip.active[data-tier="2"]{border-color:var(--tier-hrd)!important;color:var(--tier-hrd)!important;background:var(--pip-hrd)!important;}
   .tier-pip.active[data-tier="3"]{border-color:var(--tier-exp)!important;color:var(--tier-exp)!important;background:var(--pip-exp)!important;}
-  .task-list{padding:0;}
-  .task-item{padding:16px 18px;border-bottom:0.5px solid var(--border2);}
-  .task-item:last-child{border-bottom:none;}
+  .task-list{padding:0;}.task-item{padding:16px 18px;border-bottom:0.5px solid var(--border2);}.task-item:last-child{border-bottom:none;}
   .task-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .task-number{font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:2px;border:0.5px solid;transition:all 0.4s;}
   .task-title-txt{font-size:14px;color:var(--text);font-weight:600;}
@@ -261,8 +278,7 @@
   .task-input.correct{border-color:var(--tier-nov);background:var(--pip-nov);}
   .task-input.wrong{border-color:var(--tier-exp);background:var(--pip-exp);}
   .execute-btn{font-family:var(--font-mono);font-size:11px;color:var(--accent);background:var(--accent2);border:1px solid var(--border);border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all 0.2s;}
-  .execute-btn:hover{background:var(--green-glow);}
-  .execute-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .execute-btn:hover{background:var(--green-glow);}.execute-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .task-feedback{margin-top:8px;font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:3px;display:none;}
   .task-feedback.show{display:block;}
   .task-feedback.ok{color:var(--tier-nov);background:var(--pip-nov);border:0.5px solid var(--tier-nov);}
@@ -280,240 +296,13 @@
   .cstat-val{font-family:var(--font-mono);font-size:18px;color:var(--accent);font-weight:700;}
   .cstat-label{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;}
   .completion-btn{font-family:var(--font-mono);font-size:11px;color:var(--accent);background:var(--accent2);border:1px solid var(--border);border-radius:4px;padding:9px 20px;cursor:pointer;letter-spacing:1px;margin:4px;transition:all 0.2s;}
-  .completion-btn:hover{background:var(--green-glow);}
-  .completion-btn.secondary{border-color:var(--border2);color:var(--text2);}
+  .completion-btn:hover{background:var(--green-glow);}.completion-btn.secondary{border-color:var(--border2);color:var(--text2);}
   #completion-canvas{position:absolute;inset:0;pointer-events:none;border-radius:8px;}
   @media(max-width:600px){.room-header{flex-direction:column;align-items:flex-start;}.task-input-row{flex-direction:column;}}
 
 </style>
 </head>
 <body>
-<svg class="city-layer" id="city-light" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="dr-g"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <radialGradient id="dr-smog" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#ff8c00" stop-opacity="0.07"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-  </defs>
-  <rect width="1440" height="900" fill="url(#dr-smog)"/>
-  <ellipse cx="200" cy="420" rx="280" ry="380" fill="rgba(80,50,20,0.22)" transform="rotate(-12,200,420)"/>
-  <ellipse cx="1280" cy="380" rx="260" ry="340" fill="rgba(80,50,20,0.18)" transform="rotate(14,1280,380)"/>
-  <g fill="#0e0802" opacity="0.88">
-    <rect x="0" y="260" width="80" height="640"/><rect x="12" y="210" width="44" height="690"/>
-    <rect x="88" y="275" width="75" height="625"/><rect x="100" y="228" width="38" height="672"/>
-    <rect x="172" y="258" width="88" height="642"/><rect x="186" y="208" width="52" height="692"/>
-    <rect x="272" y="272" width="82" height="628"/><rect x="285" y="225" width="42" height="675"/>
-    <rect x="368" y="262" width="86" height="638"/><rect x="382" y="214" width="48" height="686"/>
-    <rect x="468" y="270" width="80" height="630"/><rect x="480" y="222" width="40" height="678"/>
-    <rect x="562" y="255" width="90" height="645"/><rect x="578" y="205" width="54" height="695"/>
-    <rect x="664" y="268" width="84" height="632"/><rect x="678" y="220" width="44" height="680"/>
-    <rect x="760" y="258" width="88" height="642"/><rect x="775" y="210" width="52" height="690"/>
-    <rect x="860" y="265" width="82" height="635"/><rect x="873" y="218" width="42" height="682"/>
-    <rect x="954" y="255" width="90" height="645"/><rect x="970" y="206" width="54" height="694"/>
-    <rect x="1058" y="268" width="84" height="632"/><rect x="1072" y="220" width="44" height="680"/>
-    <rect x="1154" y="260" width="88" height="640"/><rect x="1168" y="212" width="52" height="688"/>
-    <rect x="1254" y="272" width="82" height="628"/><rect x="1268" y="225" width="42" height="675"/>
-    <rect x="1350" y="258" width="90" height="642"/>
-  </g>
-  <g fill="#140e04">
-    <rect x="0" y="368" width="110" height="532"/><rect x="10" y="308" width="64" height="592"/>
-    <rect x="120" y="382" width="105" height="518"/><rect x="132" y="322" width="60" height="578"/>
-    <rect x="238" y="372" width="112" height="528"/><rect x="252" y="312" width="66" height="588"/>
-    <rect x="364" y="380" width="108" height="520"/><rect x="378" y="320" width="62" height="580"/>
-    <rect x="488" y="368" width="114" height="532"/><rect x="502" y="308" width="68" height="592"/>
-    <rect x="618" y="375" width="110" height="525"/><rect x="632" y="315" width="64" height="585"/>
-    <rect x="744" y="365" width="116" height="535"/><rect x="760" y="305" width="70" height="595"/>
-    <rect x="876" y="372" width="112" height="528"/><rect x="890" y="312" width="66" height="588"/>
-    <rect x="1004" y="368" width="114" height="532"/><rect x="1018" y="308" width="68" height="592"/>
-    <rect x="1134" y="375" width="110" height="525"/><rect x="1148" y="315" width="64" height="585"/>
-    <rect x="1260" y="365" width="116" height="535"/><rect x="1276" y="305" width="70" height="595"/>
-    <rect x="1390" y="372" width="50" height="528"/>
-  </g>
-  <g fill="#1e1408">
-    <rect x="-10" y="478" width="145" height="422"/><rect x="4" y="408" width="85" height="492"/>
-    <rect x="150" y="465" width="138" height="435"/><rect x="165" y="395" width="80" height="505"/>
-    <rect x="308" y="472" width="142" height="428"/><rect x="324" y="402" width="84" height="498"/>
-    <rect x="472" y="462" width="140" height="438"/><rect x="488" y="392" width="82" height="508"/>
-    <rect x="640" y="475" width="144" height="425"/><rect x="657" y="405" width="86" height="495"/>
-    <rect x="820" y="468" width="142" height="432"/><rect x="838" y="398" width="84" height="502"/>
-    <rect x="1000" y="472" width="140" height="428"/><rect x="1018" y="402" width="82" height="498"/>
-    <rect x="1180" y="465" width="144" height="435"/><rect x="1198" y="395" width="86" height="505"/>
-    <rect x="1368" y="478" width="72" height="422"/>
-  </g>
-  <g filter="url(#dr-g)">
-    <rect x="14" y="392" width="58" height="18" fill="#ff8c00" opacity="0.92" rx="1"/>
-    <rect x="14" y="414" width="44" height="12" fill="#ff4400" opacity="0.75" rx="1"/>
-    <rect x="132" y="402" width="65" height="18" fill="#ffaa00" opacity="0.86" rx="1"/>
-    <rect x="132" y="424" width="48" height="11" fill="#ff6000" opacity="0.68" rx="1"/>
-    <rect x="258" y="394" width="60" height="18" fill="#ff8c00" opacity="0.90" rx="1"/>
-    <rect x="258" y="416" width="45" height="11" fill="#ff2200" opacity="0.72" rx="1"/>
-    <rect x="392" y="400" width="56" height="16" fill="#ffcc00" opacity="0.78" rx="1"/>
-    <rect x="512" y="392" width="62" height="18" fill="#ff8c00" opacity="0.88" rx="1"/>
-    <rect x="512" y="414" width="46" height="11" fill="#ff4400" opacity="0.72" rx="1"/>
-    <rect x="668" y="398" width="58" height="17" fill="#ffaa00" opacity="0.82" rx="1"/>
-    <rect x="848" y="394" width="60" height="18" fill="#ff8c00" opacity="0.90" rx="1"/>
-    <rect x="848" y="416" width="44" height="11" fill="#ff2200" opacity="0.70" rx="1"/>
-    <rect x="1024" y="400" width="56" height="16" fill="#ff6000" opacity="0.84" rx="1"/>
-    <rect x="1204" y="392" width="62" height="18" fill="#ff8c00" opacity="0.88" rx="1"/>
-    <rect x="1204" y="414" width="46" height="11" fill="#ffaa00" opacity="0.70" rx="1"/>
-    <rect x="1380" y="398" width="50" height="15" fill="#ffcc00" opacity="0.78" rx="1"/>
-    <rect x="28" y="445" width="46" height="13" fill="#ff2200" opacity="0.80" rx="1"/>
-    <rect x="170" y="440" width="52" height="13" fill="#ff3300" opacity="0.74" rx="1"/>
-    <rect x="326" y="445" width="48" height="13" fill="#ff2200" opacity="0.80" rx="1"/>
-    <rect x="502" y="440" width="50" height="13" fill="#ff3300" opacity="0.74" rx="1"/>
-    <rect x="680" y="445" width="46" height="13" fill="#ff2200" opacity="0.80" rx="1"/>
-    <rect x="862" y="438" width="52" height="13" fill="#ff3300" opacity="0.74" rx="1"/>
-    <rect x="1042" y="444" width="48" height="13" fill="#ff2200" opacity="0.80" rx="1"/>
-    <rect x="1222" y="440" width="50" height="13" fill="#ff3300" opacity="0.74" rx="1"/>
-  </g>
-  <rect x="0" y="720" width="1440" height="180" fill="#0a0600"/>
-  <line x1="0" y1="752" x2="1440" y2="752" stroke="rgba(255,140,0,0.16)" stroke-width="2"/>
-  <line x1="0" y1="772" x2="1440" y2="772" stroke="rgba(255,140,0,0.08)" stroke-width="1"/>
-  <g fill="rgba(255,140,0,0.20)">
-    <rect x="50" y="758" width="90" height="4" rx="2"/><rect x="200" y="758" width="90" height="4" rx="2"/>
-    <rect x="350" y="758" width="90" height="4" rx="2"/><rect x="500" y="758" width="90" height="4" rx="2"/>
-    <rect x="650" y="758" width="90" height="4" rx="2"/><rect x="800" y="758" width="90" height="4" rx="2"/>
-    <rect x="950" y="758" width="90" height="4" rx="2"/><rect x="1100" y="758" width="90" height="4" rx="2"/>
-    <rect x="1250" y="758" width="90" height="4" rx="2"/><rect x="1400" y="758" width="40" height="4" rx="2"/>
-  </g>
-  <rect x="0" y="720" width="1440" height="4" fill="rgba(255,140,0,0.22)"/>
-  <rect x="0" y="726" width="1440" height="2" fill="rgba(255,60,0,0.14)"/>
-</svg>
-<svg class="city-layer" id="city-dark" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="br-g"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="br-g2"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <radialGradient id="br-fire" cx="50%" cy="100%" r="60%"><stop offset="0%" stop-color="#ff4400" stop-opacity="0.20"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-    <radialGradient id="br-cold" cx="28%" cy="0%" r="70%"><stop offset="0%" stop-color="#1030ff" stop-opacity="0.30"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-    <radialGradient id="br-neb" cx="72%" cy="18%" r="55%"><stop offset="0%" stop-color="#8800ff" stop-opacity="0.22"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-  </defs>
-  <rect width="1440" height="900" fill="url(#br-cold)"/>
-  <rect width="1440" height="900" fill="url(#br-neb)"/>
-  <rect width="1440" height="900" fill="url(#br-fire)"/>
-  <g opacity="0.7">
-    <circle cx="80" cy="30" r="1.2" fill="white"/><circle cx="210" cy="22" r="1" fill="white"/>
-    <circle cx="360" cy="38" r="1.2" fill="white"/><circle cx="520" cy="18" r="1" fill="white"/>
-    <circle cx="680" cy="35" r="1.2" fill="white"/><circle cx="840" cy="24" r="1" fill="white"/>
-    <circle cx="1000" cy="40" r="1.2" fill="white"/><circle cx="1160" cy="16" r="1" fill="white"/>
-    <circle cx="1320" cy="32" r="1.2" fill="white"/>
-    <circle cx="140" cy="58" r="0.8" fill="rgba(150,180,255,0.8)"/>
-    <circle cx="440" cy="65" r="1" fill="rgba(150,180,255,0.8)"/>
-    <circle cx="760" cy="52" r="0.8" fill="rgba(150,180,255,0.8)"/>
-    <circle cx="1080" cy="62" r="1" fill="rgba(150,180,255,0.8)"/>
-    <circle cx="1380" cy="48" r="0.8" fill="rgba(150,180,255,0.8)"/>
-  </g>
-  <g fill="#06001c" stroke="rgba(50,80,255,0.22)" stroke-width="0.5">
-    <rect x="0" y="200" width="68" height="700"/><rect x="8" y="155" width="34" height="745"/>
-    <rect x="76" y="215" width="64" height="685"/><rect x="85" y="170" width="30" height="730"/>
-    <rect x="150" y="205" width="70" height="695"/><rect x="160" y="158" width="36" height="742"/>
-    <rect x="232" y="212" width="66" height="688"/><rect x="242" y="165" width="32" height="735"/>
-    <rect x="310" y="200" width="72" height="700"/><rect x="322" y="155" width="38" height="745"/>
-    <rect x="396" y="210" width="68" height="690"/><rect x="406" y="163" width="34" height="737"/>
-    <rect x="476" y="205" width="70" height="695"/><rect x="488" y="158" width="36" height="742"/>
-    <rect x="560" y="215" width="66" height="685"/><rect x="570" y="168" width="32" height="732"/>
-    <rect x="640" y="202" width="72" height="698"/><rect x="652" y="155" width="38" height="745"/>
-    <rect x="728" y="210" width="68" height="690"/><rect x="740" y="163" width="34" height="737"/>
-    <rect x="812" y="205" width="70" height="695"/><rect x="824" y="158" width="36" height="742"/>
-    <rect x="898" y="215" width="66" height="685"/><rect x="908" y="168" width="32" height="732"/>
-    <rect x="980" y="200" width="72" height="700"/><rect x="992" y="155" width="38" height="745"/>
-    <rect x="1068" y="210" width="68" height="690"/><rect x="1080" y="163" width="34" height="737"/>
-    <rect x="1152" y="205" width="70" height="695"/><rect x="1164" y="158" width="36" height="742"/>
-    <rect x="1238" y="215" width="66" height="685"/><rect x="1248" y="168" width="32" height="732"/>
-    <rect x="1320" y="200" width="72" height="700"/><rect x="1332" y="155" width="38" height="745"/>
-    <rect x="1408" y="210" width="32" height="690"/>
-  </g>
-  <g fill="#09002a">
-    <rect x="0" y="305" width="100" height="595"/><rect x="12" y="250" width="55" height="650"/>
-    <rect x="115" y="318" width="95" height="582"/><rect x="126" y="262" width="50" height="638"/>
-    <rect x="225" y="308" width="102" height="592"/><rect x="238" y="252" width="58" height="648"/>
-    <rect x="345" y="315" width="98" height="585"/><rect x="358" y="260" width="52" height="640"/>
-    <rect x="458" y="305" width="104" height="595"/><rect x="472" y="250" width="60" height="650"/>
-    <rect x="580" y="312" width="100" height="588"/><rect x="594" y="256" width="55" height="644"/>
-    <rect x="698" y="305" width="102" height="595"/><rect x="712" y="250" width="58" height="650"/>
-    <rect x="820" y="318" width="98" height="582"/><rect x="832" y="262" width="52" height="638"/>
-    <rect x="935" y="308" width="104" height="592"/><rect x="950" y="252" width="60" height="648"/>
-    <rect x="1058" y="315" width="100" height="585"/><rect x="1072" y="260" width="55" height="640"/>
-    <rect x="1178" y="305" width="102" height="595"/><rect x="1192" y="250" width="58" height="650"/>
-    <rect x="1300" y="312" width="98" height="588"/><rect x="1314" y="256" width="52" height="644"/>
-    <rect x="1408" y="305" width="32" height="595"/>
-  </g>
-  <g fill="#0c0032">
-    <rect x="-15" y="418" width="148" height="482"/><rect x="4" y="352" width="84" height="548"/>
-    <rect x="168" y="430" width="142" height="470"/><rect x="186" y="364" width="78" height="536"/>
-    <rect x="352" y="422" width="146" height="478"/><rect x="372" y="356" width="82" height="544"/>
-    <rect x="545" y="432" width="140" height="468"/><rect x="564" y="366" width="76" height="534"/>
-    <rect x="740" y="420" width="144" height="480"/><rect x="760" y="354" width="80" height="546"/>
-    <rect x="940" y="428" width="142" height="472"/><rect x="960" y="362" width="78" height="538"/>
-    <rect x="1140" y="422" width="146" height="478"/><rect x="1160" y="356" width="82" height="544"/>
-    <rect x="1345" y="430" width="95" height="470"/>
-  </g>
-  <g filter="url(#br-g2)">
-    <rect x="18" y="330" width="92" height="118" fill="rgba(30,80,255,0.22)" rx="3" stroke="rgba(80,140,255,0.55)" stroke-width="1.5"/>
-    <rect x="24" y="336" width="80" height="52" fill="rgba(50,100,255,0.32)" rx="2"/>
-    <rect x="24" y="394" width="80" height="14" fill="rgba(80,140,255,0.38)" rx="1"/>
-    <rect x="24" y="414" width="55" height="10" fill="rgba(80,140,255,0.22)" rx="1"/>
-    <rect x="680" y="325" width="88" height="112" fill="rgba(255,60,0,0.18)" rx="3" stroke="rgba(255,100,0,0.48)" stroke-width="1.5"/>
-    <rect x="686" y="331" width="76" height="46" fill="rgba(255,80,0,0.26)" rx="2"/>
-    <rect x="686" y="383" width="76" height="12" fill="rgba(255,120,0,0.32)" rx="1"/>
-    <rect x="914" y="330" width="92" height="118" fill="rgba(150,0,255,0.18)" rx="3" stroke="rgba(180,50,255,0.48)" stroke-width="1.5"/>
-    <rect x="920" y="336" width="80" height="50" fill="rgba(160,20,255,0.26)" rx="2"/>
-    <rect x="920" y="392" width="80" height="13" fill="rgba(180,50,255,0.30)" rx="1"/>
-    <rect x="1146" y="335" width="90" height="110" fill="rgba(0,180,200,0.16)" rx="3" stroke="rgba(0,220,240,0.42)" stroke-width="1.5"/>
-    <rect x="1152" y="341" width="78" height="46" fill="rgba(0,200,220,0.22)" rx="2"/>
-    <rect x="1152" y="393" width="78" height="12" fill="rgba(0,200,220,0.28)" rx="1"/>
-  </g>
-  <g filter="url(#br-g)">
-    <rect x="232" y="328" width="52" height="16" fill="#5080ff" opacity="0.75" rx="1"/>
-    <rect x="232" y="348" width="40" height="10" fill="#3060ee" opacity="0.58" rx="1"/>
-    <rect x="372" y="338" width="48" height="14" fill="#ff6600" opacity="0.68" rx="1"/>
-    <rect x="372" y="356" width="36" height="9" fill="#ff4400" opacity="0.52" rx="1"/>
-    <rect x="548" y="332" width="46" height="15" fill="#cc00ff" opacity="0.62" rx="1"/>
-    <rect x="548" y="351" width="34" height="9" fill="#aa00ee" opacity="0.48" rx="1"/>
-    <rect x="820" y="336" width="50" height="14" fill="#00ccff" opacity="0.65" rx="1"/>
-    <rect x="820" y="354" width="38" height="9" fill="#00aadd" opacity="0.50" rx="1"/>
-    <rect x="1068" y="330" width="44" height="15" fill="#5080ff" opacity="0.72" rx="1"/>
-    <rect x="1068" y="349" width="32" height="9" fill="#3060ee" opacity="0.55" rx="1"/>
-    <rect x="1320" y="338" width="40" height="13" fill="#ff6600" opacity="0.65" rx="1"/>
-    <rect x="1320" y="355" width="30" height="8" fill="#ff4400" opacity="0.50" rx="1"/>
-  </g>
-  <g stroke="rgba(80,120,255,0.09)" stroke-width="0.5">
-    <line x1="40" y1="0" x2="28" y2="160"/><line x1="120" y1="20" x2="108" y2="180"/>
-    <line x1="200" y1="0" x2="188" y2="165"/><line x1="280" y1="15" x2="268" y2="178"/>
-    <line x1="360" y1="0" x2="348" y2="168"/><line x1="440" y1="10" x2="428" y2="175"/>
-    <line x1="520" y1="0" x2="508" y2="162"/><line x1="600" y1="18" x2="588" y2="180"/>
-    <line x1="680" y1="0" x2="668" y2="166"/><line x1="760" y1="12" x2="748" y2="175"/>
-    <line x1="840" y1="0" x2="828" y2="168"/><line x1="920" y1="8" x2="908" y2="172"/>
-    <line x1="1000" y1="0" x2="988" y2="164"/><line x1="1080" y1="16" x2="1068" y2="178"/>
-    <line x1="1160" y1="0" x2="1148" y2="166"/><line x1="1240" y1="12" x2="1228" y2="175"/>
-    <line x1="1320" y1="0" x2="1308" y2="168"/><line x1="1400" y1="5" x2="1388" y2="170"/>
-    <line x1="80" y1="80" x2="68" y2="240"/><line x1="160" y1="90" x2="148" y2="250"/>
-    <line x1="240" y1="75" x2="228" y2="235"/><line x1="320" y1="88" x2="308" y2="248"/>
-    <line x1="400" y1="78" x2="388" y2="238"/><line x1="480" y1="85" x2="468" y2="245"/>
-    <line x1="560" y1="72" x2="548" y2="232"/><line x1="640" y1="90" x2="628" y2="250"/>
-    <line x1="720" y1="80" x2="708" y2="240"/><line x1="800" y1="84" x2="788" y2="244"/>
-    <line x1="880" y1="76" x2="868" y2="236"/><line x1="960" y1="88" x2="948" y2="248"/>
-    <line x1="1040" y1="78" x2="1028" y2="238"/><line x1="1120" y1="82" x2="1108" y2="242"/>
-    <line x1="1200" y1="75" x2="1188" y2="235"/><line x1="1280" y1="86" x2="1268" y2="246"/>
-    <line x1="1360" y1="79" x2="1348" y2="239"/>
-  </g>
-  <rect x="0" y="720" width="1440" height="180" fill="#030010"/>
-  <ellipse cx="720" cy="820" rx="600" ry="50" fill="rgba(255,68,0,0.07)"/>
-  <ellipse cx="280" cy="840" rx="240" ry="30" fill="rgba(50,80,255,0.05)"/>
-  <ellipse cx="1100" cy="830" rx="200" ry="25" fill="rgba(150,0,255,0.05)"/>
-  <rect x="0" y="718" width="1440" height="6" fill="rgba(255,80,0,0.08)"/>
-</svg>
-<script>
-(function(){
-  function showCity(t){
-    var l=document.getElementById('city-light');
-    var d=document.getElementById('city-dark');
-    if(l) l.style.display=(t==='light'?'block':'none');
-    if(d) d.style.display=(t==='dark'?'block':'none');
-  }
-  showCity(localStorage.getItem('opsec-theme')||'light');
-  window.addEventListener('themechange',function(e){
-    showCity(e.detail&&e.detail.theme?e.detail.theme:'light');
-  });
-})();
-</script>
 <div id="transition-overlay"></div>
 <canvas id="matrix-rain" aria-hidden="true"></canvas>
 <nav>
@@ -550,7 +339,7 @@
 <div class="container">
   <div class="page-header">
     <div class="breadcrumb"><a href="projects.html">Projects</a><span>/</span>Ransomware Analysis</div>
-    <h1 class="page-title">Ransomware Analysis</h1>
+    <h1 class="page-title" data-scramble="Ransomware Analysis">Ransomware Analysis</h1>
     <p class="page-subtitle">MITRE ATT&CK–mapped technique breakdowns across all ransomware kill chain phases.</p>
     
     <!-- Light: profile card -->
@@ -573,47 +362,26 @@
       <span class="wt-cursor"></span>
     </div>
   </div>
-
-  <div class="section">
-    <div class="section-title">Infection Chain</div>
+  <div class="section"><div class="section-title">Infection Chain</div>
     <div class="lab-steps">
       <div class="lab-step"><span class="step-num">01 · INITIAL ACCESS</span><span class="step-txt">Phishing emails with malicious Office macros (T1566.001), RDP brute-force (T1110), and exploit of public-facing applications (T1190). Primary telemetry: Event ID 4625/4624 spikes, macro execution alerts.</span></div>
       <div class="lab-step"><span class="step-num">02 · EXECUTION</span><span class="step-txt">PowerShell payload delivery (T1059.001), WMIC execution (T1047), scheduled tasks for persistence (T1053.005). Telemetry: Sysmon Event ID 1 process creation with encoded command lines.</span></div>
       <div class="lab-step"><span class="step-num">03 · PRIVILEGE ESCALATION</span><span class="step-txt">LSASS credential dumping (T1003.001), pass-the-hash lateral movement (T1550.002), Kerberoasting (T1558.003). Telemetry: LSASS access events, unusual TGS requests.</span></div>
-      <div class="lab-step"><span class="step-num">04 · IMPACT</span><span class="step-txt">Shadow copy deletion (T1490) via vssadmin, intermittent file encryption (T1486), data exfiltration before encryption for double-extortion. Telemetry: VSS deletion events, mass file rename activity.</span></div>
+      <div class="lab-step"><span class="step-num">04 · IMPACT</span><span class="step-txt">Shadow copy deletion (T1490) via vssadmin, intermittent file encryption (T1486), data exfiltration for double-extortion. Telemetry: VSS deletion events, mass file rename activity.</span></div>
       <div class="lab-step"><span class="step-num">05 · DEFENCE EVASION</span><span class="step-txt">Event log clearing (T1070.001), Windows Defender disabling via PowerShell, process injection (T1055), timestomping (T1070.006). Telemetry: wevtutil execution, MpPreference changes.</span></div>
     </div>
   </div>
-
-  <div class="section">
-    <div class="section-title">Ransomware Analyst Quiz Room — Sequential Challenge</div>
+  <div class="section"><div class="section-title">Ransomware Analyst Quiz Room — Sequential Challenge</div>
     <div class="room-terminal" id="room-terminal">
-      <div class="terminal-bar">
-        <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
-        <span class="terminal-title" id="terminal-title">ransomware-room.sh — tier 1: novice</span>
-      </div>
+      <div class="terminal-bar"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div><span class="terminal-title" id="terminal-title">ransomware-room.sh — tier 1: novice</span></div>
       <div class="room-header">
-        <div class="room-meta">
-          <div class="room-name" id="room-name">[ ROOM ] RANSOMWARE ANALYST — NOVICE</div>
-          <div class="room-desc" id="room-desc">Answer each task correctly to unlock the next. Complete all 4 to advance.</div>
-        </div>
-        <div class="room-progress-wrap">
-          <div class="room-tier-badge" id="room-tier-badge">NOVICE</div>
-          <div class="room-progress-label" id="room-progress-label">0 / 4 Tasks</div>
-          <div class="room-progress-bar"><div class="room-progress-fill" id="room-progress-fill"></div></div>
-          <div class="room-tier-track" id="room-tier-track">
-            <span class="tier-pip active" data-tier="0">N</span>
-            <span class="tier-pip" data-tier="1">I</span>
-            <span class="tier-pip" data-tier="2">H</span>
-            <span class="tier-pip" data-tier="3">E</span>
-          </div>
-        </div>
+        <div class="room-meta"><div class="room-name" id="room-name">[ ROOM ] RANSOMWARE ANALYST — NOVICE</div><div class="room-desc" id="room-desc">Answer each task correctly to unlock the next.</div></div>
+        <div class="room-progress-wrap"><div class="room-tier-badge" id="room-tier-badge">NOVICE</div><div class="room-progress-label" id="room-progress-label">0 / 4 Tasks</div><div class="room-progress-bar"><div class="room-progress-fill" id="room-progress-fill"></div></div><div class="room-tier-track" id="room-tier-track"><span class="tier-pip active" data-tier="0">N</span><span class="tier-pip" data-tier="1">I</span><span class="tier-pip" data-tier="2">H</span><span class="tier-pip" data-tier="3">E</span></div></div>
       </div>
       <div class="task-list" id="task-list"></div>
     </div>
   </div>
-</div>
-</main>
+</div></main>
 <footer>
   <span class="fbrand">[ DOMENICO :: OPSEC ] © 2026</span>
   <div class="flinks">
@@ -892,7 +660,6 @@ function raParticles(color){
 
 raRender(0);
 </script>
-<script>window.ANTHROPIC_API_KEY = 'YOUR-API-KEY-HERE';</script>
+<script>window.ANTHROPIC_API_KEY='YOUR-API-KEY-HERE';</script>
 <script src="matrix.js"></script>
-</body>
-</html>
+</body></html>
