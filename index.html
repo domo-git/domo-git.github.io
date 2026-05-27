@@ -2,57 +2,94 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
+<script>document.documentElement.setAttribute("data-theme",localStorage.getItem("opsec-theme")||"light");</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Domenico – Offensive Security Portfolio</title>
   <meta name="description" content="Offensive security portfolio specialising in adversary emulation, ransomware analysis and threat intelligence." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+  /* ── EARTHY FALL LIGHT ───────────────────────────────────── */
+  [data-theme="light"] {
+    --bg:          #f5ede0;
+    --bg2:         #ede0cd;
+    --bg3:         #e3d2b8;
+    --border:      rgba(139,58,15,0.22);
+    --border2:     rgba(139,58,15,0.10);
+    --accent:      #c4622d;
+    --accent2:     rgba(196,98,45,0.12);
+    --text:        #2c1810;
+    --text2:       #7a4a30;
+    --text3:       #b8865a;
+    --nav-bg:      rgba(245,237,224,0.92);
+    --scanline:    rgba(139,58,15,0.015);
+    --rain-opacity:0.18;
+    --hover-row:   rgba(139,58,15,0.04);
+    --card-scan:   none;
+    /* tier colours */
+    --tier-nov:    #3d6b20;
+    --tier-int:    #1a5a8a;
+    --tier-hrd:    #8a5500;
+    --tier-exp:    #8a1e1e;
+    --pip-nov:     rgba(61,107,32,0.18);
+    --pip-int:     rgba(26,90,138,0.18);
+    --pip-hrd:     rgba(138,85,0,0.18);
+    --pip-exp:     rgba(138,30,30,0.18);
+    --green-dim:   rgba(61,107,32,0.20);
+    --green-glow:  rgba(196,98,45,0.10);
+    --green:       #c4622d;
+    --red:         #8a1e1e;
+    --yellow:      #8a5500;
+    --blue:        #1a5a8a;
+    --cyan:        #2a6a5a;
+    --purple:      #6a2a6a;
+  }
+
+  /* ── CYBERPUNK CHARTREUSE DARK ───────────────────────────── */
+  [data-theme="dark"] {
+    --bg:          #04060a;
+    --bg2:         #080c12;
+    --bg3:         #0d1118;
+    --border:      rgba(180,255,0,0.18);
+    --border2:     rgba(180,255,0,0.07);
+    --accent:      #b4ff00;
+    --accent2:     rgba(180,255,0,0.09);
+    --text:        #e8f4e0;
+    --text2:       #5a7a4a;
+    --text3:       #2a3a1a;
+    --nav-bg:      rgba(4,6,10,0.94);
+    --scanline:    rgba(180,255,0,0.012);
+    --rain-opacity:0.22;
+    --hover-row:   rgba(180,255,0,0.03);
+    --card-scan:   repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(180,255,0,0.012) 3px,rgba(180,255,0,0.012) 6px);
+    /* tier colours */
+    --tier-nov:    #b4ff00;
+    --tier-int:    #ff2d78;
+    --tier-hrd:    #ffe000;
+    --tier-exp:    #ff4400;
+    --pip-nov:     rgba(180,255,0,0.10);
+    --pip-int:     rgba(255,45,120,0.10);
+    --pip-hrd:     rgba(255,224,0,0.10);
+    --pip-exp:     rgba(255,68,0,0.10);
+    --green-dim:   rgba(180,255,0,0.20);
+    --green-glow:  rgba(180,255,0,0.09);
+    --green:       #b4ff00;
+    --red:         #ff4400;
+    --yellow:      #ffe000;
+    --blue:        #4488ff;
+    --cyan:        #00ddff;
+    --purple:      #cc00cc;
+  }
+
     :root {
       --mono: 'Share Tech Mono', 'Courier New', monospace;
       --ui: 'Rajdhani', system-ui, sans-serif;
     }
 
-    [data-theme="dark"] {
-      --bg:          #0a0c0f;
-      --bg2:         #0f1215;
-      --bg3:         #141820;
-      --green:       #39d353;
-      --green-dim:   rgba(57,211,83,0.10);
-      --green-b:     rgba(57,211,83,0.20);
-      --text:        #ccdacc;
-      --text2:       #6a8a6a;
-      --text3:       #384838;
-      --border:      rgba(57,211,83,0.14);
-      --border2:     rgba(57,211,83,0.06);
-      --blue:        #4a9eff;
-      --amber:       #f5a623;
-      --red:         #e84040;
-      --nav-bg:      rgba(10,12,15,0.80);
-      --ticker-bg:   rgba(57,211,83,0.05);
-      --scanline:    rgba(0,255,0,0.016);
-    }
+    
 
-    [data-theme="light"] {
-      --bg:          #f0f4f0;
-      --bg2:         #ffffff;
-      --bg3:         #e6ece6;
-      --green:       #1a7a2e;
-      --green-dim:   rgba(26,122,46,0.08);
-      --green-b:     rgba(26,122,46,0.22);
-      --text:        #0e1f0e;
-      --text2:       #3d6640;
-      --text3:       #8aaa8a;
-      --border:      rgba(26,122,46,0.20);
-      --border2:     rgba(26,122,46,0.08);
-      --blue:        #1a5fa0;
-      --amber:       #9a6008;
-      --red:         #b02020;
-      --nav-bg:      rgba(240,244,240,0.85);
-      --ticker-bg:   rgba(26,122,46,0.05);
-      --scanline:    rgba(0,100,0,0.010);
-    }
+    
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -184,28 +221,108 @@
 
     /* HERO */
     .hero {
-      padding: 44px 24px 36px;
+      padding: 36px 24px 32px;
       border-bottom: 0.5px solid var(--border2);
+      position: relative;
     }
-    .hero-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 3px; margin-bottom: 12px; }
+    /* Circuit corner decorations */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--accent) 0%, transparent 40%) top left / 60px 0.5px no-repeat,
+        linear-gradient(180deg, var(--accent) 0%, transparent 60%) top left / 0.5px 40px no-repeat,
+        linear-gradient(270deg, var(--accent) 0%, transparent 40%) bottom right / 60px 0.5px no-repeat,
+        linear-gradient(0deg, var(--accent) 0%, transparent 60%) bottom right / 0.5px 40px no-repeat;
+      opacity: 0.45;
+    }
+    [data-theme="dark"] .hero::before { opacity: 0.55; }
+
+    .hero-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 3px; margin-bottom: 10px; }
+
+    /* Orbitron name */
     .hero-name {
-      font-family: var(--mono); font-size: clamp(26px,5vw,42px);
-      color: var(--green); letter-spacing: 6px; line-height: 1;
-      margin-bottom: 10px;
-      text-shadow: 0 0 36px rgba(57,211,83,0.22);
+      font-family: 'Orbitron', var(--mono);
+      font-weight: 900;
+      font-size: clamp(22px, 4.5vw, 40px);
+      color: var(--accent);
+      letter-spacing: 6px; line-height: 1;
+      margin-bottom: 16px;
     }
-    [data-theme="light"] .hero-name { text-shadow: none; }
-    .hero-sub { font-family: var(--mono); font-size: 12px; color: var(--text2); margin-bottom: 24px; line-height: 1.8; }
-    .hero-sub em { color: var(--green); font-style: normal; }
+    [data-theme="dark"] .hero-name { filter: drop-shadow(0 0 10px var(--accent)); }
+
+    /* WHOAMI — Light mode: profile card */
+    .whoami-card {
+      border: 0.5px solid var(--border);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      display: none;
+    }
+    [data-theme="light"] .whoami-card { display: block; }
+    .wc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-bottom: 0.5px solid var(--border);
+      background: var(--bg2);
+    }
+    .wc-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--accent2); border: 0.5px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 10px; color: var(--accent);
+      font-weight: 700; flex-shrink: 0;
+    }
+    .wc-name { font-family: var(--mono); font-size: 12px; color: var(--text); font-weight: 600; letter-spacing: 1px; }
+    .wc-role { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+    .wc-row {
+      display: flex; align-items: center;
+      border-bottom: 0.5px solid var(--border2);
+      font-family: var(--mono); font-size: 10px;
+      background: var(--bg2);
+    }
+    .wc-row:last-child { border-bottom: none; }
+    .wc-key {
+      width: 72px; flex-shrink: 0; padding: 7px 12px;
+      color: var(--text3); border-right: 0.5px solid var(--border2); letter-spacing: 1px;
+    }
+    .wc-val { padding: 7px 12px; color: var(--text2); flex: 1; }
+    .wc-val em { color: var(--accent); font-style: normal; font-weight: 700; }
+    .online-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4a8a2a; margin-right: 5px; vertical-align: middle; }
+
+    /* WHOAMI — Dark mode: terminal */
+    .whoami-terminal {
+      font-family: var(--mono); font-size: 11px; line-height: 2;
+      padding: 12px 14px; border: 0.5px solid var(--border);
+      border-radius: 4px; background: rgba(180,255,0,0.04);
+      color: var(--text2); margin-bottom: 18px; display: none;
+    }
+    .whoami-terminal::before {
+      content: 'OPSEC@portfolio:~$ whoami';
+      display: block; font-size: 10px; color: var(--text3);
+      margin-bottom: 6px; letter-spacing: 1px;
+    }
+    [data-theme="dark"] .whoami-terminal { display: block; }
+    .wt-key { color: var(--accent); }
+    .wt-val { color: var(--text2); }
+    .wt-good { color: #4aaa2a; }
+    .wt-cursor {
+      display: inline-block; width: 7px; height: 12px;
+      background: var(--accent); vertical-align: middle;
+      animation: blink-cur 1s step-end infinite;
+    }
+    @keyframes blink-cur { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .hero-sub { font-family: var(--mono); font-size: 12px; color: var(--text2); margin-bottom: 20px; line-height: 1.8; }
+    .hero-sub em { color: var(--accent); font-style: normal; }
     .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn-p {
-      font-family: var(--mono); font-size: 11px; color: var(--green);
-      background: var(--green-dim); border: 0.5px solid var(--green);
+      font-family: var(--mono); font-size: 11px; color: var(--accent);
+      background: var(--accent2); border: 0.5px solid var(--accent);
       border-radius: 4px; padding: 8px 16px; cursor: pointer;
       letter-spacing: 1.5px; text-decoration: none; display: inline-block;
       transition: background 0.2s;
     }
-    .btn-p:hover { background: rgba(57,211,83,0.17); }
+    .btn-p:hover { background: var(--green-glow); }
     .btn-g {
       font-family: var(--mono); font-size: 11px; color: var(--text2);
       background: transparent; border: 0.5px solid var(--border);
@@ -393,8 +510,46 @@
   <section class="hero" data-fadein>
     <p class="hero-label">OFFENSIVE SECURITY PORTFOLIO</p>
     <h1 class="hero-name" data-glitch>DOMENICO</h1>
+
+    <!-- LIGHT MODE: Profile card -->
+    <div class="whoami-card">
+      <div class="wc-header">
+        <div class="wc-avatar">DG</div>
+        <div>
+          <div class="wc-name">DOMENICO G.</div>
+          <div class="wc-role">OFFENSIVE SECURITY ANALYST</div>
+        </div>
+      </div>
+      <div class="wc-row">
+        <div class="wc-key">STATUS</div>
+        <div class="wc-val"><span class="online-dot"></span><em>Open to opportunities</em></div>
+      </div>
+      <div class="wc-row">
+        <div class="wc-key">ROLE</div>
+        <div class="wc-val">Adversary Emulation · Threat Intel</div>
+      </div>
+      <div class="wc-row">
+        <div class="wc-key">FOCUS</div>
+        <div class="wc-val">Certified Ethical Hacking</div>
+      </div>
+      <div class="wc-row">
+        <div class="wc-key">GITHUB</div>
+        <div class="wc-val"><em>domo-git</em></div>
+      </div>
+    </div>
+
+    <!-- DARK MODE: Terminal whoami -->
+    <div class="whoami-terminal">
+      <span class="wt-key">  name   </span><span class="wt-val">→ Domenico G.</span><br>
+      <span class="wt-key">  role   </span><span class="wt-val">→ Offensive Security Analyst</span><br>
+      <span class="wt-key">  status </span><span class="wt-val">→ </span><span class="wt-good">open to opportunities</span><br>
+      <span class="wt-key">  focus  </span><span class="wt-val">→ Certified Ethical Hacking</span><br>
+      <span class="wt-key">  links  </span><span class="wt-val">→ github.com/domo-git</span><br>
+      <span class="wt-cursor"></span>
+    </div>
+
     <p class="hero-sub">
-      Specialising in adversary emulation · ransomware analysis · <em>threat intelligence</em>
+      Adversary emulation · ransomware analysis · <em>threat intelligence</em>
     </p>
     <div class="hero-btns">
       <a class="btn-p" href="projects.html" data-nav>VIEW PROJECTS</a>
