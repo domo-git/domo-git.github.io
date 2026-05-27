@@ -62,15 +62,15 @@
       const theme = document.documentElement.getAttribute('data-theme');
       if (theme === 'light') {
         return {
-          fade:   'rgba(242, 246, 242, 0.15)',
-          bright: 'rgba(20, 100, 40, 0.80)',
-          dim:    'rgba(20, 100, 40, 0.28)',
+          fade:   'rgba(245, 237, 224, 0.18)',
+          bright: 'rgba(139, 58, 15, 0.55)',
+          dim:    'rgba(139, 58, 15, 0.18)',
         };
       }
       return {
-        fade:   'rgba(10, 12, 15, 0.10)',
-        bright: 'rgba(57, 211, 83, 0.90)',
-        dim:    'rgba(57, 211, 83, 0.28)',
+        fade:   'rgba(4, 6, 10, 0.12)',
+        bright: 'rgba(180, 255, 0, 0.90)',
+        dim:    'rgba(180, 255, 0, 0.22)',
       };
     }
 
