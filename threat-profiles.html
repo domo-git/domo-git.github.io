@@ -4,10 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Threat Actor Profiling – Domenico</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  [data-theme="dark"]{--bg:#0a0c0f;--bg2:#0d1117;--bg3:#161b22;--border:#21262d;--border-accent:#30363d;--green:#39d353;--green-dim:#1a6b2a;--green-glow:rgba(57,211,83,0.10);--red:#f85149;--yellow:#e3b341;--blue:#58a6ff;--cyan:#79c0ff;--text:#c9d1d9;--text-dim:#8b949e;--text-bright:#f0f6fc;--nav-bg:rgba(13,17,23,0.88);--scanline:rgba(0,0,0,0.04);--rain-opacity:0.25;--hover-row:rgba(255,255,255,0.015);}
-  [data-theme="light"]{--bg:#f0f4f0;--bg2:#ffffff;--bg3:#e6ece6;--border:#d0dbd0;--border-accent:#b8ccb8;--green:#1a7a2e;--green-dim:#c8e6c9;--green-glow:rgba(26,122,46,0.08);--red:#b02020;--yellow:#9a6008;--blue:#1a5fa0;--cyan:#1a7a8a;--text:#0e1f0e;--text-dim:#3d6640;--text-bright:#0a140a;--nav-bg:rgba(240,244,240,0.88);--scanline:rgba(0,80,0,0.015);--rain-opacity:0.12;--hover-row:rgba(0,0,0,0.02);}
+  /* ── EARTHY FALL LIGHT ───────────────────────────────────── */
+  [data-theme="light"] {
+    --bg:          #f5ede0;
+    --bg2:         #ede0cd;
+    --bg3:         #e3d2b8;
+    --border:      rgba(139,58,15,0.22);
+    --border2:     rgba(139,58,15,0.10);
+    --accent:      #c4622d;
+    --accent2:     rgba(196,98,45,0.12);
+    --text:        #2c1810;
+    --text2:       #7a4a30;
+    --text3:       #b8865a;
+    --nav-bg:      rgba(245,237,224,0.92);
+    --scanline:    rgba(139,58,15,0.015);
+    --rain-opacity:0.18;
+    --hover-row:   rgba(139,58,15,0.04);
+    --card-scan:   none;
+    /* tier colours */
+    --tier-nov:    #3d6b20;
+    --tier-int:    #1a5a8a;
+    --tier-hrd:    #8a5500;
+    --tier-exp:    #8a1e1e;
+    --pip-nov:     rgba(61,107,32,0.18);
+    --pip-int:     rgba(26,90,138,0.18);
+    --pip-hrd:     rgba(138,85,0,0.18);
+    --pip-exp:     rgba(138,30,30,0.18);
+    --green-dim:   rgba(61,107,32,0.20);
+    --green-glow:  rgba(196,98,45,0.10);
+    --green:       #c4622d;
+    --red:         #8a1e1e;
+    --yellow:      #8a5500;
+    --blue:        #1a5a8a;
+    --cyan:        #2a6a5a;
+    --purple:      #6a2a6a;
+  }
+
+  /* ── CYBERPUNK CHARTREUSE DARK ───────────────────────────── */
+  [data-theme="dark"] {
+    --bg:          #04060a;
+    --bg2:         #080c12;
+    --bg3:         #0d1118;
+    --border:      rgba(180,255,0,0.18);
+    --border2:     rgba(180,255,0,0.07);
+    --accent:      #b4ff00;
+    --accent2:     rgba(180,255,0,0.09);
+    --text:        #e8f4e0;
+    --text2:       #5a7a4a;
+    --text3:       #2a3a1a;
+    --nav-bg:      rgba(4,6,10,0.94);
+    --scanline:    rgba(180,255,0,0.012);
+    --rain-opacity:0.22;
+    --hover-row:   rgba(180,255,0,0.03);
+    --card-scan:   repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(180,255,0,0.012) 3px,rgba(180,255,0,0.012) 6px);
+    /* tier colours */
+    --tier-nov:    #b4ff00;
+    --tier-int:    #ff2d78;
+    --tier-hrd:    #ffe000;
+    --tier-exp:    #ff4400;
+    --pip-nov:     rgba(180,255,0,0.10);
+    --pip-int:     rgba(255,45,120,0.10);
+    --pip-hrd:     rgba(255,224,0,0.10);
+    --pip-exp:     rgba(255,68,0,0.10);
+    --green-dim:   rgba(180,255,0,0.20);
+    --green-glow:  rgba(180,255,0,0.09);
+    --green:       #b4ff00;
+    --red:         #ff4400;
+    --yellow:      #ffe000;
+    --blue:        #4488ff;
+    --cyan:        #00ddff;
+    --purple:      #cc00cc;
+  }
+
+  
+  
   :root{--font-mono:'Share Tech Mono',monospace;--font-ui:'Rajdhani',sans-serif;}
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 16px; line-height: 1.6; min-height: 100vh; transition: background 0.25s, color 0.25s; }
@@ -175,7 +247,106 @@
     .room-header { flex-direction: column; align-items: flex-start; }
     .room-progress-wrap { align-items: flex-start; }
   }
-</style>
+
+    /* ── ORBITRON NAME ─────────────────────────────────────── */
+    .page-title, .hero-name {
+      font-family: 'Orbitron', var(--font-mono, monospace) !important;
+      font-weight: 900 !important;
+      color: var(--accent) !important;
+      letter-spacing: 5px;
+    }
+    [data-theme="dark"] .page-title,
+    [data-theme="dark"] .hero-name {
+      filter: drop-shadow(0 0 8px var(--accent));
+    }
+    /* ── CIRCUIT HERO CORNERS ─────────────────────────────── */
+    .page-header {
+      position: relative;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--accent) 0%, transparent 40%) top left / 50px 0.5px no-repeat,
+        linear-gradient(180deg, var(--accent) 0%, transparent 60%) top left / 0.5px 34px no-repeat,
+        linear-gradient(270deg, var(--accent) 0%, transparent 40%) bottom right / 50px 0.5px no-repeat,
+        linear-gradient(0deg, var(--accent) 0%, transparent 60%) bottom right / 0.5px 34px no-repeat;
+      opacity: 0.4;
+    }
+    /* ── WHOAMI CARD (light) ─────────────────────────────── */
+    .whoami-card {
+      border: 0.5px solid var(--border);
+      border-radius: 5px; overflow: hidden;
+      margin-bottom: 16px; display: none;
+    }
+    [data-theme="light"] .whoami-card { display: block; }
+    .wc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 13px; border-bottom: 0.5px solid var(--border);
+      background: var(--bg2);
+    }
+    .wc-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent2); border: 0.5px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono, monospace); font-size: 10px;
+      color: var(--accent); font-weight: 700; flex-shrink: 0;
+    }
+    .wc-name { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text); font-weight: 600; letter-spacing: 1px; }
+    .wc-role { font-family: var(--font-mono, monospace); font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+    .wc-row {
+      display: flex; align-items: center;
+      border-bottom: 0.5px solid var(--border2);
+      font-family: var(--font-mono, monospace); font-size: 10px;
+      background: var(--bg2);
+    }
+    .wc-row:last-child { border-bottom: none; }
+    .wc-key { width: 70px; flex-shrink: 0; padding: 6px 11px; color: var(--text3); border-right: 0.5px solid var(--border2); letter-spacing: 1px; }
+    .wc-val { padding: 6px 11px; color: var(--text2); flex: 1; }
+    .wc-val em { color: var(--accent); font-style: normal; font-weight: 700; }
+    .online-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4a8a2a; margin-right: 5px; vertical-align: middle; }
+    /* ── WHOAMI TERMINAL (dark) ─────────────────────────── */
+    .whoami-terminal {
+      font-family: var(--font-mono, monospace); font-size: 11px; line-height: 2;
+      padding: 11px 13px; border: 0.5px solid var(--border);
+      border-radius: 4px; background: rgba(180,255,0,0.04);
+      color: var(--text2); margin-bottom: 16px; display: none;
+    }
+    .whoami-terminal::before {
+      content: 'OPSEC@portfolio:~$ whoami';
+      display: block; font-size: 10px; color: var(--text3);
+      margin-bottom: 5px; letter-spacing: 1px;
+    }
+    [data-theme="dark"] .whoami-terminal { display: block; }
+    .wt-key { color: var(--accent); }
+    .wt-val { color: var(--text2); }
+    .wt-good { color: #4aaa2a; }
+    .wt-cursor {
+      display: inline-block; width: 7px; height: 12px;
+      background: var(--accent); vertical-align: middle;
+      animation: blink-wt 1s step-end infinite;
+    }
+    @keyframes blink-wt { 0%,100%{opacity:1} 50%{opacity:0} }
+    /* ── TIER COLOURS ────────────────────────────────────── */
+    .tier-novice       { color: var(--tier-nov) !important; border-color: var(--tier-nov) !important; background: var(--pip-nov) !important; }
+    .tier-intermediate { color: var(--tier-int) !important; border-color: var(--tier-int) !important; background: var(--pip-int) !important; }
+    .tier-hard         { color: var(--tier-hrd) !important; border-color: var(--tier-hrd) !important; background: var(--pip-hrd) !important; }
+    .tier-expert       { color: var(--tier-exp) !important; border-color: var(--tier-exp) !important; background: var(--pip-exp) !important; }
+    .tier-pip.active[data-tier="0"] { border-color: var(--tier-nov) !important; color: var(--tier-nov) !important; background: var(--pip-nov) !important; }
+    .tier-pip.active[data-tier="1"] { border-color: var(--tier-int) !important; color: var(--tier-int) !important; background: var(--pip-int) !important; }
+    .tier-pip.active[data-tier="2"] { border-color: var(--tier-hrd) !important; color: var(--tier-hrd) !important; background: var(--pip-hrd) !important; }
+    .tier-pip.active[data-tier="3"] { border-color: var(--tier-exp) !important; color: var(--tier-exp) !important; background: var(--pip-exp) !important; }
+    /* ── CRT SCANLINES on dark cards ────────────────────── */
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .proj-card,
+    [data-theme="dark"] .project-card,
+    [data-theme="dark"] .news-feed,
+    [data-theme="dark"] .room-terminal,
+    [data-theme="dark"] .soc-terminal {
+      background-image: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(180,255,0,0.012) 3px,rgba(180,255,0,0.012) 6px) !important;
+    }
+
+  </style>
 </head>
 <body>
 <canvas id="matrix-rain" aria-hidden="true"></canvas>
@@ -216,6 +387,31 @@
   <div class="page-header">
     <div class="breadcrumb"><a href="projects.html">Projects</a><span>/</span>Threat Actor Profiling</div>
     <h1 class="page-title">Threat Actor Profiling</h1>
+
+    <!-- LIGHT MODE: Profile card -->
+    <div class="whoami-card">
+      <div class="wc-header">
+        <div class="wc-avatar">DG</div>
+        <div>
+          <div class="wc-name">DOMENICO G.</div>
+          <div class="wc-role">OFFENSIVE SECURITY ANALYST</div>
+        </div>
+      </div>
+      <div class="wc-row"><div class="wc-key">STATUS</div><div class="wc-val"><span class="online-dot"></span><em>Open to opportunities</em></div></div>
+      <div class="wc-row"><div class="wc-key">ROLE</div><div class="wc-val">Adversary Emulation · Threat Intel</div></div>
+      <div class="wc-row"><div class="wc-key">FOCUS</div><div class="wc-val">Certified Ethical Hacking</div></div>
+      <div class="wc-row"><div class="wc-key">GITHUB</div><div class="wc-val"><em>domo-git</em></div></div>
+    </div>
+    <!-- DARK MODE: Terminal whoami -->
+    <div class="whoami-terminal">
+      <span class="wt-key">  name   </span><span class="wt-val">→ Domenico G.</span><br>
+      <span class="wt-key">  role   </span><span class="wt-val">→ Offensive Security Analyst</span><br>
+      <span class="wt-key">  status </span><span class="wt-val">→ </span><span class="wt-good">open to opportunities</span><br>
+      <span class="wt-key">  focus  </span><span class="wt-val">→ Certified Ethical Hacking</span><br>
+      <span class="wt-key">  links  </span><span class="wt-val">→ github.com/domo-git</span><br>
+      <span class="wt-cursor"></span>
+    </div>
+
     <p class="page-subtitle">Ransomware TTP Analysis &amp; Live Threat Intelligence</p>
   </div>
 
